@@ -1,0 +1,15 @@
+Dinge, die du hier lernen wirst:
+- Anlegen einer Konfigurationsdatei im YAML-Format
+- Globale Variablen in Klassen verwenden
+- Was ist YAML?
+- Einlesen einer Konfigurationsdatei
+- Speichern der Sprache
+- Verwenden einzelner Konfigurationen
+
+conda create -n 03_configuration_management python=3.7
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 03_configuration_management python=3.6
+
+conda activate 03_configuration_management

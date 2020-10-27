@@ -1,0 +1,25 @@
+Dinge, die du hier lernen wirst:
+- Laden von Modelldaten
+- Umwandlung von Sprache in Text
+- Umschalten zwischen dem Warte- und dem Befehlsmodus
+- Unterscheiden von Modellgüten
+- Verarbeiten von Daten im JSON Format
+
+conda create -n 05_speech_to_text python=3.8
+
+Download des vortrainierten Modells von https://alphacephei.com/vosk/models:
+
+Großes Modell (höhere Genauigkeit):
+https://alphacephei.com/vosk/models/vosk-model-de-0.6.zip
+
+ODER Kleineres Modell (lädt schneller, für mobile Devices oder einen Raspberry):
+https://alphacephei.com/vosk/models/vosk-model-small-de-zamia-0.3.zip
+
+UND das Modell zur Erkennung der Sprecher:
+https://alphacephei.com/vosk/models/vosk-model-spk-0.4.zip
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 05_speech_to_text python=3.6
+
+conda activate 05_speech_to_text

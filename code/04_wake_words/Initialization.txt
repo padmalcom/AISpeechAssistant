@@ -1,0 +1,16 @@
+Dinge, die du hier lernen wirst:
+- Installation eines Wheel Files
+- Audioeingabe und -Verarbeitung über pyAudio
+- Erkennen eines Aktivierungsworts über Porcupine
+- Unterscheiden zwischen verschiedenen Aktivierungswörtern
+
+conda create -n 04_wake_words python=3.7
+
+Manueller Download von pyaudio für windows:
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio->PyAudio‑0.2.11‑cp37‑cp37m‑win_amd64.whl
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 04_wake_words python=3.6
+
+conda activate 04_wake_words

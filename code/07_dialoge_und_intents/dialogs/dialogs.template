@@ -1,0 +1,4 @@
+{% block %}
+    {% client %}(wie spät ist es|wie viel uhr ist es|was sagt die uhr){% endclient %}
+    {% response %}{% call time: 0 %}{% endresponse %}
+{% endblock %}

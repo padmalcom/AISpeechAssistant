@@ -1,0 +1,7 @@
+certifi==2020.6.20
+comtypes==1.1.7
+pypiwin32==223
+pyttsx3==2.90
+pywin32==228
+PyYAML==5.3.1
+wincertstore==0.2

@@ -1,0 +1,15 @@
+Dinge, die du hier lernen wirst:
+- Erstellen einer einfachen Anwendung
+- Logging und Log-Level
+- Erstellen einer Klasse
+- Erstellen einer Klassenmethode
+- Erstellen einer __init__-Funktion
+
+conda create -n 01_hello_world python=3.7
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 01_hello_world python=3.6
+
+
+conda activate 01_hello_world
