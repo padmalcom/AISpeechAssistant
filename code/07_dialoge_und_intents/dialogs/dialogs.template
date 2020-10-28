@@ -2,3 +2,8 @@
     {% client %}(wie spät ist es|wie viel uhr ist es|was sagt die uhr){% endclient %}
     {% response %}{% call time: 0 %}{% endresponse %}
 {% endblock %}
+
+{% block %}
+    {% client %}(stop|halt|stopp|schweigefuchs){% endclient %}
+    {% response %}{% call stop: 0 %}{% endresponse %}
+{% endblock %}

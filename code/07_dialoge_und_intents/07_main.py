@@ -27,9 +27,16 @@ logging.getLogger('comtypes._comobject').setLevel(logging.WARNING)
 CONFIG_FILE = "config.yml"
 
 @register_call("time")
-def getTime(empty, session_id = "general"):
+def getTime(dummy, session_id = "general"):
 	now = datetime.now()
 	return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten."
+	
+@register_call("stop")
+def stop(empty, session_id = "general"):
+	if va.tts.is_busy():
+		va.tts.stop()
+		return "okay ich bin still"
+	return "Ich sage doch garnichts"
 
 class VoiceAssistant():
 
@@ -99,25 +106,19 @@ class VoiceAssistant():
 		#self.MAIN_FILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 		#self.DIALOG_TEMPLATE = self.MAIN_FILE_DIR + "/dialogs/dialogs.template"
 		logger.info("Initialisiere Chatbot...")
-		self.dialog_template_path = './dialogs/dialogs.template'
-		if os.path.isfile(self.dialog_template_path):
-			self.chat = Chat(default_template=self.dialog_template_path, language='de')
+		dialog_template_path = './dialogs/dialogs.template'
+		if os.path.isfile(dialog_template_path):
+			self.chat = Chat(dialog_template_path)
 		else:
-			logger.error('Dialogdatei konnte nicht in %s gefunden werden.', self.dialog_template_path)
+			logger.error('Dialogdatei konnte nicht in %s gefunden werden.', dialog_template_path)
 			sys.exit(1)
-		logger.info('Chatbot aus %s initialisiert.', self.dialog_template_path)
+		logger.info('Chatbot aus %s initialisiert.', dialog_template_path)
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
 	def __detectSpeaker__(self, input):
 		bestSpeaker = None
 		bestCosDist = 100
 		for speaker in self.user_management.speaker_table.all():
-			# Die Cosinus-Ähnlichkeit interpretiert das Muster des gespeicherten Sprechers
-			# und des aktuellen Sprechers als Vektor und berechnet deren Distanz über
-			# den Cosinus-Winkel zwischen den Vektoren. Je kleiner der Winkel, desto ähnlicher
-			# sind die beiden Stimmen. Der Wert liegt immer zwischen 0.0 und 1.0 wobei 0.0 eine
-			# absolute Ähnlichkeit bedeutet. Wir setzen 0.3 als Schwelle für die Ähnlichkeit
-			# gemäß MUP (Methode des unbekümmerten Probierens).
 			nx = np.array(speaker.get('voice'))
 			ny = np.array(input)
 			cosDist = 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
@@ -152,15 +153,7 @@ if __name__ == '__main__':
 				if va.rec.AcceptWaveform(pcm):
 					recResult = json.loads(va.rec.Result())
 					
-					# Hole den Namen des Sprechers falls bekannt.
 					speaker = va.__detectSpeaker__(recResult['spk'])
-					
-					# Zeige den "Fingerabdruck" deiner Stimme. Speichere diesen und füge
-					# ihn mit einer neuen ID in db.json ein, die nach dem ersten Aufruf
-					# im Projektverzeichnis erstellt wird.
-					logger.debug('Deine Stimme sieht so aus %s', recResult['spk'])
-					
-					# Sind nur bekannte sprecher erlaubt?
 					if (speaker == None) and (va.allow_only_known_speakers == True):
 						print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
 						va.current_speaker = None
@@ -170,6 +163,11 @@ if __name__ == '__main__':
 						va.current_speaker = speaker
 						va.current_speaker_fingerprint = recResult['spk']
 						logger.debug('Ich habe verstanden "%s"', recResult['text'])
+						
+						# Lasse den Assistenten auf die Spracheingabe reagieren
+						output = va.chat.respond(recResult['text'])
+						va.tts.say(output)
+						
 						va.is_listening = False
 						va.current_speaker = None
 				

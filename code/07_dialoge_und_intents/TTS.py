@@ -32,6 +32,11 @@ class Voice:
 	def stop(self):
 		if self.process:
 			self.process.terminate()
+	
+	# Überprüfe, ob derzeit gesprochen wird
+	def is_busy(self):
+		if self.process:
+			return self.process.is_alive()
 		
 	def get_voice_keys_by_language(self, language=''):
 		result = []

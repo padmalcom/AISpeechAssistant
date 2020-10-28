@@ -6,6 +6,8 @@ Dinge, die du hier lernen wirst:
 - Hinzufügen dieses Fingerabdrucks zu bekannten Sprechern
 - Identifikation bekannter Sprecher über einen Abgleich
 - Aussperren unbekannter Sprecher
+- Überprüfung, ob derzeit gesprochen wird
+- Stop-Intent, um den Assistenten zu unterbrechen
 
 conda create -n 06_speaker_identification python=3.8
 
