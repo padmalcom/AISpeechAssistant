@@ -1,26 +1,13 @@
 Dinge, die du hier lernen wirst:
-- verwenden einer Datenbank zur Speicherung von Nutzerdaten
-- Anlegen einer Tabelle
-- Hinzufügen von Testdaten
-- Anzeigen des Fingerabdrucks deiner Stimme
-- Hinzufügen dieses Fingerabdrucks zu bekannten Sprechern
-- Identifikation bekannter Sprecher über einen Abgleich
-- Aussperren unbekannter Sprecher
-- Überprüfung, ob derzeit gesprochen wird
-- Stop-Intent, um den Assistenten zu unterbrechen
+- Anlegen eines Templates zur Initialisierung eines Chats
+- Verwenden eines Defaulttemplates für unvorhergesehene Chats
+- Implementieren eines Intents zur Ansage der Uhrzeit
+- Implementieren einer Stop-Funktion für TTS und deren Verwendung als Intent
 
-conda create -n 06_speaker_identification python=3.8
-
-Download des vortrainierten Modells von https://alphacephei.com/vosk/models:
-
-Großes Modell (höhere Genauigkeit):
-https://alphacephei.com/vosk/models/vosk-model-de-0.6.zip
-
-UND das Modell zur Erkennung der Sprecher:
-https://alphacephei.com/vosk/models/vosk-model-spk-0.4.zip
+conda create -n 07_dialogs_and_intents python=3.8
 
 Hint:
 Raspberry Pi supports python up to 3.6:
-conda create -n 06_speaker_identificationpython=3.6
+conda create -n 07_dialogs_and_intents python=3.6
 
-conda activate 06_speaker_identification
+conda activate 07_dialogs_and_intents

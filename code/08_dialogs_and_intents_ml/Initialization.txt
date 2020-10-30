@@ -1,0 +1,22 @@
+Dinge, die du hier lernen wirst:
+- Erstellen von Trainingsdaten, um den Assistenten anzulernen
+- Trainieren des Assistenten
+- Einrichten eines Uhrzeitintents mit Zeitzone
+
+WICHTIG: Anaconda muss hier für snips_nlu als Administrator gestartet werden.
+
+Installieren von RUST für snips-nlu:
+https://www.rust-lang.org/tools/install
+
+conda create -n 08_dialogs_and_intents_ml python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 08_dialogs_and_intents_ml python=3.6
+
+conda activate 08_dialogs_and_intents_ml
+
+pip install -r requirements.txt
+
+
+python -m snips_nlu download de
