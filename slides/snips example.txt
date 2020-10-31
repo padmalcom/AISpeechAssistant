@@ -1,1 +1,8 @@
+07 introduce chatbot frameworks - strict and ml
+why use chatbot aI?
+next use snips and training?
+
+
 {'input': 'wie spät ist es in amerika', 'intent': {'intentName': 'getTime', 'probability': 0.7193185567015047}, 'slots': [{'range': {'start': 19, 'end': 26}, 'rawValue': 'amerika', 'value': {'kind': 'Custom', 'value': 'amerika'}, 'entity': 'country', 'slotName': 'country'}]}
+
+why use both? chatbot can hande intents without known input. snips is more flexible.
