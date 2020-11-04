@@ -1,0 +1,14 @@
+Dinge, die du hier lernen wirst:
+- Verwalten mehrerer Frameworks zum Erkennen von Intents
+- Auswahl des richtigen Frameworks über den Confidence Score
+- Lesen aller Konfigurationsdateien für snips-nlu und chatbotai
+
+
+conda create -n 09_intent_management python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 09_intent_management python=3.6
+
+conda activate 09_intent_management
+

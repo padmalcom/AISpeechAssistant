@@ -1,0 +1,4 @@
+assistant:
+    language: "german"
+    wakewords: ["bumblebee", "terminator"]
+    allow_only_known_speakers: True

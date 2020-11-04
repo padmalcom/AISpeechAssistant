@@ -1,0 +1,27 @@
+adding a ui
+
+intents
+- remind me
+	- store in db
+- calendar
+	- next appointments (benachrichtigung)
+	- create appointment
+- weather forecast pyowm
+- wikipedia
+	- online
+	- offline
+- mailto
+- whereami
+	- geocoder.ip('me')
+- childrensstory
+- animal sound
+- stream
+	- benachrichtigung, dass nachrichten kommen
+
+
+
+
+usermanagement
+- gender guesser (by name)
+- i am
+	- name updaten
