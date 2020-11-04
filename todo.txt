@@ -17,6 +17,7 @@ intents
 - animal sound
 - stream
 	- benachrichtigung, dass nachrichten kommen
+- übersetzung
 
 
 

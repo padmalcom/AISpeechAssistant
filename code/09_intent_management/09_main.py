@@ -13,16 +13,13 @@ import numpy as np
 from usermgmt import UserMgmt
 
 import io
-import pytz
-from snips_nlu import SnipsNLUEngine
-from snips_nlu.default_configs import CONFIG_DE
-
-
-from datetime import datetime
+#from snips_nlu import SnipsNLUEngine
+#from snips_nlu.default_configs import CONFIG_DE
 
 from TTS import Voice
 import multiprocessing
 
+from intentmgmt import IntentMgmt
 logger = logging.getLogger(__name__)
 # Zur besseren Übersicht wird das gloale Log-Level reduziert
 logging.basicConfig(level=logging.ERROR)
@@ -31,23 +28,8 @@ logging.getLogger('comtypes._comobject').setLevel(logging.WARNING)
 
 CONFIG_FILE = "config.yml"
 
-def getTime(country):
 
-	country_timezone_map = {
-		"deutschland": pytz.timezone('Europe/Berlin'),
-		"england": pytz.timezone('Europe/London'),
-		"frankreich": pytz.timezone('Europe/Paris'),
-		"amerika": pytz.timezone('America/New_York'), # Hier gibt es natürlich mehre Zeitzonen...
-		"china": pytz.timezone('Asia/Shanghai') # ...gilt traditionell auch hier, obwohl China eine öffentliche offizielle Zeitzone hat
-	}
-
-	now = datetime.now()
-	timezone = country_timezone_map.get(country.lower())
-	if timezone:
-		now = datetime.now(timezone)
-		return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten in " + country.capitalize() + "."
-	return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten."
-	
+# Spezieller Intent, der Zugriff auf va braucht	
 def stop():
 	if va.tts.is_busy():
 		va.tts.stop()
@@ -118,18 +100,9 @@ class VoiceAssistant():
 		logger.info("Benutzerverwaltung initialisiert")
 		
 		# Initialisiere den Chatbot. Ersetzen von ChatbotAI durch SNIPS-NLU		
-		logger.info("Initialisiere Chatbot...")
-		self.nlu_engine = None
-		with io.open("dialog-datasets/time_dataset.json") as f:
-			time_dataset = json.load(f)
-			nlu_engine = SnipsNLUEngine(config=CONFIG_DE)
-			self.nlu_engine = nlu_engine.fit(time_dataset)
-			
-		if not self.nlu_engine:
-			logger.error("Konnte Dialog-Engine nicht laden.")
-			sys.exit(1)
-			
-		logger.info('Chatbot aus %s initialisiert.', "dialog-datasets/time_dataset.json")
+		logger.info("Initialisiere Intent-Management...")
+		self.intent_management = IntentMgmt()
+		logger.info('%d intents geladen', self.intent_management.get_count())
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
 	def __detectSpeaker__(self, input):
@@ -182,15 +155,7 @@ if __name__ == '__main__':
 						logger.debug('Ich habe verstanden "%s"', recResult['text'])
 						
 						# Lasse den Assistenten auf die Spracheingabe reagieren
-						parsing = va.nlu_engine.parse(recResult['text'])
-						print(parsing)
-						output = ""
-						if parsing["intent"]["intentName"] == "getTime":
-							if len(parsing["slots"]) == 0:
-								output = getTime("Germany")
-							elif parsing["slots"][0]["entity"] == "country":
-								output = getTime(parsing["slots"][0]["rawValue"])
-						print(output)
+						
 						#va.tts.say(output)
 						
 						va.is_listening = False
