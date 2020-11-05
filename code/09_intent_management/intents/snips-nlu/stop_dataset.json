@@ -1,4 +1,6 @@
 {
+  "entities": {
+  },
   "intents": {
     "stop": {
       "utterances": [
