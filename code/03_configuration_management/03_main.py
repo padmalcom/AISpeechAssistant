@@ -1,14 +1,9 @@
-import logging
+from loguru import logger
 import yaml
 import sys
 
 from TTS import Voice
 import multiprocessing
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-logger.setLevel(logging.INFO)
-logging.getLogger('comtypes._comobject').setLevel(logging.WARNING)
 
 CONFIG_FILE = "config.yml"
 
@@ -34,14 +29,14 @@ class VoiceAssistant():
 		language = self.cfg['assistant']['language']
 		if not language:
 			language = "German"
-		logger.info("Verwende Sprache %s", language)
+		logger.info("Verwende Sprache {}", language)
 		
 		# Initialisiere TTS
 		logger.info("Initialisiere Sprachausgabe...")
 		self.tts = Voice()
 		voices = self.tts.get_voice_keys_by_language(language)
 		if len(voices) > 0:
-			logger.info('Stimme %s gesetzt.', voices[0])
+			logger.info('Stimme {} gesetzt.', voices[0])
 			self.tts.set_voice(voices[0])
 		else:
 			logger.warning("Es wurden keine Stimmen gefunden.")

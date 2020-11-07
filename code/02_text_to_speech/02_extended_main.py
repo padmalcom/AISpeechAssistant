@@ -1,12 +1,7 @@
-import logging
+from loguru import logger
 import pyttsx3
 from TTS import Voice
 import multiprocessing
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-logger.setLevel(logging.INFO)
-logging.getLogger('comtypes._comobject').setLevel(logging.WARNING)
 
 class VoiceAssistant():
 
@@ -17,7 +12,7 @@ class VoiceAssistant():
 		self.tts = Voice()
 		voices = self.tts.get_voice_keys_by_language("German")
 		if len(voices) > 0:
-			logger.info('Stimme %s gesetzt.', voices[0])
+			logger.info('Stimme {} gesetzt.', voices[0])
 			self.tts.set_voice(voices[0])
 		else:
 			logger.warning("Es wurden keine Stimmen gefunden.")
@@ -34,6 +29,5 @@ if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')
 
 	va = VoiceAssistant()
-	try:
-		logger.info("Anwendung wurde gestartet")
-		va.run()
+	logger.info("Anwendung wurde gestartet")
+	va.run()

@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 import yaml
 import time
 import sys
@@ -11,11 +11,6 @@ import os
 
 from TTS import Voice
 import multiprocessing
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-logger.setLevel(logging.DEBUG)
-logging.getLogger('comtypes._comobject').setLevel(logging.WARNING)
 
 CONFIG_FILE = "config.yml"
 
@@ -41,7 +36,7 @@ class VoiceAssistant():
 		language = self.cfg['assistant']['language']
 		if not language:
 			language = "German"
-		logger.info("Verwende Sprache %s", language)
+		logger.info("Verwende Sprache {}", language)
 			
 		# Initialisiere Wake Word Detection
 		logger.debug("Initialisiere Wake Word Erkennung...")
@@ -52,7 +47,7 @@ class VoiceAssistant():
 		# Wird keins gefunden, nimm 'bumblebee'
 		if not self.wake_words:
 			self.wake_words = ['bumblebee']
-		logger.debug("Wake words are %s", ','.join(self.wake_words))
+		logger.debug("Wake Words sind {}", ','.join(self.wake_words))
 		self.porcupine = pvporcupine.create(keywords=self.wake_words)
 		logger.debug("Wake Word Erkennung wurde initialisiert.")
 		
@@ -62,7 +57,7 @@ class VoiceAssistant():
 		
 		# Liste alle Audio Devices auf
 		for i in range(self.pa.get_device_count()):
-			logger.debug('id: %d, name: %s', self.pa.get_device_info_by_index(i).get('index'),
+			logger.debug('id: {}, name: {}', self.pa.get_device_info_by_index(i).get('index'),
 				self.pa.get_device_info_by_index(i).get('name'))
 		
 		# Wir öffnen einen (mono) Audio-Stream, der Audiodaten einer bestimmten Länge
@@ -81,7 +76,7 @@ class VoiceAssistant():
 		self.tts = Voice()
 		voices = self.tts.get_voice_keys_by_language(language)
 		if len(voices) > 0:
-			logger.info('Stimme %s gesetzt.', voices[0])
+			logger.info('Stimme {} gesetzt.', voices[0])
 			self.tts.set_voice(voices[0])
 		else:
 			logger.warning("Es wurden keine Stimmen gefunden.")
@@ -109,7 +104,7 @@ if __name__ == '__main__':
 			pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
 			keyword_index = va.porcupine.process(pcm_unpacked)
 			if keyword_index >= 0:
-				logger.info("Wake Word %s wurde verstanden.", va.wake_words[keyword_index])
+				logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
 				
 	# Der Except Block ist hier in seiner Behandlung eingeschränkt auf den Typ KeyboardInterrupt,
 	# also falls der Benutzer die Ausführung des Programms mit STRG+C unterbricht.
