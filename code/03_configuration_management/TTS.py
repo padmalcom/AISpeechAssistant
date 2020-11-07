@@ -1,11 +1,5 @@
-import logging
 import time, pyttsx3
 import multiprocessing
-	
-	
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-logger.setLevel(logging.INFO)
 
 def __speak__(text, voiceId):
 	engine = pyttsx3.init()

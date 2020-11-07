@@ -1,12 +1,15 @@
 certifi==2020.6.20
+colorama==0.4.4
 comtypes==1.1.7
 enum34==1.1.10
-numpy==1.19.2
+loguru==0.5.3
+numpy==1.19.4
 pvporcupine==1.8.7
-PyAudio @ file:///C:/Users/admin/AISpeechAssistant/code/05_speech_to_text/PyAudio-0.2.11-cp38-cp38-win_amd64.whl
+PyAudio @ file:///C:/Users/jfrei/AISpeechAssistant/code/05_speech_to_text/PyAudio-0.2.11-cp38-cp38-win_amd64.whl
 pypiwin32==223
 pyttsx3==2.90
 pywin32==228
 PyYAML==5.3.1
 vosk==0.3.7
+win32-setctime==1.0.3
 wincertstore==0.2
