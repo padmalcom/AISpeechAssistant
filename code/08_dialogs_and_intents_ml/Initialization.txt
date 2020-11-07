@@ -3,7 +3,7 @@ Dinge, die du hier lernen wirst:
 - Trainieren des Assistenten
 - Einrichten eines Uhrzeitintents mit Zeitzone
 
-WICHTIG: Anaconda muss hier für snips_nlu als Administrator gestartet werden.
+WICHTIG: Anaconda muss hier für das snips_nlu trainings dataset als Administrator gestartet werden.
 
 Installieren von RUST für snips-nlu:
 https://www.rust-lang.org/tools/install

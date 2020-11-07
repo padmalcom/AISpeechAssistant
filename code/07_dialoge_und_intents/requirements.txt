@@ -1,0 +1,21 @@
+certifi==2020.6.20
+chardet==3.0.4
+chatbotAI==0.3.0.0
+colorama==0.4.4
+comtypes==1.1.7
+enum34==1.1.10
+idna==2.10
+loguru==0.5.3
+numpy==1.19.3
+pvporcupine==1.8.7
+PyAudio @ file:///C:/Users/jfrei/AISpeechAssistant/code/07_dialoge_und_intents/PyAudio-0.2.11-cp38-cp38-win_amd64.whl
+pypiwin32==223
+pyttsx3==2.90
+pywin32==228
+PyYAML==5.3.1
+requests==2.24.0
+tinydb==4.2.0
+urllib3==1.25.11
+vosk==0.3.7
+win32-setctime==1.0.3
+wincertstore==0.2

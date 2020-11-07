@@ -1,3 +1,4 @@
+from loguru import logger
 import pip
 import importlib
 import importlib.util
@@ -5,9 +6,9 @@ import glob
 import os
 import sys
 from pathlib import Path
-import json
 from snips_nlu import SnipsNLUEngine
 from snips_nlu.default_configs import CONFIG_DE
+from snips_nlu.dataset import Dataset
 
 class IntentMgmt:
 
@@ -35,39 +36,36 @@ class IntentMgmt:
 		# Registriere Funktionen, die von snips-nlu und chatbotai aufgerufen werden
 		function_count = 0
 		for ff in self.functions_folders:
-			print("Suche nach Funktionen in " + ff)
+			logger.debug("Suche nach Funktionen in {}...", ff)
 			req_file = os.path.join(ff, 'requirements.txt')
 			if os.path.exists(req_file):
 				install_result = self.install_requirements(req_file)
 				if install_result == 0:
-					print("Abhängigkeiten für " + ff + " erfolgreich installiert oder bereits vorhanden.")
+					logger.debug("Abhängigkeiten für {} erfolgreich installiert oder bereits vorhanden.", ff)
 			
 			# Finde Python-Dateien, die mit Intent beginnen
 			intent_files = glob.glob(os.path.join(ff, 'intent_*.py'))
 			for infi in intent_files:
-				print("Lade Intent Datei " + infi)
+				logger.debug("Lade Intent-Datei {}...", infi)
 				spec = importlib.util.spec_from_file_location(Path(ff).name, infi)
 				new_module = importlib.util.module_from_spec(spec)
-				print("Modul " + str(new_module) + " geladen.")
+				logger.debug("Modul {} geladen.", str(spec))
 				function_count +=1
 				
 		# Trainiere snips-nlu
 		self.snips_nlu_engine = SnipsNLUEngine(Config=CONFIG_DE)
-		#json_content = ''
-		snips_nlu_count = 0
-		snips_files = glob.glob(os.path.join("./intents/snips-nlu", '*.json'))
-		for sf in snips_files:
-			print("Verarbeite snips nlu training datei " + sf)
-			with open(sf, 'r') as json_file:
-				json_content = json.load(json_file)
-				self.snips_nlu_engine = self.snips_nlu_engine.fit(json_content)
-				print(self.snips_nlu_engine.dataset_metadata)
-				snips_nlu_count +=1
-
-		print(str(snips_nlu_count) + " Snips NLU files gefunden.")
+		snips_files = glob.glob(os.path.join("./intents/snips-nlu", '*.yaml'))
+		dataset = Dataset.from_yaml_files("de", snips_files)
+		nlu_engine = SnipsNLUEngine(config=CONFIG_DE)
+		self.nlu_engine = nlu_engine.fit(dataset)
+		logger.info("{} Snips NLU files gefunden.", len(snips_files))
+		if not self.nlu_engine:
+			logger.error("Konnte Dialog-Engine nicht laden.")
+		else:
+			logger.debug("Dialog Metadaten: {}.", self.nlu_engine.dataset_metadata)
 
 		
-		print("Snips NLU Training abgeschlossen")
+		logger.debug("Snips NLU Training abgeschlossen")
 					
 				
 	
