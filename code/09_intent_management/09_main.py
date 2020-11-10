@@ -77,7 +77,7 @@ class VoiceAssistant():
 			self.tts.set_voice(voices[0])
 		else:
 			logger.warning("Es wurden keine Stimmen gefunden.")
-		self.tts.say("Initialisierung abgeschlossen")
+		self.tts.say("Sprachausgabe aktiviert.")
 		logger.debug("Sprachausgabe initialisiert")
 		
 		logger.info("Initialisiere Spracherkennung...")
@@ -96,6 +96,7 @@ class VoiceAssistant():
 		logger.info("Initialisiere Intent-Management...")
 		self.intent_management = IntentMgmt()
 		logger.info('{} intents geladen', self.intent_management.get_count())
+		self.tts.say("Initialisierung abgeschlossen")
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
 	def __detectSpeaker__(self, input):
@@ -148,8 +149,8 @@ if __name__ == '__main__':
 						logger.debug('Ich habe verstanden "{}"', recResult['text'])
 						
 						# Lasse den Assistenten auf die Spracheingabe reagieren
-						
-						#va.tts.say(output)
+						output = va.intent_management.process(recResult['text'], speaker)
+						va.tts.say(output)
 						
 						va.is_listening = False
 						va.current_speaker = None

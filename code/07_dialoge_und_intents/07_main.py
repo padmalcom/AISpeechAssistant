@@ -96,9 +96,6 @@ class VoiceAssistant():
 		logger.info("Benutzerverwaltung initialisiert")
 		
 		# Initialisiere den Chatbot
-		
-		#self.MAIN_FILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-		#self.DIALOG_TEMPLATE = self.MAIN_FILE_DIR + "/dialogs/dialogs.template"
 		logger.info("Initialisiere Chatbot...")
 		dialog_template_path = './dialogs/dialogs.template'
 		if os.path.isfile(dialog_template_path):
@@ -158,7 +155,8 @@ if __name__ == '__main__':
 						va.current_speaker_fingerprint = recResult['spk']
 						logger.debug('Ich habe verstanden "{}"', recResult['text'])
 						
-						# Lasse den Assistenten auf die Spracheingabe reagieren
+						# Lasse den Assistenten auf die Spracheingabe reagieren.
+						# Problem: Es wird das Default Template aufgerufen, wenn kein Intent erkannt wurde. Und das ist in Englisch.
 						output = va.chat.respond(recResult['text'])
 						va.tts.say(output)
 						
