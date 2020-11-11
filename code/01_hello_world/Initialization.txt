@@ -4,6 +4,7 @@ Dinge, die du hier lernen wirst:
 - Erstellen einer Klasse
 - Erstellen einer Klassenmethode
 - Erstellen einer __init__-Funktion
+- Benamung des Python Files ohne Unterstriche
 
 conda create -n 01_hello_world python=3.7
 

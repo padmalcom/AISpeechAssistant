@@ -1,7 +1,10 @@
 Dinge, die du hier lernen wirst:
 - Verwalten mehrerer Frameworks zum Erkennen von Intents
-- Auswahl des richtigen Frameworks über den Confidence Score
+- Dynamisches Einlesen von Python Modulen und dem Aufruf deren Funktionen
+- Einrichten eines primären und eines sekundären Moduls für die Interprentation von Intents
 - Lesen aller Konfigurationsdateien für snips-nlu und chatbotai
+- Gesunder Umgang mit default Variablen (Intents brauchen Defaults, weil nicht sichergestellt werden kann, dass immer alle felder befüllt sind)
+- Teilen von Variablen über mehrere Module (Es muss ein extra Modul geschaffen werden, das den voiceassistant vorhält. Wenn wir das in der Main machen, wird va bei jedem Import auf den Ursprungszustand zurückgesetzt und der ist None)
 
 
 conda create -n 09_intent_management python=3.8

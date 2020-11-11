@@ -17,6 +17,3 @@ def gettime(country="deutschland"):
 		now = datetime.now(timezone)
 		return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten in " + country.capitalize() + "."
 	return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten."
-	
-def asdasd():
-	pass
