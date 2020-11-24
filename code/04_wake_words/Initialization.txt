@@ -1,5 +1,5 @@
 Dinge, die du hier lernen wirst:
-- Installation eines Wheel Files
+- Installation eines Wheel Files (Anpassung in der requirements.txt, einfach nur Dateiname rein)
 - Audioeingabe und -Verarbeitung über pyAudio
 - Erkennen eines Aktivierungsworts über Porcupine
 - Unterscheiden zwischen verschiedenen Aktivierungswörtern

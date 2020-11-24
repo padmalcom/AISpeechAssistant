@@ -1,0 +1,13 @@
+Dinge, die du hier lernen wirst:
+- Abspielen von Sounds (Dank an https://freeanimalsounds.org/de/download-tierstimmen/)
+
+conda create -n 10_a_tierlaute python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 10_a_tierlautepython=3.6
+
+conda activate 10_a_tierlaute
+
+Als root:
+python -m snips_nlu download de

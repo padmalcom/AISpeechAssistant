@@ -1,5 +1,4 @@
 from tinydb import TinyDB, Query
-import global_variables
 
 class UserMgmt:
 

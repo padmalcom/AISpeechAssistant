@@ -15,3 +15,5 @@ conda create -n 09_intent_management python=3.6
 
 conda activate 09_intent_management
 
+Als root:
+python -m snips_nlu download de

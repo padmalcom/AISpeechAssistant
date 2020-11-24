@@ -21,6 +21,8 @@ from intentmgmt import IntentMgmt
 
 CONFIG_FILE = "config.yml"
 
+#va = None
+
 class VoiceAssistant():
 
 	def __init__(self):

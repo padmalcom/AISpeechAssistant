@@ -1,0 +1,4 @@
+{% block %}
+    {% client %}.*{% endclient %}
+    {% response %}{% call default_snips_nlu_handler: %0 %}{% endresponse %}
+{% endblock %}

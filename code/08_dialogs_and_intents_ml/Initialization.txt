@@ -18,5 +18,5 @@ conda activate 08_dialogs_and_intents_ml
 
 pip install -r requirements.txt
 
-
+Als root:
 python -m snips_nlu download de
