@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+vosk-model-de-0.6
+vosk-model-spk-0.4

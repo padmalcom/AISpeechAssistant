@@ -1,33 +1,40 @@
 from chatbot import register_call
 import global_variables
 import random
+import os
+import yaml
+from pygame import mixer
 
 @register_call("animalSound")
-def animalSound(animal="none", session_id = "general"):
+def animalSound(session_id = "general", animal="none"):
 
-	with open("config_animalsounds.yml", "r") as ymlfile:
+	config_path = os.path.join('intents','functions','animalsounds','config_animalsounds.yml')
+	mp3_path = os.path.join('intents','functions','animalsounds','animals')
+	cfg = None
+	with open(config_path, "r", encoding='utf8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+	
+	if not cfg:
+		logger.error("Konnte Konfigurationsdatei für animalsounds nicht lesen.")
+		return ""
 		
 	# Holen der Sprache aus der globalen Konfigurationsdatei
 	LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
 	
 	# Das Tier ist nicht bekannt
-	ANIMAL_UNKNOWN = random.choice(cfg['intent']['animalsound'][LANGUAGE]['animal_not_found'])
+	ANIMAL_UNKNOWN = random.choice(cfg['intent']['animalsounds'][LANGUAGE]['animal_not_found'])
 	
 	animals = {}
 	for key, value in cfg['intent']['animalsounds']['animals'].items():
 		animals[key] = value
-	
-	print(animals)
-	
+
 	for a in animals:
-		if animal in animals[a]:
-			mp3_path = os.path.join('animals', a + '.mp3')
-			print("Playing " + str(mp3))
-			if global_variables.voice_assistant.mixer.music.get_busy():
-				global_variables.voice_assistant.mixer.music.stop()
-			global_variables.voice_assistant.mixer.music.load(mp3_path)
-			global_variables.voice_assistant.mixer.music.play()
+		if animal.strip().lower() in animals[a]:
+			mp3_file = os.path.join(mp3_path, a + '.mp3')
+			if mixer.music.get_busy():
+				mixer.music.stop()
+			mixer.music.load(mp3_file)
+			mixer.music.play()
 			
 			# Der Assistent muss nicht sprechen, wenn ein Tierlaut wiedergegeben wird
 			return ""

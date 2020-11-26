@@ -21,12 +21,15 @@ import multiprocessing
 CONFIG_FILE = "config.yml"
 
 @register_call("time")
-def getTime(dummy, session_id = "general"):
+# dummy muss theoretisch nicht auf 0 gesetzt werden, Python fordert aber,
+# dass ein Parameter, der einen Default-Wert erhält, nur von weiteren Parametern gefolgt
+# werden dürfen, die auch einen Default-Wert haben
+def getTime(session_id = "general", dummy=0):
 	now = datetime.now()
 	return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten."
 	
 @register_call("stop")
-def stop(empty, session_id = "general"):
+def stop(session_id = "general", dummy=0):
 	if va.tts.is_busy():
 		va.tts.stop()
 		return "okay ich bin still"
@@ -40,7 +43,7 @@ class VoiceAssistant():
 		logger.debug("Lese Konfiguration...")
 		
 		global CONFIG_FILE
-		with open(CONFIG_FILE, "r") as ymlfile:
+		with open(CONFIG_FILE, "r", encoding='utf8') as ymlfile:
 			self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 		if self.cfg:
 			logger.debug("Konfiguration gelesen.")

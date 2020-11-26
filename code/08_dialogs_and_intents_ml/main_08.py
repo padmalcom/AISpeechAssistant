@@ -56,7 +56,7 @@ class VoiceAssistant():
 		logger.debug("Lese Konfiguration...")
 		
 		global CONFIG_FILE
-		with open(CONFIG_FILE, "r") as ymlfile:
+		with open(CONFIG_FILE, "r", encoding='utf8') as ymlfile:
 			self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 		if self.cfg:
 			logger.debug("Konfiguration gelesen.")

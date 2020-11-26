@@ -1,0 +1,10 @@
+{% block %}
+    {% client %}(Wie macht (der|die|das)) (?P<animal>.*){% endclient %}
+    {% response %}{% call animalSound: %animal %}{% endresponse %}
+{% endblock %}{% block %}
+    {% client %}(stop|halt|stopp|schweigefuchs){% endclient %}
+    {% response %}{% call stop: 0 %}{% endresponse %}
+{% endblock %}{% block %}
+    {% client %}.*{% endclient %}
+    {% response %}{% call default_snips_nlu_handler: %0 %}{% endresponse %}
+{% endblock %}

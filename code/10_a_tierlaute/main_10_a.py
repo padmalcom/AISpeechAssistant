@@ -11,8 +11,9 @@ import json
 import tinydb
 import numpy as np
 from usermgmt import UserMgmt
-
 import io
+
+from pygame import mixer
 
 from TTS import Voice
 import multiprocessing
@@ -31,7 +32,7 @@ class VoiceAssistant():
 		logger.debug("Lese Konfiguration...")
 		
 		global CONFIG_FILE
-		with open(CONFIG_FILE, "r") as ymlfile:
+		with open(CONFIG_FILE, "r", encoding='utf8') as ymlfile:
 			self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 		if self.cfg:
 			logger.debug("Konfiguration gelesen.")
@@ -86,7 +87,9 @@ class VoiceAssistant():
 		self.allow_only_known_speakers = self.cfg["assistant"]["allow_only_known_speakers"]
 		logger.info("Benutzerverwaltung initialisiert")
 		
-		# Initialisiere den Chatbot. Ersetzen von ChatbotAI durch SNIPS-NLU		
+		# Initialisiere den Audio-Player
+		mixer.init()
+		
 		logger.info("Initialisiere Intent-Management...")
 		self.intent_management = IntentMgmt()
 		logger.info('{} intents geladen', self.intent_management.get_count())

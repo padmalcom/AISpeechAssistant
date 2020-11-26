@@ -3,15 +3,18 @@ from chatbot import register_call
 import global_variables
 import yaml
 import random
+import os
+from pygame import mixer
 
 # Spezieller Intent, der Zugriff auf voice_assistant braucht	
 @register_call("stop")
-def stop(dummy=0, session_id = "general"):
+def stop(session_id = "general", dummy=0):
 
 	cfg = None
 	
 	# Laden der intent-eigenen Konfigurationsdatei
-	with open("config_animalsounds.yml", "r") as ymlfile:
+	config_path = os.path.join('intents','functions','stop','config_stop.yml')
+	with open(config_path, "r", encoding='utf8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	# Holen der Sprache aus der globalen Konfigurationsdatei
@@ -29,8 +32,8 @@ def stop(dummy=0, session_id = "general"):
 			result = random.choice(cfg['intent']['stop'][LANGUAGE]['be_silent'])
 			
 		# Wird ein Sound ausgegeben? Stoppe ihn
-		if global_variables.voice_assistant.mixer.music.get_busy():
-			global_variables.voice_assistant.mixer.music.stop()
+		if mixer.music.get_busy():
+			mixer.music.stop()
 			result = random.choice(cfg['intent']['stop'][LANGUAGE]['be_silent'])
 			
 		return result

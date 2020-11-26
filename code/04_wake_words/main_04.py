@@ -24,7 +24,7 @@ class VoiceAssistant():
 		
 		# Verweise lokal auf den globalen Kontext und hole die Variable CONFIG_FILE
 		global CONFIG_FILE
-		with open(CONFIG_FILE, "r") as ymlfile:
+		with open(CONFIG_FILE, "r", encoding='utf8') as ymlfile:
 			# Lade die Konfiguration im YAML-Format
 			self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 		if self.cfg:
