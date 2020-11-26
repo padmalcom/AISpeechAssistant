@@ -1,0 +1,4 @@
+{% block %}
+    {% client %}(stop|halt|stopp|schweigefuchs){% endclient %}
+    {% response %}{% call stop: 0 %}{% endresponse %}
+{% endblock %}

@@ -63,6 +63,8 @@ def default_snips_nlu_handler(session, text):
 		
 class IntentMgmt:
 
+	intent_count = 0
+
 	def install(self, package):
 		if hasattr(pip, 'main'):
 			pip.main(['install', package])
@@ -78,7 +80,7 @@ class IntentMgmt:
 		return retcode
 		
 	def get_count(self):
-		return 1
+		return self.intent_count
 
 	def __init__(self):
 	
@@ -86,7 +88,7 @@ class IntentMgmt:
 		self.functions_folders = [os.path.abspath(name) for name in glob.glob("./intents/functions/*/")]
 		self.dynamic_intents = []
 		
-		function_count = 0
+		self.intent_count = 0
 		for ff in self.functions_folders:
 			logger.debug("Suche nach Funktionen in {}...", ff)
 			req_file = os.path.join(ff, 'requirements.txt')
@@ -108,7 +110,7 @@ class IntentMgmt:
 				globals()[Path(ff).name] = importlib.import_module(name)
 				logger.debug("Modul {} geladen.", str(Path(ff).name))
 				self.dynamic_intents.append(str(Path(ff).name))
-				function_count +=1
+				self.intent_count +=1
 				
 		# 2. Finde alle Dialoge, die über snips nlu abgehandelt werden
 		logger.info("Initialisiere snips nlu...")

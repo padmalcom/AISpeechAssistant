@@ -1,0 +1,21 @@
+intent:
+    animalsounds:
+        german:
+            animal_not_found: ["Das Tier kenne ich nicht.", "Was ist das denn bitte für ein Tier?"]
+        english:
+            animal_not_found: ["I don't know such an animal.", "What kind of animal should that be?"]
+        animals:
+            cat: ["cat", "katze"]
+            chicken: ["chicken", "huhn", "mum", "mama"]
+            cock: ["cock", "hahn"]
+            cow: ["cow", "kuh"]
+            dog: ["dog", "hund"]
+            donkey: ["donkey", "esel"]
+            duck: ["duck", "ente"]
+            goat: ["goat", "ziege"]
+            goose: ["goose", "gans"]
+            horse: ["horse", "pferd"]
+            ox: ["ox", "ochse", "dad", "papa"]
+            pig: ["pig", "schwein"]
+            sheep: ["sheep", "schaf"]
+            turkey: ["turkey", "truthahn"]

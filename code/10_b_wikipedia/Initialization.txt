@@ -1,0 +1,13 @@
+Dinge, die du hier lernen wirst:
+- Informationen über Entitäten von Wikipedia
+
+conda create -n 10_b_wikipedia python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 10_b_wikipedia=3.6
+
+conda activate 10_b_wikipedia
+
+Als root:
+python -m snips_nlu download de
