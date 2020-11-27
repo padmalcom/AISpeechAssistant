@@ -16,6 +16,8 @@ import random
 
 @register_call("default_snips_nlu_handler")
 def default_snips_nlu_handler(session, text):
+	print("TEXT:")
+	print(text)
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
 	print(parsing)
 	output = "Ich verstehe deine Frage nicht. Kannst du sie umformulieren?"
@@ -43,13 +45,13 @@ def default_snips_nlu_handler(session, text):
 		
 			# Die Wahrscheinlichkeit wird geprüft, um sicherzustellen, dass nicht irgendein Intent angewendet wird,
 			# der garnicht gemeint war
-			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.7):
+			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
 				intent_found = True
 				
 				# Parse alle Parameter
 				arguments = dict()
 				for slot in parsing["slots"]:
-					arguments[slot["entity"]] = slot["rawValue"]
+					arguments[slot["slotName"]] = slot["value"]["value"]
 					
 				# Rufe Methode dynamich mit der Parameterliste auf
 				argument_string = json.dumps(arguments)

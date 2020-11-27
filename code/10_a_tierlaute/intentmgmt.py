@@ -49,7 +49,7 @@ def default_snips_nlu_handler(session, text):
 				# Parse alle Parameter
 				arguments = dict()
 				for slot in parsing["slots"]:
-					arguments[slot["entity"]] = slot["rawValue"]
+					arguments[slot["slotName"]] = slot["value"]["value"]
 					
 				# Rufe Methode dynamich mit der Parameterliste auf
 				argument_string = json.dumps(arguments)

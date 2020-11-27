@@ -1,6 +1,10 @@
 Dinge, die du hier lernen wirst:
-- Implementieren einer Erinnerungsfunktion
-- Mehrstufige Dialoge
+- Implementieren einer Erinnerungsfunktion (Arbeit mit Datumswerten)
+- Natürliche Sprache <-> Zahlen
+
+Limit beim Einsprechen genauer Datumswerte, VOSK gibt Zahlen ausgeschrieben an. Die beste Bibliothek,
+um Wörter in Zahlen zu wandeln ist https://github.com/allo-media/text2num, diese unterstützt aber noch kein
+Deutsch.
 
 conda create -n 10_c_reminder python=3.8
 

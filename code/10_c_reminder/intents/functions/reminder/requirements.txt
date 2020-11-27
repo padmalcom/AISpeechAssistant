@@ -1,1 +1,2 @@
-pytz
+python-dateutil==2.8.1
+num2words==0.5.10

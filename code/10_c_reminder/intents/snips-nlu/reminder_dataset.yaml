@@ -1,18 +1,20 @@
 # action_an (im Deutschen ist sprachlich an Infinitiv und Konjugation zu unterscheiden)
 ---
 type: entity
-name: reminder_action_an
+name: reminder_action_to
 automatically_extensible: true
 use_synonyms: false
 matching_strictness: 0.8
 values:
     - an den Geburtstag von Peter
     - an den Wocheneinkauf
+    - ans Kochen
+    - ans Wäschewaschen
     
 # action_infinitiv (im Deutschen ist sprachlich an Infinitiv und Konjugation zu unterscheiden)
 ---
 type: entity
-name: reminder_action_infinitiv
+name: reminder_action_infinitive
 automatically_extensible: true
 use_synonyms: false
 matching_strictness: 0.8
@@ -20,14 +22,19 @@ values:
     - die Zähne zu putzen
     - die Fenster zu schließen
     - Peter ein Geschenk zu kaufen
+    - zu putzen
     
 # reminder intents
 ---
 type: intent
 name: reminder
 utterances:
-    - Erinnere mich bitte [time:snips/datetime](um 10 Uhr) [reminder:reminder_action_an](meine Fernsehsendung)
-    - Erinnere mich [time:snips/datetime](um 10 Uhr) [reminder:reminder_action_an](an das Essen)
-    - Erinnere mich [reminder:reminder_action_an](an den Geburtstag von Peter) [time:snips/datetime](um 10 Uhr)
-    - Erinnerung [time:snips/datetime] (in 10 Minuten) [reminder:reminder_action_infinitiv](den Kuchen aus dem Kühlschrank zu nehmen)
-    - Erinnerung [time:snips/datetime] (um 8 Uhr) daran [reminder:reminder_action_infinitiv](die Fenster zu schließen)
+    - Erinnere mich [time:snips/datetime](um 10 Uhr) [reminder_to:reminder_action_to](meine Fernsehsendung)
+    - Erinnere mich [time:snips/datetime](um 10 Uhr) [reminder_to:reminder_action_to](an das Essen)
+    - Erinnere mich [reminder_to:reminder_action_to](an den Geburtstag von Peter) [time:snips/datetime](um 10 Uhr)
+    - Erinner mich [time:snips/datetime](um 10 Uhr) [reminder_to:reminder_action_to](meine Fernsehsendung)
+    - Erinner mich [time:snips/datetime](um 10 Uhr) [reminder_to:reminder_action_to](an das Essen)
+    - Erinner mich [reminder_to:reminder_action_to](an den Geburtstag von Peter) [time:snips/datetime](um 10 Uhr)
+    - Erinnerung [time:snips/datetime] (in 10 Minuten) [reminder_infinitive:reminder_action_infinitive](den Kuchen aus dem Kühlschrank zu nehmen)
+    - Erinnerung [time:snips/datetime] (um 8 Uhr) daran [reminder_infinitive:reminder_action_infinitive](die Fenster zu schließen)
+    - Erinnere mich [time:snips/datetime] (um 16 Uhr) [reminder_infinitive:reminder_action_infinitive](zu kochen)

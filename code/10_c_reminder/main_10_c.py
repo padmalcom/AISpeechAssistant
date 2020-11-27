@@ -13,6 +13,7 @@ import numpy as np
 from usermgmt import UserMgmt
 import io
 
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from pygame import mixer
 
 from TTS import Voice

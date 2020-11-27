@@ -5,7 +5,7 @@ import os
 import random
 import yaml
 
-def gettime(country="default"):
+def gettime(place="default"):
 
 	
 	config_path = os.path.join('intents','functions','gettime','config_gettime.yml')
@@ -24,7 +24,7 @@ def gettime(country="default"):
 	PLACE_UNKNOWN = random.choice(cfg['intent']['gettime'][LANGUAGE]['place_not_found'])
 	
 	# Wir fügen den unbekannten Ort in die Antwort ein
-	PLACE_UNKNOWN = PLACE_UNKNOWN.format(country)
+	PLACE_UNKNOWN = PLACE_UNKNOWN.format(place)
 
 	# Lesen aller Orte aus der Konfigurationsdatei
 	country_timezone_map = {}
@@ -35,7 +35,7 @@ def gettime(country="default"):
 	timezone = None
 	now = datetime.now()
 	for c in country_timezone_map:
-		if country.strip().lower() in country_timezone_map[c]:
+		if place.strip().lower() in country_timezone_map[c]:
 			timezone = pytz.timezone(c)
 			break
 	
@@ -43,11 +43,11 @@ def gettime(country="default"):
 	if timezone:
 		now = datetime.now(timezone)
 		TIME_AT_PLACE = random.choice(cfg['intent']['gettime'][LANGUAGE]['time_in_place'])
-		TIME_AT_PLACE = TIME_AT_PLACE.format(str(now.hour), str(now.minute), country.capitalize())
+		TIME_AT_PLACE = TIME_AT_PLACE.format(str(now.hour), str(now.minute), place.capitalize())
 		return TIME_AT_PLACE
 	else:
 		# Falls nicht, prüfe, ob nach der Uhrzeit am Platz des Benutzers gefragt wurde
-		if country == "default":
+		if place == "default":
 			TIME_HERE = random.choice(cfg['intent']['gettime'][LANGUAGE]['time_here'])
 			TIME_HERE = TIME_HERE.format(str(now.hour), str(now.minute))
 			return TIME_HERE

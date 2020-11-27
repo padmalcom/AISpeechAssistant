@@ -1,5 +1,8 @@
 # AISpeechAssistant
 
+## Vorgehen
+- Wir werden immer auf dem vorherigen Kapitel aufsetzen
+
 ## Chapters
 1. Introduction
 	1.1 Speech Assistant to support Life and Home Automation

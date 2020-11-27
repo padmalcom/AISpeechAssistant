@@ -25,7 +25,7 @@ import multiprocessing
 
 CONFIG_FILE = "config.yml"
 
-def getTime(country):
+def getTime(place):
 
 	country_timezone_map = {
 		"deutschland": pytz.timezone('Europe/Berlin'),
@@ -36,10 +36,10 @@ def getTime(country):
 	}
 
 	now = datetime.now()
-	timezone = country_timezone_map.get(country.lower())
+	timezone = country_timezone_map.get(place.lower()) # Achtung, wenn kein Wert gefunden wird. Das müssen wir zukünftig abfangen.
 	if timezone:
 		now = datetime.now(timezone)
-		return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten in " + country.capitalize() + "."
+		return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten in " + place.capitalize() + "."
 	return "Es ist " + str(now.hour) + " Uhr und " + str(now.minute) + " Minuten."
 	
 def stop():
@@ -184,6 +184,7 @@ if __name__ == '__main__':
 							if len(parsing["slots"]) == 0:
 								output = getTime("Germany")
 							elif parsing["slots"][0]["entity"] == "country":
+								# RawValue ist nicht der beste Ansatz, wie wir später sehen werden. Manchmal bereitet snips nlu für uns die Parameter zu.
 								output = getTime(parsing["slots"][0]["rawValue"])
 						va.tts.say(output)
 						
