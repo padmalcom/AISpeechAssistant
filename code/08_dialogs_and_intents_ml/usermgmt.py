@@ -1,4 +1,5 @@
 from tinydb import TinyDB, Query
+from loguru import logger
 
 class UserMgmt:
 

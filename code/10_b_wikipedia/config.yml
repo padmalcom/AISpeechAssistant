@@ -1,7 +1,7 @@
 assistant:
-    language: "german"
+    language: "de"
     wakewords: ["bumblebee", "terminator"]
     allow_only_known_speakers: True
 defaults:
-    german:
+    de:
         no_intent_recognized: ["Ich habe dich nicht verstanden", "Den Befehl habe ich nicht verstanden"]

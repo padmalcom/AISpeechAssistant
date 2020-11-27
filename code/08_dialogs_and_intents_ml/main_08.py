@@ -65,7 +65,7 @@ class VoiceAssistant():
 			sys.exit(1)
 		language = self.cfg['assistant']['language']
 		if not language:
-			language = "German"
+			language = "de"
 		logger.info("Verwende Sprache {}", language)
 			
 		logger.debug("Initialisiere Wake Word Erkennung...")
@@ -185,8 +185,7 @@ if __name__ == '__main__':
 								output = getTime("Germany")
 							elif parsing["slots"][0]["entity"] == "country":
 								output = getTime(parsing["slots"][0]["rawValue"])
-						print(output)
-						#va.tts.say(output)
+						va.tts.say(output)
 						
 						va.is_listening = False
 						va.current_speaker = None

@@ -1,0 +1,22 @@
+# Country entity
+---
+type: entity
+name: country
+automatically_extensible: true
+use_synonyms: false
+matching_strictness: 0.8
+values:
+    - deutschland
+    - england
+    
+# getTime intents
+---
+type: intent
+name: getTime
+utterances:
+    - Wie spät ist es in [place:country](deutschland)
+    - Wie viel Uhr ist es in [place:country](deutschland)
+    - Uhrzeit in [place:country](deutschland)
+    - Wie spät ist es
+    - Wie viel Uhr ist es
+    - Uhrzeit

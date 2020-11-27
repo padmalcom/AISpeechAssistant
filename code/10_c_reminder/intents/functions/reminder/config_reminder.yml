@@ -1,0 +1,12 @@
+intent:
+    reminder:
+        de:
+            reminder_same_day_infinitive: ["Ich werde dich um {} Uhr daran erinnern {}."]
+            reminder_infinitive: ["Ich erinnere dich am {} um {} Uhr daran {}.]
+            reminder_same_day_to: ["Ich erinnere dich um {} Uhr {}."]
+            reminder_to: ["Ich erinnere dich am {} um {} Uhr {}."]
+        en:
+            reminder_same_day_infinitive: ["I'll remind you at {} to {}."]
+            reminder_infinitive: ["I'll remind you on the {} at {} o'clock to {}."]
+            reminder_same_day_to: ["I'll remind you at {} to {}."]
+            reminder_to: ["I'll remind you on the {} at {} o'clock to {}."]

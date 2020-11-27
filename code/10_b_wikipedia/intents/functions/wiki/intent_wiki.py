@@ -5,7 +5,6 @@ import yaml
 import random
 import os
 import wikipedia
-import pycountry
 
 @register_call("wiki")
 def wiki(session_id = "general", query="none"):
@@ -20,9 +19,8 @@ def wiki(session_id = "general", query="none"):
 	LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
 	
 	# Setze die richtige Sprache für Wikipedia
-	lang = pycountry.languages.get(name=LANGUAGE) # Hole den iso-638 code für die Sprache
-	if lang:
-		wikipedia.set_lang(lang.alpha_2)
+	if LANGUAGE:
+		wikipedia.set_lang(LANGUAGE)
 
 	UNKNOWN_ENTITY = random.choice(cfg['intent']['wiki'][LANGUAGE]['unknown_entity'])
 	UNKNOWN_ENTITY = UNKNOWN_ENTITY.format(query)

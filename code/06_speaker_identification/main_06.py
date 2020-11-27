@@ -35,7 +35,7 @@ class VoiceAssistant():
 			sys.exit(1)
 		language = self.cfg['assistant']['language']
 		if not language:
-			language = "German"
+			language = "de"
 		logger.info("Verwende Sprache {}", language)
 			
 		logger.debug("Initialisiere Wake Word Erkennung...")

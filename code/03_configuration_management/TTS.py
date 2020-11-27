@@ -31,10 +31,15 @@ class Voice:
 		result = []
 		engine = pyttsx3.init()
 		voices = engine.getProperty('voices')
+		
+		# Wir hängen ein "-" an die Sprache in Großschrift an, damit sie in der ID gefunden wird
+		lang_search_str = language.upper()+"-"
+		
 		for voice in voices:
-			# Schreibe Sprache und Name klein
+			# Die ID einer Sprache ist beispielsweise:
+			# HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_DE-DE_HEDDA_11.0
 			if language == '':
 				result.append(voice.id)
-			elif language.lower() in voice.name.lower():
+			elif lang_search_str in voice.id:
 				result.append(voice.id)
 		return result

@@ -1,5 +1,6 @@
 Dinge, die du hier lernen wirst:
 - Verwalten mehrerer Frameworks zum Erkennen von Intents
+- Beim Intent Stop kann beobachtet werden, wann die ML Methode mit SNIPS NLU greift und wann ChatbotAI eingesetzt wird
 - Dynamisches Einlesen von Python Modulen und dem Aufruf deren Funktionen
 - Konzeption mehrsprachiger Intents
 - Einrichten eines primären und eines sekundären Moduls für die Interprentation von Intents

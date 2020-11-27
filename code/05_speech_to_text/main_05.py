@@ -32,7 +32,7 @@ class VoiceAssistant():
 			sys.exit(1)
 		language = self.cfg['assistant']['language']
 		if not language:
-			language = "German"
+			language = "de"
 		logger.info("Verwende Sprache {}", language)
 			
 		logger.debug("Initialisiere Wake Word Erkennung...")
@@ -68,7 +68,7 @@ class VoiceAssistant():
 		
 		# Initialisiere Spracherkennung
 		logger.info("Initialisiere Spracherkennung...")
-		stt_model = Model('./vosk-model-small-de-zamia-0.3')
+		stt_model = Model('./vosk-model-de-0.6')
 		speaker_model = SpkModel('./vosk-model-spk-0.4')
 		self.rec = KaldiRecognizer(stt_model, speaker_model, 16000)
 		# Hört der Assistent gerade auf einen Befehl oder wartet er auf ein Wake Word?

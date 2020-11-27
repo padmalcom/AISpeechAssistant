@@ -1,0 +1,14 @@
+Dinge, die du hier lernen wirst:
+- Implementieren einer Erinnerungsfunktion
+- Mehrstufige Dialoge
+
+conda create -n 10_c_reminder python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 10_c_reminder=3.6
+
+conda activate 10_c_reminder
+
+Als root:
+python -m snips_nlu download de

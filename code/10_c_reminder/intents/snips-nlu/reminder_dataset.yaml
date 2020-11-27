@@ -1,0 +1,33 @@
+# action_an (im Deutschen ist sprachlich an Infinitiv und Konjugation zu unterscheiden)
+---
+type: entity
+name: reminder_action_an
+automatically_extensible: true
+use_synonyms: false
+matching_strictness: 0.8
+values:
+    - an den Geburtstag von Peter
+    - an den Wocheneinkauf
+    
+# action_infinitiv (im Deutschen ist sprachlich an Infinitiv und Konjugation zu unterscheiden)
+---
+type: entity
+name: reminder_action_infinitiv
+automatically_extensible: true
+use_synonyms: false
+matching_strictness: 0.8
+values:
+    - die Zähne zu putzen
+    - die Fenster zu schließen
+    - Peter ein Geschenk zu kaufen
+    
+# reminder intents
+---
+type: intent
+name: reminder
+utterances:
+    - Erinnere mich bitte [time:snips/datetime](um 10 Uhr) [reminder:reminder_action_an](meine Fernsehsendung)
+    - Erinnere mich [time:snips/datetime](um 10 Uhr) [reminder:reminder_action_an](an das Essen)
+    - Erinnere mich [reminder:reminder_action_an](an den Geburtstag von Peter) [time:snips/datetime](um 10 Uhr)
+    - Erinnerung [time:snips/datetime] (in 10 Minuten) [reminder:reminder_action_infinitiv](den Kuchen aus dem Kühlschrank zu nehmen)
+    - Erinnerung [time:snips/datetime] (um 8 Uhr) daran [reminder:reminder_action_infinitiv](die Fenster zu schließen)
