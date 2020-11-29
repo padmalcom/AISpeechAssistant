@@ -65,6 +65,11 @@ def reminder(time=None, reminder_to=None, reminder_infinitive=None):
 	print(month)
 	print(year)
 	
+	# Initialisiere Datenbankzugriff
+	reminder_db_path = os.path.join('intents','functions','reminder','reminder_db.json')
+	reminder_db = TinyDB(reminder_db_path)
+	reminder_table = self.db.table('reminder')
+	
 
 	# Am selben Tag wie heute?
 	if datetime.now().date() == parsed_time.date():
@@ -73,33 +78,39 @@ def reminder(time=None, reminder_to=None, reminder_infinitive=None):
 			SAME_DAY_TO = random.choice(cfg['intent']['reminder'][LANGUAGE]['reminder_same_day_to'])
 			SAME_DAY_TO = SAME_DAY_TO.format(hours, minutes, reminder_to)
 			result = result + " " + SAME_DAY_TO
+			reminder_table.insert({'time':time, 'kind':'to', 'msg':reminder_to, 'speaker':speaker})
 		elif reminder_infinitive:
 			print(2)
 			SAME_DAY_INFINITIVE = random.choice(cfg['intent']['reminder'][LANGUAGE]['reminder_same_day_infinitive'])
 			SAME_DAY_INFINITIVE = SAME_DAY_INFINITIVE.format(hours, minutes, reminder_infinitive)
 			result = result + " " + SAME_DAY_INFINITIVE
+			reminder_table.insert({'time':time, 'kind':'inf', 'msg':reminder_infinitive, 'speaker':speaker})
 		else:
 			print(3)
 			# Es wurde nicht angegeben, an was erinnert werden soll
 			SAME_DAY_NO_ACTION = random.choice(cfg['intent']['reminder'][LANGUAGE]['reminder_same_day_no_action'])
 			SAME_DAY_NO_ACTION = SAME_DAY_NO_ACTION.format(hours, minutes)
 			result = result + " " + SAME_DAY_NO_ACTION
+			reminder_table.insert({'time':time, 'kind':'none', 'msg':'', 'speaker':speaker})
 	else:
 		if reminder_to:
 			print(4)
 			TO = random.choice(cfg['intent']['reminder'][LANGUAGE]['reminder_to'])
 			TO = TO.format(day, month, year, hours, minutes, reminder_to)
 			result = result + " " + TO
+			reminder_table.insert({'time':time, 'kind':'to', 'msg':reminder_to, 'speaker':speaker})
 		elif reminder_infinitive:
 			print(5)
 			INFINITIVE = random.choice(cfg['intent']['reminder'][LANGUAGE]['reminder_infinitive'])
 			INFINITIVE = INFINITIVE.format(day, month, year, hours, minutes, reminder_infinitive)
 			result = result + " " + INFINITIVE
+			reminder_table.insert({'time':time, 'kind':'inf', 'msg':reminder_infinitive, 'speaker':speaker})
 		else:
 			Print(6)
 			# Es wurde nicht angegeben, an was erinnert werden soll
 			NO_ACTION = random.choice(cfg['intent']['reminder'][LANGUAGE]['reminder_no_action'])
 			NO_ACTION = NO_ACTION.format(day, month, year, hours, minutes)
 			result = result + " " + NO_ACTION
+			reminder_table.insert({'time':time, 'kind':'none', 'msg':'', 'speaker':speaker})
 			
 	return result

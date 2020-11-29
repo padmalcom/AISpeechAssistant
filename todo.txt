@@ -1,5 +1,5 @@
 11 adding a ui
-12 paketierung
+12 paketierung (conda constructor)
 
 intents
 - remind me
