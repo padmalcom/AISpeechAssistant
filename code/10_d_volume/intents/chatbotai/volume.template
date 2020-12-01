@@ -1,0 +1,14 @@
+{% block %}
+    {% client %}Lautstärke (?P<query>.*){% endclient %}
+    {% response %}{% call wiki: %query %}{% endresponse %}
+{% endblock %}
+
+{% block %}
+    {% client %}Lauter (?P<query>.*){% endclient %}
+    {% response %}{% call volume_up: %query %}{% endresponse %}
+{% endblock %}
+
+{% block %}
+    {% client %}Leiser (?P<query>.*){% endclient %}
+    {% response %}{% call volume_down: %query %}{% endresponse %}
+{% endblock %}

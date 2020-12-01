@@ -182,7 +182,7 @@ if __name__ == '__main__':
 							if mixer.music.get_busy():
 								mixer.music.set_volume(0.1)
 							
-							# Spreche das Ergebnis des Callbacks
+							# 
 							global_variables.voice_assistant.tts.say(output)
 							
 							# Wir rufen die selbe Funktion erneut auf und geben mit,

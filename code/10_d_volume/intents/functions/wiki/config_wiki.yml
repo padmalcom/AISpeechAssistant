@@ -1,0 +1,6 @@
+intent:
+    wiki:
+        de:
+            unknown_entity: ["Ich weiß nichts über {}.", "{} sagt mir nichts."]
+        en:
+            unknown_entity: ["I don't know {}.", "{} rings no bell."]

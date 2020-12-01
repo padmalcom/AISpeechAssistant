@@ -1,0 +1,2 @@
+pycountry==20.7.3
+wikipedia==1.4.0

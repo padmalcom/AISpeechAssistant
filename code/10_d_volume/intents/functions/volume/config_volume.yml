@@ -1,0 +1,7 @@
+intent:
+    volume:
+        de:
+            invalid_volume: ["Bitte nenne eine Lautstärke zwischen 0 und 10."]
+        en:
+            invalid_volume: ["Please set the volume between 0 and 10."]
+            
