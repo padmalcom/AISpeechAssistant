@@ -2,6 +2,7 @@ assistant:
     language: "de"
     wakewords: ["bumblebee", "terminator"]
     allow_only_known_speakers: True
+    volume: 0.5
 defaults:
     de:
         no_intent_recognized: ["Ich habe dich nicht verstanden", "Den Befehl habe ich nicht verstanden"]

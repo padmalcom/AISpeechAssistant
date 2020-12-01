@@ -8,7 +8,6 @@ import os
 import sys
 from vosk import Model, SpkModel, KaldiRecognizer
 import json
-import tinydb
 import numpy as np
 from usermgmt import UserMgmt
 import io
@@ -90,10 +89,16 @@ class VoiceAssistant():
 		
 		# Initialisiere den Audio-Player
 		mixer.init()
-		
+		self.volume = self.cfg["assistant"]["volume"]
+		mixer.music.set_volume(self.volume)
+				
 		logger.info("Initialisiere Intent-Management...")
 		self.intent_management = IntentMgmt()
 		logger.info('{} intents geladen', self.intent_management.get_count())
+		
+		# Erzeuge eine Liste, die die Callback Funktionen vorhält
+		self.callbacks = self.intent_management.register_callbacks()
+		logger.info('{} callbacks gefunden', len(self.callbacks))
 		self.tts.say("Initialisierung abgeschlossen")
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
@@ -132,6 +137,11 @@ if __name__ == '__main__':
 				
 			# Spracherkennung
 			if global_variables.voice_assistant.is_listening:
+			
+				# Spielt derzeit Musik oder sonstiges Audio? Dann setze die Lautstärke runter
+				if mixer.music.get_busy():
+					mixer.music.set_volume(0.1)
+						
 				if global_variables.voice_assistant.rec.AcceptWaveform(pcm):
 					recResult = json.loads(global_variables.voice_assistant.rec.Result())
 					
@@ -152,6 +162,37 @@ if __name__ == '__main__':
 						
 						global_variables.voice_assistant.is_listening = False
 						global_variables.voice_assistant.current_speaker = None
+			
+			# Wird derzeit nicht zugehört?
+			else:
+				# Setze die Lautstärke auf Normalniveau zurück
+				mixer.music.set_volume(global_variables.voice_assistant.volume)
+						
+				# Prozessiere alle registrierten Callback Funktionen, die manche Intents
+				# jede Iteration benötigen
+				for cb in global_variables.voice_assistant.callbacks:
+					output = cb()
+					
+					# Gibt die Callback Funktion einen Wert zurück? Dann versuche
+					# ihn zu sprechen.
+					if output:
+						if not global_variables.voice_assistant.tts.is_busy():
+					
+							# Wird etwas abgespielt? Dann schalte die Lautstärke runter
+							if mixer.music.get_busy():
+								mixer.music.set_volume(0.1)
+							
+							# 
+							global_variables.voice_assistant.tts.say(output)
+							
+							# Wir rufen die selbe Funktion erneut auf und geben mit,
+							# dass der zu behandelnde Eintrag abgearbeitet wurde.
+							# Im Falle der Reminder-Funktion wird dann z.B. der Datenbankeintrag
+							# für den Reminder gelöscht
+							cb(True)
+							
+							# TODO Reset Volume
+
 				
 	except KeyboardInterrupt:
 		logger.debug("Per Keyboard beendet")

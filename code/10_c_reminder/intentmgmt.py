@@ -11,15 +11,12 @@ from snips_nlu.default_configs import CONFIG_DE
 from snips_nlu.dataset import Dataset
 from chatbot import Chat, register_call
 import json
-import global_variables
 import random
+import global_variables
 
 @register_call("default_snips_nlu_handler")
 def default_snips_nlu_handler(session, text):
-	print("TEXT:")
-	print(text)
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
-	print(parsing)
 	output = "Ich verstehe deine Frage nicht. Kannst du sie umformulieren?"
 	
 	# Schaue, ob es einen Intent gibt, der zu dem NLU intent passt
@@ -144,7 +141,7 @@ class IntentMgmt:
 				if (not Path(caf).name == Path(WILDCARD_FILE).name) and (not Path(caf).name == Path(MERGED_FILE).name):
 					logger.debug("Verarbeite chatbotai Template {}...", Path(caf).name)
 					with open(caf) as infile:
-							outfile.write(infile.read())
+						outfile.write(infile.read())
 							
 			# Hänge den Wildcard Intent ans Ende
 			if os.path.exists(WILDCARD_FILE):
@@ -160,7 +157,24 @@ class IntentMgmt:
 			self.chat = Chat(MERGED_FILE)
 		else:
 			logger.error('Dialogdatei konnte nicht in {} gefunden werden.', MERGED_FILE)
+						
 		logger.info('Chatbot aus {} initialisiert.', MERGED_FILE)
+		
+	def register_callbacks(self):
+		# Registriere alle Callback Funktionen
+		logger.info("Registriere Callbacks...")
+		callbacks = []
+		for ff in self.functions_folders:
+			module_name = "intents.functions." + Path(ff).name + ".intent_" + Path(ff).name
+			module_obj = sys.modules[module_name]
+			logger.debug("Verarbeite Modul {}...", module_name)
+			if hasattr(module_obj, 'callback'):
+				logger.debug("Callback in {} gefunden.", module_name)
+				logger.info('Registriere Callback für {}.', module_name)
+				callbacks.append(getattr(module_obj, 'callback'))
+			else:
+				logger.debug("{} hat kein Callback.", module_name)
+		return callbacks
 	
 	def process(self, text, speaker):
 	
