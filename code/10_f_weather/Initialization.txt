@@ -1,0 +1,14 @@
+Dinge, die du hier lernen wirst:
+- Feststellen des Standorts
+- Abfragen des Wetters
+
+conda create -n 10_f_weather python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 10_f_weather python=3.6
+
+conda activate 10_f_weather 
+
+Als root:
+python -m snips_nlu download de

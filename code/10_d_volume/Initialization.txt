@@ -2,10 +2,6 @@ Dinge, die du hier lernen wirst:
 - Ändern der Lautstärke für TTS und Sound
 - Dialoge mit mehreren Blöcken
 
-Limit beim Einsprechen genauer Datumswerte, VOSK gibt Zahlen ausgeschrieben an. Die beste Bibliothek,
-um Wörter in Zahlen zu wandeln ist https://github.com/allo-media/text2num, diese unterstützt aber noch kein
-Deutsch.
-
 conda create -n 10_d_volume python=3.8
 
 Hint:

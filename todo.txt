@@ -1,3 +1,8 @@
+Kevin als Alternative zu Porcupine
+Englische Templates und deren Verwaltung
+Weather
+Statistik (Bekannte User, Aufrufe diesen Tag/letzten Tag, das darf nur der Admin)
+
 11 adding a ui
 12 paketierung (conda constructor)
 

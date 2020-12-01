@@ -1,0 +1,13 @@
+Dinge, die du hier lernen wirst:
+- Spielen von MP3 Streams (https://hendrikjansen.nl/henk/streaming3.html)
+
+conda create -n 10_e_music_stream python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 10_e_music_stream python=3.6
+
+conda activate 10_e_music_stream
+
+Als root:
+python -m snips_nlu download de
