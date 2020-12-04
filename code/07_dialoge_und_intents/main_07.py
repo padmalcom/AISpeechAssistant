@@ -156,11 +156,14 @@ if __name__ == '__main__':
 							logger.debug("Sprecher ist {}", speaker)
 						va.current_speaker = speaker
 						va.current_speaker_fingerprint = recResult['spk']
-						logger.debug('Ich habe verstanden "{}"', recResult['text'])
+						sentence = recResult['text']
+						sentence = text2numde.sentence2num(recResult['text'])
+						logger.debug('Ich habe verstanden "{}"', sentence)
+						
 						
 						# Lasse den Assistenten auf die Spracheingabe reagieren.
 						# Problem: Es wird das Default Template aufgerufen, wenn kein Intent erkannt wurde. Und das ist in Englisch.
-						output = va.chat.respond(recResult['text'])
+						output = va.chat.respond(sentence)
 						va.tts.say(output)
 						
 						va.is_listening = False

@@ -1,3 +1,4 @@
+beautifulsoup4==4.9.3
 certifi==2020.6.20
 chardet==3.0.4
 chatbotAI==0.3.0.0
@@ -8,6 +9,7 @@ docopt==0.6.2
 enum34==1.1.10
 future==0.17.1
 idna==2.10
+iso-639==0.4.5
 joblib==0.17.0
 loguru==0.5.3
 num2words==0.5.10
@@ -16,6 +18,7 @@ packaging==20.4
 pvporcupine==1.8.7
 pyaml==19.12.0
 PyAudio @ file:///C:/Users/jfrei/AISpeechAssistant/code/09_intent_management/PyAudio-0.2.11-cp38-cp38-win_amd64.whl
+pycountry==20.7.3
 pygame==2.0.0
 pyparsing==2.4.7
 pypiwin32==223
@@ -33,10 +36,13 @@ snips-nlu==0.20.2
 snips-nlu-de @ https://github.com/snipsco/snips-nlu-language-resources/releases/download/snips_nlu_de-0.2.3/snips_nlu_de-0.2.3.tar.gz
 snips-nlu-parsers==0.4.3
 snips-nlu-utils==0.9.1
+soupsieve==2.0.1
 tabulate==0.8.7
+text2numde==1.0
 tinydb==4.2.0
 tqdm==4.51.0
 urllib3==1.25.11
 vosk==0.3.7
+wikipedia==1.4.0
 win32-setctime==1.0.3
 wincertstore==0.2

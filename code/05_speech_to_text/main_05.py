@@ -9,6 +9,7 @@ import sys
 
 from vosk import Model, SpkModel, KaldiRecognizer
 import json
+import text2numde 
 
 from TTS import Voice
 import multiprocessing
@@ -99,7 +100,14 @@ if __name__ == '__main__':
 			if va.is_listening:
 				if va.rec.AcceptWaveform(pcm):
 					recResult = json.loads(va.rec.Result())
-					logger.debug('Ich habe verstanden "{}"', recResult['text'])
+					
+					# Hole das Resultat aus dem JSON Objekt
+					sentence = recResult['text']
+					
+					# Konvertiere Zahlenwörter in Zahlen
+					sentence = text2numde.sentence2num(recResult['text'])
+					logger.debug('Ich habe verstanden "{}"', sentence)
+
 					va.is_listening = False
 				
 	except KeyboardInterrupt:

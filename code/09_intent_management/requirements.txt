@@ -33,6 +33,7 @@ snips-nlu-de @ https://github.com/snipsco/snips-nlu-language-resources/releases/
 snips-nlu-parsers==0.4.3
 snips-nlu-utils==0.9.1
 tabulate==0.8.7
+text2numde==1.0
 tinydb==4.2.0
 tqdm==4.51.0
 urllib3==1.25.11

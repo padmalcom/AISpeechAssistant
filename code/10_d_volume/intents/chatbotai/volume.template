@@ -1,14 +1,24 @@
 {% block %}
-    {% client %}Lautstärke (?P<query>.*){% endclient %}
-    {% response %}{% call wiki: %query %}{% endresponse %}
+    {% client %}Lautstärke (?P<volume>.*){% endclient %}
+    {% response %}{% call set_volume: %volume %}{% endresponse %}
 {% endblock %}
 
 {% block %}
-    {% client %}Lauter (?P<query>.*){% endclient %}
-    {% response %}{% call volume_up: %query %}{% endresponse %}
+    {% client %}Lauter (?P<volume>.*){% endclient %}
+    {% response %}{% call volume_up: %volume %}{% endresponse %}
 {% endblock %}
 
 {% block %}
-    {% client %}Leiser (?P<query>.*){% endclient %}
-    {% response %}{% call volume_down: %query %}{% endresponse %}
+    {% client %}Leiser (?P<volume>.*){% endclient %}
+    {% response %}{% call volume_down: %volume %}{% endresponse %}
+{% endblock %}
+
+{% block %}
+    {% client %}Lauter{% endclient %}
+    {% response %}{% call volume_up: "lauter" %}{% endresponse %}
+{% endblock %}
+
+{% block %}
+    {% client %}Leiser{% endclient %}
+    {% response %}{% call volume_down: "leiser" %}{% endresponse %}
 {% endblock %}

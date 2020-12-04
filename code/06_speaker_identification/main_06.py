@@ -144,7 +144,9 @@ if __name__ == '__main__':
 							logger.debug("Sprecher ist {}", speaker)
 						va.current_speaker = speaker
 						va.current_speaker_fingerprint = recResult['spk']
-						logger.debug('Ich habe verstanden "{}"', recResult['text'])
+						sentence = recResult['text']
+						sentence = text2numde.sentence2num(recResult['text'])
+						logger.debug('Ich habe verstanden "{}"', sentence)
 						va.is_listening = False
 						va.current_speaker = None
 				

@@ -174,10 +174,12 @@ if __name__ == '__main__':
 							logger.debug("Sprecher ist {}", speaker)
 						va.current_speaker = speaker
 						va.current_speaker_fingerprint = recResult['spk']
-						logger.debug('Ich habe verstanden "{}"', recResult['text'])
+						sentence = recResult['text']
+						sentence = text2numde.sentence2num(recResult['text'])
+						logger.debug('Ich habe verstanden "{}"', sentence)
 						
 						# Lasse den Assistenten auf die Spracheingabe reagieren
-						parsing = va.nlu_engine.parse(recResult['text'])
+						parsing = va.nlu_engine.parse(sentence)
 						print(parsing)
 						output = ""
 						if parsing["intent"]["intentName"] == "getTime":

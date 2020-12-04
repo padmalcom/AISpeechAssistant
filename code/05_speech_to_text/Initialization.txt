@@ -4,6 +4,7 @@ Dinge, die du hier lernen wirst:
 - Umschalten zwischen dem Warte- und dem Befehlsmodus
 - Unterscheiden von Modellgüten
 - Verarbeiten von Daten im JSON Format
+- Umwandeln von Zahlenwörter in Zahlenwerte (https://github.com/padmalcom/text2numde)
 
 conda create -n 05_speech_to_text python=3.8
 

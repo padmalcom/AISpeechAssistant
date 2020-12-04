@@ -138,10 +138,12 @@ if __name__ == '__main__':
 							logger.debug("Sprecher ist {}", speaker)
 						global_variables.voice_assistant.current_speaker = speaker
 						global_variables.voice_assistant.current_speaker_fingerprint = recResult['spk']
-						logger.debug('Ich habe verstanden "{}"', recResult['text'])
+						sentence = recResult['text']
+						sentence = text2numde.sentence2num(recResult['text'])
+						logger.debug('Ich habe verstanden "{}"', sentence)
 						
 						# Lasse den Assistenten auf die Spracheingabe reagieren
-						output = global_variables.voice_assistant.intent_management.process(recResult['text'], speaker)
+						output = global_variables.voice_assistant.intent_management.process(sentence, speaker)
 						global_variables.voice_assistant.tts.say(output)
 						
 						global_variables.voice_assistant.is_listening = False
