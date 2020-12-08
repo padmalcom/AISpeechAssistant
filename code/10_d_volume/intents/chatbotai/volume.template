@@ -1,4 +1,8 @@
 {% block %}
+    {% client %}(lautstärke|wie ist die lautstärke|wie laut ist es){% endclient %}
+    {% response %}{% call getVolume: 0 %}{% endresponse %}
+{% endblock %}
+{% block %}
     {% client %}(lautstärke|setze lautstärke|setze lautstärke auf) (?P<volume>.*){% endclient %}
     {% response %}{% call setVolume: %volume %}{% endresponse %}
 {% endblock %}

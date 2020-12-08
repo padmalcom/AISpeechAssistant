@@ -1,6 +1,7 @@
 Dinge, die du hier lernen wirst:
 - Ändern der Lautstärke für TTS und Sound
-- Bester Usecase für Snips NLU, da Lautstärken sehr dynamisch ausgedrückt werden können
+- Einführen einer silenced volume, falls neben TTS ein Stream gespielt wird
+- Speichern der Einstellungen
 
 conda create -n 10_d_volume python=3.8
 
