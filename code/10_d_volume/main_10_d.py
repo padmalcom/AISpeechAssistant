@@ -155,7 +155,6 @@ if __name__ == '__main__':
 						global_variables.voice_assistant.current_speaker = speaker
 						global_variables.voice_assistant.current_speaker_fingerprint = recResult['spk']
 						sentence = recResult['text']
-						sentence = text2numde.sentence2num(recResult['text'])
 						logger.debug('Ich habe verstanden "{}"', sentence)
 						
 						# Lasse den Assistenten auf die Spracheingabe reagieren

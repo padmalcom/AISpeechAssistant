@@ -1,0 +1,21 @@
+# volume intents
+---
+type: intent
+name: set_volume
+utterances:
+    - Lautstärke [volume:snips/number](3)
+    - Setze die Lautstärke auf [volume:snips/number](3)
+
+type: intent
+name: louder
+utterances:
+    - Lauter
+    - Mach mal lauter
+    - Lauter lauter
+    
+type: intent
+name: quieter
+utterances:
+    - Leiser
+    - Mach mal leiser
+    - Leiser leiser

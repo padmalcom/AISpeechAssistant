@@ -14,7 +14,6 @@ pyttsx3==2.90
 pywin32==228
 PyYAML==5.3.1
 requests==2.24.0
-text2numde==1.0
 tinydb==4.2.0
 urllib3==1.25.11
 vosk==0.3.7

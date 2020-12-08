@@ -103,9 +103,6 @@ if __name__ == '__main__':
 					
 					# Hole das Resultat aus dem JSON Objekt
 					sentence = recResult['text']
-					
-					# Konvertiere Zahlenwörter in Zahlen
-					sentence = text2numde.sentence2num(recResult['text'])
 					logger.debug('Ich habe verstanden "{}"', sentence)
 
 					va.is_listening = False

@@ -1,6 +1,6 @@
 Dinge, die du hier lernen wirst:
 - Ändern der Lautstärke für TTS und Sound
-- Dialoge mit mehreren Blöcken
+- Bester Usecase für Snips NLU, da Lautstärken sehr dynamisch ausgedrückt werden können
 
 conda create -n 10_d_volume python=3.8
 

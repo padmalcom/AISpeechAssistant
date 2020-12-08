@@ -1,24 +1,20 @@
 {% block %}
-    {% client %}Lautstärke (?P<volume>.*){% endclient %}
-    {% response %}{% call set_volume: %volume %}{% endresponse %}
+    {% client %}(lautstärke|setze lautstärke|setze lautstärke auf) (?P<volume>.*){% endclient %}
+    {% response %}{% call setVolume: %volume %}{% endresponse %}
 {% endblock %}
-
 {% block %}
-    {% client %}Lauter (?P<volume>.*){% endclient %}
-    {% response %}{% call volume_up: %volume %}{% endresponse %}
+    {% client %}lauter{% endclient %}
+    {% response %}{% call volumeUp: 1 %}{% endresponse %}
 {% endblock %}
-
 {% block %}
-    {% client %}Leiser (?P<volume>.*){% endclient %}
-    {% response %}{% call volume_down: %volume %}{% endresponse %}
+    {% client %}leiser{% endclient %}
+    {% response %}{% call volumeDown: 1 %}{% endresponse %}
 {% endblock %}
-
 {% block %}
-    {% client %}Lauter{% endclient %}
-    {% response %}{% call volume_up: "lauter" %}{% endresponse %}
+    {% client %}lauter (?P<volume>.*){% endclient %}
+    {% response %}{% call volumeUp: %volume %}{% endresponse %}
 {% endblock %}
-
 {% block %}
-    {% client %}Leiser{% endclient %}
-    {% response %}{% call volume_down: "leiser" %}{% endresponse %}
+    {% client %}leiser (?P<volume>.*){% endclient %}
+    {% response %}{% call volumeDown: %volume %}{% endresponse %}
 {% endblock %}

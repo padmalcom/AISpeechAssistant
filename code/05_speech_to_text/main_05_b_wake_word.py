@@ -1,17 +1,14 @@
 from loguru import logger
 import yaml
 import time
-import pvporcupine
 import pyaudio
 import struct
 import os
 import sys
+
 from vosk import Model, SpkModel, KaldiRecognizer
 import json
-
-import tinydb
-import numpy as np
-from usermgmt import UserMgmt
+import text2numde 
 
 from TTS import Voice
 import multiprocessing
@@ -37,14 +34,6 @@ class VoiceAssistant():
 		if not language:
 			language = "de"
 		logger.info("Verwende Sprache {}", language)
-			
-		logger.debug("Initialisiere Wake Word Erkennung...")
-		self.wake_words = self.cfg['assistant']['wakewords']
-		if not self.wake_words:
-			self.wake_words = ['bumblebee']
-		logger.debug("Wake Words sind {}", ','.join(self.wake_words))
-		self.porcupine = pvporcupine.create(keywords=self.wake_words)
-		logger.debug("Wake Word Erkennung wurde initialisiert.")
 		
 		logger.debug("Initialisiere Audioeingabe...")
 		self.pa = pyaudio.PyAudio()
@@ -69,38 +58,14 @@ class VoiceAssistant():
 		self.tts.say("Initialisierung abgeschlossen")
 		logger.debug("Sprachausgabe initialisiert")
 		
+		# Initialisiere Spracherkennung
 		logger.info("Initialisiere Spracherkennung...")
 		stt_model = Model('./vosk-model-de-0.6')
 		speaker_model = SpkModel('./vosk-model-spk-0.4')
 		self.rec = KaldiRecognizer(stt_model, speaker_model, 16000)
+		# Hört der Assistent gerade auf einen Befehl oder wartet er auf ein Wake Word?
 		self.is_listening = False
 		logger.info("Initialisierung der Spracherkennung abgeschlossen.")
-		
-		# Initialisiere die Benutzerverwaltung
-		logger.info("Initialisiere Benutzerverwaltung...")
-		self.user_management = UserMgmt(init_dummies=True)
-		self.allow_only_known_speakers = self.cfg["assistant"]["allow_only_known_speakers"]
-		logger.info("Benutzerverwaltung initialisiert")
-	
-	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
-	def __detectSpeaker__(self, input):
-		bestSpeaker = None
-		bestCosDist = 100
-		for speaker in self.user_management.speaker_table.all():
-			# Die Cosinus-Ähnlichkeit interpretiert das Muster des gespeicherten Sprechers
-			# und des aktuellen Sprechers als Vektor und berechnet deren Distanz über
-			# den Cosinus-Winkel zwischen den Vektoren. Je kleiner der Winkel, desto ähnlicher
-			# sind die beiden Stimmen. Der Wert liegt immer zwischen 0.0 und 1.0 wobei 0.0 eine
-			# absolute Ähnlichkeit bedeutet. Wir setzen 0.3 als Schwelle für die Ähnlichkeit
-			# gemäß MUP (Methode des unbekümmerten Probierens).
-			nx = np.array(speaker.get('voice'))
-			ny = np.array(input)
-			cosDist = 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
-			if (cosDist < bestCosDist):
-				if (cosDist < 0.3):
-					bestCosDist = cosDist
-					bestSpeaker = speaker.get('name')
-		return bestSpeaker		
 			
 	def run(self):
 		logger.info("VoiceAssistant Instanz wurde gestartet.")
@@ -127,27 +92,11 @@ if __name__ == '__main__':
 				if va.rec.AcceptWaveform(pcm):
 					recResult = json.loads(va.rec.Result())
 					
-					# Hole den Namen des Sprechers falls bekannt.
-					speaker = va.__detectSpeaker__(recResult['spk'])
-					
-					# Zeige den "Fingerabdruck" deiner Stimme. Speichere diesen und füge
-					# ihn mit einer neuen ID in db.json ein, die nach dem ersten Aufruf
-					# im Projektverzeichnis erstellt wird.
-					logger.debug('Deine Stimme sieht so aus {}', recResult['spk'])
-					
-					# Sind nur bekannte sprecher erlaubt?
-					if (speaker == None) and (va.allow_only_known_speakers == True):
-						print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
-						va.current_speaker = None
-					else:
-						if speaker:
-							logger.debug("Sprecher ist {}", speaker)
-						va.current_speaker = speaker
-						va.current_speaker_fingerprint = recResult['spk']
-						sentence = recResult['text']
-						logger.debug('Ich habe verstanden "{}"', sentence)
-						va.is_listening = False
-						va.current_speaker = None
+					# Hole das Resultat aus dem JSON Objekt
+					sentence = recResult['text']
+					logger.debug('Ich habe verstanden "{}"', sentence)
+
+					va.is_listening = False
 				
 	except KeyboardInterrupt:
 		logger.debug("Per Keyboard beendet")
@@ -160,4 +109,4 @@ if __name__ == '__main__':
 			va.audio_stream.close()
 			
 		if va.pa is not None:
-			va.pa.terminate()			
+			va.pa.terminate()				
