@@ -1,5 +1,10 @@
 Dinge, die du hier lernen wirst:
 - Spielen von MP3 Streams (https://hendrikjansen.nl/henk/streaming3.html)
+- Verwendung von Fuzzy String Vergleichen
+- Eine eigene Audioplayer Klasse
+- installation über conda
+
+conda install ffmpeg
 
 conda create -n 10_e_music_stream python=3.8
 

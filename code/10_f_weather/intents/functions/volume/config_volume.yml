@@ -2,10 +2,12 @@ intent:
     volume:
         de:
             invalid_volume: ["Bitte nenne eine Lautstärke zwischen 0 und 10."]
-            volume_up: "Lauter"
-            volume_down: "Leiser"
+            volume_up: "lauter"
+            volume_down: "leiser"
+            volume_is: "Die Lautstärke ist {}"
         en:
             invalid_volume: ["Please set the volume between 0 and 10."]
-            volume_up: "Volume up"
-            volume_down: "Volume down"
+            volume_up: "volume up"
+            volume_down: "volume down"
+            volume_is: "Volume is {}"
             

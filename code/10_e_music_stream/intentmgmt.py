@@ -17,6 +17,7 @@ import global_variables
 @register_call("default_snips_nlu_handler")
 def default_snips_nlu_handler(session, text):
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
+
 	output = "Ich verstehe deine Frage nicht. Kannst du sie umformulieren?"
 	
 	# Schaue, ob es einen Intent gibt, der zu dem NLU intent passt

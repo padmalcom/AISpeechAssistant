@@ -63,6 +63,10 @@ class VoiceAssistant():
 			frames_per_buffer=self.porcupine.frame_length,
 			input_device_index=0)
 		logger.debug("Audiostream geöffnet.")
+		
+		# Lese Lautstärke
+		self.volume = self.cfg["assistant"]["volume"]
+		self.silenced_volume = self.cfg["assistant"]["silenced_volume"]
 
 		logger.info("Initialisiere Sprachausgabe...")
 		self.tts = Voice()
@@ -72,6 +76,7 @@ class VoiceAssistant():
 			self.tts.set_voice(voices[0])
 		else:
 			logger.warning("Es wurden keine Stimmen gefunden.")
+		self.tts.set_volume(self.volume)
 		self.tts.say("Sprachausgabe aktiviert.")
 		logger.debug("Sprachausgabe initialisiert")
 		
@@ -89,12 +94,14 @@ class VoiceAssistant():
 		
 		# Initialisiere den Audio-Player
 		mixer.init()
-		self.volume = self.cfg["assistant"]["volume"]
 		mixer.music.set_volume(self.volume)
 				
 		logger.info("Initialisiere Intent-Management...")
 		self.intent_management = IntentMgmt()
 		logger.info('{} intents geladen', self.intent_management.get_count())
+		
+		# Initialisiere Audio Player
+		self.audio_player = pyaudio.PyAudio()
 		
 		# Erzeuge eine Liste, die die Callback Funktionen vorhält
 		self.callbacks = self.intent_management.register_callbacks()
@@ -140,7 +147,7 @@ if __name__ == '__main__':
 			
 				# Spielt derzeit Musik oder sonstiges Audio? Dann setze die Lautstärke runter
 				if mixer.music.get_busy():
-					mixer.music.set_volume(0.1)
+					mixer.music.set_volume(global_variables.voice_assistant.silenced_volume)
 						
 				if global_variables.voice_assistant.rec.AcceptWaveform(pcm):
 					recResult = json.loads(global_variables.voice_assistant.rec.Result())
@@ -181,7 +188,7 @@ if __name__ == '__main__':
 					
 							# Wird etwas abgespielt? Dann schalte die Lautstärke runter
 							if mixer.music.get_busy():
-								mixer.music.set_volume(0.1)
+								mixer.music.set_volume(mixer.music.set_volume(global_variables.voice_assistant.silenced_volume))
 							
 							# 
 							global_variables.voice_assistant.tts.say(output)
@@ -192,13 +199,20 @@ if __name__ == '__main__':
 							# für den Reminder gelöscht
 							cb(True)
 							
-							# TODO Reset Volume
-
+							# Zurücksetzen der Lautstärke auf Normalniveau
+							mixer.music.set_volume(global_variables.voice_assistant.volume)
 				
 	except KeyboardInterrupt:
 		logger.debug("Per Keyboard beendet")
 	finally:
 		logger.debug('Beginne Aufräumarbeiten...')
+		
+		# Speichern der Konfiguration
+		global_variables.voice_assistant.cfg["assistant"]["volume"] = global_variables.voice_assistant.volume
+		global_variables.voice_assistant.cfg["assistant"]["silenced_volume"] = global_variables.voice_assistant.silenced_volume
+		with open(CONFIG_FILE, 'w') as f:
+			yaml.dump(global_variables.voice_assistant.cfg, f, default_flow_style=False, sort_keys=False)		
+		
 		if global_variables.voice_assistant.porcupine:
 			global_variables.voice_assistant.porcupine.delete()
 			

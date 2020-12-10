@@ -4,12 +4,13 @@ import random
 import os
 import yaml
 from pygame import mixer
+import audioplayer
 
 @register_call("animalSound")
 def animalSound(session_id = "general", animal="none"):
 
 	config_path = os.path.join('intents','functions','animalsounds','config_animalsounds.yml')
-	mp3_path = os.path.join('intents','functions','animalsounds','animals')
+	ogg_path = os.path.join('intents','functions','animalsounds','animals')
 	cfg = None
 	with open(config_path, "r", encoding='utf8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -30,11 +31,12 @@ def animalSound(session_id = "general", animal="none"):
 
 	for a in animals:
 		if animal.strip().lower() in animals[a]:
-			mp3_file = os.path.join(mp3_path, a + '.mp3')
-			if mixer.music.get_busy():
-				mixer.music.stop()
-			mixer.music.load(mp3_file)
-			mixer.music.play()
+			ogg_file = os.path.join(ogg_path, a + '.ogg')
+			#if mixer.music.get_busy():
+			#	mixer.music.stop()
+			#mixer.music.load(ogg_file)
+			#mixer.music.play()
+			audioplayer.play_file(ogg_file)
 			
 			# Der Assistent muss nicht sprechen, wenn ein Tierlaut wiedergegeben wird
 			return ""
