@@ -2,6 +2,7 @@ Dinge, die du hier lernen wirst:
 - Ändern der Lautstärke für TTS und Sound
 - Einführen einer silenced volume, falls neben TTS ein Stream gespielt wird
 - Speichern der Einstellungen
+- Optionale Parameter in einem Chat
 
 conda create -n 10_d_volume python=3.8
 

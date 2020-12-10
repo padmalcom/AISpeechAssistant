@@ -3,8 +3,6 @@ import global_variables
 import random
 import os
 import yaml
-from pygame import mixer
-import audioplayer
 
 @register_call("animalSound")
 def animalSound(session_id = "general", animal="none"):
@@ -36,7 +34,7 @@ def animalSound(session_id = "general", animal="none"):
 			#	mixer.music.stop()
 			#mixer.music.load(ogg_file)
 			#mixer.music.play()
-			audioplayer.play_file(ogg_file)
+			global_variables.voice_assistant.audio_player.play_file(ogg_file)
 			
 			# Der Assistent muss nicht sprechen, wenn ein Tierlaut wiedergegeben wird
 			return ""

@@ -8,7 +8,6 @@ from pygame import mixer
 
 import text2numde
 from fuzzywuzzy import fuzz
-import audioplayer
 
 def musicstream(station=None):
 
@@ -58,7 +57,7 @@ def musicstream(station=None):
 	#mixer.music.load(station_stream)
 	#mixer.music.play()
 	#global_variables.voice_assistant.play_audio(station_stream)
-	audioplayer.play_stream(station_stream)
+	global_variables.voice_assistant.audio_player.play_stream(station_stream)
 		
 	# Der Assistent muss nicht sprechen, wenn ein Radiostream gespielt wird
 	return ""	

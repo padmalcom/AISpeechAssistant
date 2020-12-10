@@ -4,7 +4,7 @@ assistant:
   - bumblebee
   - terminator
   allow_only_known_speakers: true
-  volume: 0.3
+  volume: 0.7
   silenced_volume: 0.1
 defaults:
   de:

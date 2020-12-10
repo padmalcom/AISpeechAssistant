@@ -4,7 +4,6 @@ import global_variables
 import yaml
 import random
 import os
-from pygame import mixer
 
 # Spezieller Intent, der Zugriff auf voice_assistant braucht	
 @register_call("stop")
@@ -32,8 +31,8 @@ def stop(session_id = "general", dummy=0):
 			result = random.choice(cfg['intent']['stop'][LANGUAGE]['be_silent'])
 			
 		# Wird ein Sound ausgegeben? Stoppe ihn
-		if mixer.music.get_busy():
-			mixer.music.stop()
+		if global_variables.voice_assistant.audio_player.is_playing():
+			global_variables.voice_assistant.audio_player.stop()
 			result = random.choice(cfg['intent']['stop'][LANGUAGE]['be_silent'])
 			
 		return result

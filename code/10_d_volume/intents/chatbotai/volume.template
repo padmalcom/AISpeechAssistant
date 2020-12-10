@@ -1,24 +1,16 @@
 {% block %}
-    {% client %}(lautstärke|wie ist die lautstärke|wie laut ist es){% endclient %}
+    {% client %}(wie ist die lautstärke|wie laut ist es){% endclient %}
     {% response %}{% call getVolume: 0 %}{% endresponse %}
 {% endblock %}
 {% block %}
-    {% client %}(lautstärke|setze lautstärke|setze lautstärke auf) (?P<volume>.*){% endclient %}
+    {% client %}(lautstärke|setze lautstärke|setze lautstärke auf)(\s*)(?P<volume>.*)?{% endclient %}
     {% response %}{% call setVolume: %volume %}{% endresponse %}
 {% endblock %}
 {% block %}
-    {% client %}lauter{% endclient %}
-    {% response %}{% call volumeUp: 1 %}{% endresponse %}
-{% endblock %}
-{% block %}
-    {% client %}leiser{% endclient %}
-    {% response %}{% call volumeDown: 1 %}{% endresponse %}
-{% endblock %}
-{% block %}
-    {% client %}lauter (?P<volume>.*){% endclient %}
+    {% client %}lauter(\s*)(?P<volume>.*)?{% endclient %}
     {% response %}{% call volumeUp: %volume %}{% endresponse %}
 {% endblock %}
 {% block %}
-    {% client %}leiser (?P<volume>.*){% endclient %}
+    {% client %}leiser(\s*)(?P<volume>.*)?{% endclient %}
     {% response %}{% call volumeDown: %volume %}{% endresponse %}
 {% endblock %}

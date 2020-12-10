@@ -37,7 +37,7 @@ class AudioPlayer:
 			logger.error("Error bei der Soundwiedergabe {}.", status)
 		
 	def _play_stream(self, source):
-	
+		print("Vol: " + str(self._volume))
 		_q = Queue(maxsize=20)
 		
 		def _callback_stream(outdata, frames, time, status):
@@ -46,7 +46,7 @@ class AudioPlayer:
 			assert not status
 			try:
 				data = _q.get_nowait()
-				#data = data * self._volume
+				#data = data
 			except queue.Empty as e:
 				raise sd.CallbackAbort from e
 			assert len(data) == len(outdata)
@@ -70,9 +70,7 @@ class AudioPlayer:
 		samplerate = float(stream['sample_rate'])
 		
 		try:
-			process = ffmpeg.input(
-				source
-			).output(
+			process = ffmpeg.input(source).filter('volume', self._volume).output(
 				'pipe:',
 				format='f32le',
 				acodec='pcm_f32le',

@@ -25,12 +25,15 @@ def __read_config__():
 @register_call("getVolume")
 def getVolume(session_id = "general", dummy=0):
 	cfg, language = __read_config__()
-	logger.info("Lautstärke ist {}.", global_variables.voice_assistant.volume)
-	return cfg['intent']['volume'][language]['volume_is'].format(global_variables.voice_assistant.volume)
+	logger.info("Lautstärke ist {} von zehn.", int(global_variables.voice_assistant.volume * 10))
+	return cfg['intent']['volume'][language]['volume_is'].format(int(global_variables.voice_assistant.volume * 10))
 
 @register_call("setVolume")
 def setVolume(session_id = "general", volume=None):
 	cfg, language = __read_config__()
+	
+	if volume.strip() == "":
+		return getVolume(session_id, 0)
 
 	# konvertiere das Zahlenwort in einen geladenanzzahligen Wert
 	if isinstance(volume, str):
