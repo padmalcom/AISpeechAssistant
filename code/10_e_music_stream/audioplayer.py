@@ -8,14 +8,14 @@ import soundfile as sf
 import multiprocessing
 import queue # Für die Exceptions
 from multiprocessing import Queue
+from functools import partial
 
 class AudioPlayer:
 
 	def __init__(self):
+		print(sd.query_devices())
 		self._process = None
-		#self._q = Queue(maxsize=20)
 		self._volume = 0.5
-	#_event = threading.Event()
 	
 	def play_file(self, file):
 		if self._process:
@@ -35,10 +35,10 @@ class AudioPlayer:
 		status = sd.wait()	
 		if status:
 			logger.error("Error bei der Soundwiedergabe {}.", status)
-		
+			
 	def _play_stream(self, source):
-		print("Vol: " + str(self._volume))
 		_q = Queue(maxsize=20)
+		logger.info("Spiele auf Device {}.", sd.default.device['output'])
 		
 		def _callback_stream(outdata, frames, time, status):
 			if status.output_underflow:
@@ -46,7 +46,6 @@ class AudioPlayer:
 			assert not status
 			try:
 				data = _q.get_nowait()
-				#data = data
 			except queue.Empty as e:
 				raise sd.CallbackAbort from e
 			assert len(data) == len(outdata)
@@ -89,12 +88,13 @@ class AudioPlayer:
 			with stream:
 				timeout = 1024 * 20 / samplerate
 				while True:
+					print("put")
 					_q.put(process.stdout.read(read_size), timeout=timeout)
 		#except KeyboardInterrupt:
 		#	logger.error('\nInterrupted by user')
-		except queue.Full as e:
+		#except queue.Full as e:
 			# A timeout occurred, i.e. there was an error in the callback
-			logger.error("Queue ist voll: {}", e)
+			#logger.error("Queue ist voll: {}", e)
 		except Exception as e:
 			logger.error(e)
 			

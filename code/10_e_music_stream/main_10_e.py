@@ -217,5 +217,8 @@ if __name__ == '__main__':
 		if global_variables.voice_assistant.audio_stream is not None:
 			global_variables.voice_assistant.audio_stream.close()
 			
+		if global_variables.voice_assistant.audio_player is not None:
+			global_variables.voice_assistant.audio_player.stop()
+			
 		if global_variables.voice_assistant.pa is not None:
 			global_variables.voice_assistant.pa.terminate()			
