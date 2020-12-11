@@ -12,8 +12,6 @@ import numpy as np
 from usermgmt import UserMgmt
 import io
 
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
 from TTS import Voice
 import multiprocessing
 
@@ -92,8 +90,6 @@ class VoiceAssistant():
 		logger.info("Benutzerverwaltung initialisiert")
 		
 		# Initialisiere den Audio-Player
-		#mixer.init()
-		#mixer.music.set_volume(self.volume)
 		self.audio_player = AudioPlayer()
 		self.audio_player.set_volume(self.volume)
 
@@ -216,7 +212,8 @@ if __name__ == '__main__':
 			
 		if global_variables.voice_assistant.audio_stream is not None:
 			global_variables.voice_assistant.audio_stream.close()
-			
+		
+		# Räume mögliche Prozesse des Audio Players weg
 		if global_variables.voice_assistant.audio_player is not None:
 			global_variables.voice_assistant.audio_player.stop()
 			

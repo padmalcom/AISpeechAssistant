@@ -3,7 +3,6 @@ Dinge, die du hier lernen wirst:
 - Verwendung von Fuzzy String Vergleichen
 - Eine eigene Audioplayer Klasse
 - installation über conda
-- Verwenden von Partials und Lambdas zum Übergeben von Parametern an Callback
 
 conda install ffmpeg
 

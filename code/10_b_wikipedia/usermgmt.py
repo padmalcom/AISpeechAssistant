@@ -14,7 +14,7 @@ class UserMgmt:
 
 	def __init__(self, init_dummies=False):
 		# initialize a db to store speaker data
-		self.db = TinyDB('./db.json')
+		self.db = TinyDB('./users.json')
 		self.speaker_table = self.db.table('speakers')
 		if init_dummies:
 			self.__add_dummies__()

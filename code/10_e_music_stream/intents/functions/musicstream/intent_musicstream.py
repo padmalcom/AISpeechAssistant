@@ -4,7 +4,6 @@ import global_variables
 import random
 import os
 import yaml
-from pygame import mixer
 
 import text2numde
 from fuzzywuzzy import fuzz

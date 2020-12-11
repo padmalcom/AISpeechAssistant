@@ -131,7 +131,7 @@ if __name__ == '__main__':
 					speaker = va.__detectSpeaker__(recResult['spk'])
 					
 					# Zeige den "Fingerabdruck" deiner Stimme. Speichere diesen und füge
-					# ihn mit einer neuen ID in db.json ein, die nach dem ersten Aufruf
+					# ihn mit einer neuen ID in users.json ein, die nach dem ersten Aufruf
 					# im Projektverzeichnis erstellt wird.
 					logger.debug('Deine Stimme sieht so aus {}', recResult['spk'])
 					

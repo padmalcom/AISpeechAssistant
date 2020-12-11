@@ -1,0 +1,4 @@
+{% block %}
+    {% client %}(wie ist das wetter in|wie ist das wetter|wetter|wetter in)(\s*)?(?P<location>.*){% endclient %}
+    {% response %}{% call weather: %location %}{% endresponse %}
+{% endblock %}

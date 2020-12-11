@@ -4,7 +4,6 @@ import global_variables
 import yaml
 import random
 import os
-from pygame import mixer
 import text2numde
 
 # Konfiguration muss in jedem Call neu gelesen werden, da beim Laden des gesamten Moduls

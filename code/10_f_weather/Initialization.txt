@@ -1,8 +1,11 @@
 Dinge, die du hier lernen wirst:
 - Feststellen des Standorts
 - Abfragen des Wetters
+- Erlaube Abfrage nur bestimmten Benutzern
 
 conda create -n 10_f_weather python=3.8
+
+conda install ffmpeg
 
 Hint:
 Raspberry Pi supports python up to 3.6:

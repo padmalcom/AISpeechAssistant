@@ -12,17 +12,14 @@ import numpy as np
 from usermgmt import UserMgmt
 import io
 
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-from pygame import mixer
-
 from TTS import Voice
 import multiprocessing
 
 from intentmgmt import IntentMgmt
 
-CONFIG_FILE = "config.yml"
+from audioplayer import AudioPlayer
 
-#va = None
+CONFIG_FILE = "config.yml"
 
 class VoiceAssistant():
 
@@ -93,8 +90,8 @@ class VoiceAssistant():
 		logger.info("Benutzerverwaltung initialisiert")
 		
 		# Initialisiere den Audio-Player
-		mixer.init()
-		mixer.music.set_volume(self.volume)
+		self.audio_player = AudioPlayer()
+		self.audio_player.set_volume(self.volume)
 				
 		logger.info("Initialisiere Intent-Management...")
 		self.intent_management = IntentMgmt()
@@ -143,8 +140,8 @@ if __name__ == '__main__':
 			if global_variables.voice_assistant.is_listening:
 			
 				# Spielt derzeit Musik oder sonstiges Audio? Dann setze die Lautstärke runter
-				if mixer.music.get_busy():
-					mixer.music.set_volume(global_variables.voice_assistant.silenced_volume)
+				if global_variables.voice_assistant.audio_player.is_playing():
+					global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume)
 						
 				if global_variables.voice_assistant.rec.AcceptWaveform(pcm):
 					recResult = json.loads(global_variables.voice_assistant.rec.Result())
@@ -171,7 +168,7 @@ if __name__ == '__main__':
 			# Wird derzeit nicht zugehört?
 			else:
 				# Setze die Lautstärke auf Normalniveau zurück
-				mixer.music.set_volume(global_variables.voice_assistant.volume)
+				global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 						
 				# Prozessiere alle registrierten Callback Funktionen, die manche Intents
 				# jede Iteration benötigen
@@ -184,8 +181,8 @@ if __name__ == '__main__':
 						if not global_variables.voice_assistant.tts.is_busy():
 					
 							# Wird etwas abgespielt? Dann schalte die Lautstärke runter
-							if mixer.music.get_busy():
-								mixer.music.set_volume(mixer.music.set_volume(global_variables.voice_assistant.silenced_volume))
+							if global_variables.voice_assistant.audio_player.is_playing():
+								global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume))
 							
 							# 
 							global_variables.voice_assistant.tts.say(output)
@@ -197,7 +194,7 @@ if __name__ == '__main__':
 							cb(True)
 							
 							# Zurücksetzen der Lautstärke auf Normalniveau
-							mixer.music.set_volume(global_variables.voice_assistant.volume)
+							global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 				
 	except KeyboardInterrupt:
 		logger.debug("Per Keyboard beendet")
@@ -215,6 +212,9 @@ if __name__ == '__main__':
 			
 		if global_variables.voice_assistant.audio_stream is not None:
 			global_variables.voice_assistant.audio_stream.close()
+			
+		if global_variables.voice_assistant.audio_player is not None:
+			global_variables.voice_assistant.audio_player.stop()			
 			
 		if global_variables.voice_assistant.pa is not None:
 			global_variables.voice_assistant.pa.terminate()			

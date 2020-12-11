@@ -1,0 +1,7 @@
+intent:
+    location:
+        de:
+            youarehere: ["Du befindest dich in {}.", "Du bist in {}."]
+        en:
+            youarehere: ["You are in {}."]
+            
