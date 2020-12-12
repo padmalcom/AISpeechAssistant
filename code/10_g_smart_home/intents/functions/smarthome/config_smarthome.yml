@@ -1,0 +1,14 @@
+intent:
+    smarthome:
+        de:
+            state_unknown: "Der Zustand {} ist für den Schalter ungültig."
+            device_unknown: "Das Gerät {} kenne ich nicht."
+            on: ["an", "ein"]
+            off: ["aus"]
+        en:
+            state_unknown: "The state {} is invalid."
+            device_unknown: "The device {} is unknown."
+            on: ["on"]
+            off: ["off"]
+        devices:  
+            Büro: "192.168.0.1"

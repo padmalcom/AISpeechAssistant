@@ -1,0 +1,26 @@
+intent:
+    reminder:
+        de:
+            reminder_same_day_infinitive: ["Ich werde dich um {} Uhr {} daran erinnern {}."]
+            reminder_infinitive: ["Ich erinnere dich am {} {} {} um {} Uhr {} daran {}."]
+            reminder_same_day_to: ["Ich erinnere dich um {} Uhr {} {}."]
+            reminder_to: ["Ich erinnere dich am {} {} {} um {} Uhr {} {}."]
+            reminder_same_day_no_action: ["Ich erinnere dich um {} Uhr {}."]
+            reminder_no_action: ["Ich erinnere dich am {} {} {} um {} Uhr {}."]
+            no_time_given: ["Ich habe leider das Erinnerungsdatum beziehungsweise die Uhrzeit nicht verstanden."]
+            
+            execute_reminder_infinitive: ["Ich soll dich daran erinnern {}."]
+            execute_reminder_to: ["Ich erinnere dich {}."]
+            execute_reminder: ["Ich soll dich jetzt erinnern.", "Das ist die gewünschte Erinnerung."]
+        en:
+            reminder_same_day_infinitive: ["I'll remind you at {} {} to {}."]
+            reminder_infinitive: ["I'll remind you on the {} at {} {} to {}."]
+            reminder_same_day_to: ["I'll remind you at {} {} to {}."]
+            reminder_to: ["I'll remind you on the {} at {} {} to {}."]
+            reminder_same_day_no_action: ["I'll remind you at {} {}."]
+            reminder_no_action: ["I'll remind you on the {} at {} {}."]
+            no_time_given: ["I could not understand the time to remind you."]
+       
+            execute_reminder_infinitive: ["I want to remind you to {}."]
+            execute_reminder_to: ["I want to remind you to {}."]
+            execute_reminder: ["This is a reminder."]

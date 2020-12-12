@@ -1,0 +1,11 @@
+# Stop intent
+---
+type: intent
+name: stop
+utterances:
+    - stop
+    - halt
+    - sei still
+    - sei ruhig
+    - abbrechen
+    - schweigefuchs

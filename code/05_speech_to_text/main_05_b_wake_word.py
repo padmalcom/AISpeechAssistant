@@ -63,8 +63,7 @@ class VoiceAssistant():
 		stt_model = Model('./vosk-model-de-0.6')
 		speaker_model = SpkModel('./vosk-model-spk-0.4')
 		self.rec = KaldiRecognizer(stt_model, speaker_model, 16000)
-		# Hört der Assistent gerade auf einen Befehl oder wartet er auf ein Wake Word?
-		self.is_listening = False
+
 		logger.info("Initialisierung der Spracherkennung abgeschlossen.")
 			
 	def run(self):
@@ -81,29 +80,23 @@ if __name__ == '__main__':
 		while True:
 		
 			pcm = va.audio_stream.read(va.porcupine.frame_length)
-			pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
-			keyword_index = va.porcupine.process(pcm_unpacked)
-			if keyword_index >= 0:
-				logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
-				va.is_listening = True
 				
-			# Spracherkennung
-			if va.is_listening:
-				if va.rec.AcceptWaveform(pcm):
-					recResult = json.loads(va.rec.Result())
+			if va.rec.AcceptWaveform(pcm):
+				recResult = json.loads(va.rec.Result())
 					
-					# Hole das Resultat aus dem JSON Objekt
-					sentence = recResult['text']
-					logger.debug('Ich habe verstanden "{}"', sentence)
-
-					va.is_listening = False
+				# Hole das Resultat aus dem JSON Objekt
+				sentence = recResult['text']
+				logger.debug('Ich habe verstanden "{}"', sentence)
+				
+				if sentence.lower().startswith("kevin"):
+					sentence = sentence [5:] # Schneide Kevin am Anfang des Satzes weg
+					sentence = sentence.strip() # Entferne Leerzeichen am Anfang und Ende des Satzes
+					logger.info("Prozessiere Befehl {}.", sentence)
 				
 	except KeyboardInterrupt:
 		logger.debug("Per Keyboard beendet")
 	finally:
 		logger.debug('Beginne Aufräumarbeiten...')
-		if va.porcupine:
-			va.porcupine.delete()
 			
 		if va.audio_stream is not None:
 			va.audio_stream.close()

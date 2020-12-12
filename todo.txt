@@ -1,34 +1,8 @@
 Kevin als Alternative zu Porcupine
 Englische Templates und deren Verwaltung
 Weather
+name every intent and add authentication script
 
 
 11 adding a ui
 12 paketierung (conda constructor) pyflakes um zu checken was gebraucht wird und was nicht
-
-intents
-- remind me
-	- store in db
-- calendar
-	- next appointments (benachrichtigung)
-	- create appointment
-- weather forecast pyowm
-- wikipedia
-	- online
-	- offline
-- mailto
-- whereami
-	- geocoder.ip('me')
-- childrensstory
-- animal sound
-- stream
-	- benachrichtigung, dass nachrichten kommen
-- übersetzung
-
-
-
-
-usermanagement
-- gender guesser (by name)
-- i am
-	- name updaten
