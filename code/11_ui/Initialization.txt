@@ -1,0 +1,16 @@
+Dinge, die du hier lernen wirst:
+- Anzeigen der Anwendung als Tray Icon
+- Aufräumen von nicht benötigten Paketen
+
+conda create -n 11_ui python=3.8
+
+conda install ffmpeg
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 11_ui python=3.6
+
+conda activate 11_ui
+
+Als root:
+python -m snips_nlu download de

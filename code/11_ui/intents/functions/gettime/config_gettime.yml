@@ -1,0 +1,16 @@
+intent:
+    gettime:
+        de:
+            time_in_place: ["Es ist {} Uhr {} in {}.", "Die Uhrzeit ist {} Uhr {} in {}.", "Es ist {} Uhr und {} Minuten in {}."]
+            time_here: ["Es ist {} Uhr {}.", "Es ist {} Uhr und {} Minuten."]
+            place_not_found: ["Die Region {} kenne ich leider nicht", "Das Land oder den Ort {} kenne ich nicht.", "{}, nie gehört!"]
+        en:
+            time_in_place: ["It is {} {} in {}."]
+            time_here: ["It is {} {}.", "It is {} o'clock and {} minutes."]
+            place_not_found: ["I don't know the place {}.", "I don't know a place called {}."]
+        timezones:  
+            Europe/Berlin: ["deutschland", "germany"]
+            Europe/London: ["england", "großbrittanien", "great britain"]
+            Europe/Paris: ["frankreich", "france"]
+            America/New_York: ["amerika", "america"]
+            Asia/Shanghai: ["china"]

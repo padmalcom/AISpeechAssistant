@@ -45,9 +45,6 @@ def default_snips_nlu_handler(session, text):
 			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
 				intent_found = True
 				
-				# Überprüfe, ob der Benutzer diesen Intent ausführen darf
-				# TODO
-				
 				# Parse alle Parameter
 				arguments = dict()
 				for slot in parsing["slots"]:
@@ -183,8 +180,4 @@ class IntentMgmt:
 	
 		# Evaluiere ChatbotAI, wenn keines der strikten Intents greift, wird die Eingabe über die dialogs.template
 		# automatisch an snips nlu umgeleitet.
-		response = self.chat.respond(text)
-		
-		# Überprüfe, ob der Sprecher diese Aktion ausführen darf
-		# TODO
-		return response
+		return self.chat.respond(text)

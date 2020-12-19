@@ -1,17 +1,16 @@
 Dinge, die du hier lernen wirst:
-- Feststellen des Standorts
-- Abfragen des Wetters
-- Erlaube Abfrage nur bestimmten Benutzern
+- An- und Abschalten von Smart Home Schaltern von Shelly
+- Absetzen von Requests
 
-conda create -n 10_f_weather python=3.8
+conda create -n 10_g_smart_home python=3.8
 
 conda install ffmpeg
 
 Hint:
 Raspberry Pi supports python up to 3.6:
-conda create -n 10_f_weather python=3.6
+conda create -n 10_g_smart_home python=3.6
 
-conda activate 10_f_weather 
+conda activate 10_g_smart_home
 
 Als root:
 python -m snips_nlu download de

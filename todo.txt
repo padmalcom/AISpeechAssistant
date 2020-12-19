@@ -1,8 +1,6 @@
 Kevin als Alternative zu Porcupine
 Englische Templates und deren Verwaltung
-Weather
 name every intent and add authentication script
+befülle überall die run() Funktion
 
-
-11 adding a ui
 12 paketierung (conda constructor) pyflakes um zu checken was gebraucht wird und was nicht

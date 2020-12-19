@@ -83,9 +83,33 @@ class VoiceAssistant():
 		self.tts.say("Initialisierung abgeschlossen")
 		logger.debug("Sprachausgabe initialisiert")
 		
-	
 	def run(self):
-		logger.info("VoiceAssistant Instanz wurde gestartet.")
+		# Versuche folgenden Code auszuführen. Sollte eine Ausnahme auftreten, wird der except Block behandelt.
+		try:
+			while True:
+			
+				pcm = self.audio_stream.read(self.porcupine.frame_length)
+				pcm_unpacked = struct.unpack_from("h" * self.porcupine.frame_length, pcm)		
+				keyword_index = self.porcupine.process(pcm_unpacked)
+				if keyword_index >= 0:
+					logger.info("Wake Word {} wurde verstanden.", self.wake_words[keyword_index])
+					
+		# Der Except Block ist hier in seiner Behandlung eingeschränkt auf den Typ KeyboardInterrupt,
+		# also falls der Benutzer die Ausführung des Programms mit STRG+C unterbricht.
+		except KeyboardInterrupt:
+			logger.debug("Per Keyboard beendet")
+		# Egal ob erfolgreicher Durchlauf oder Exception: Finally wird am Ende dieses Blocks ausgeführt.
+		# Das erlaubt uns die Fehlerbehandlung und das Aufräumen von Ressourcen.
+		finally:
+			logger.debug('Beginne Aufräumarbeiten...')
+			if self.porcupine:
+				self.porcupine.delete()
+				
+			if self.audio_stream is not None:
+				self.audio_stream.close()
+				
+			if self.pa is not None:
+				self.pa.terminate()
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')
@@ -95,30 +119,3 @@ if __name__ == '__main__':
 	va = VoiceAssistant()
 	logger.info("Anwendung wurde gestartet")
 	va.run()
-		
-	# Versuche folgenden Code auszuführen. Sollte eine Ausnahme auftreten, wird der except Block behandelt.
-	try:
-		while True:
-		
-			pcm = va.audio_stream.read(va.porcupine.frame_length)
-			pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
-			keyword_index = va.porcupine.process(pcm_unpacked)
-			if keyword_index >= 0:
-				logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
-				
-	# Der Except Block ist hier in seiner Behandlung eingeschränkt auf den Typ KeyboardInterrupt,
-	# also falls der Benutzer die Ausführung des Programms mit STRG+C unterbricht.
-	except KeyboardInterrupt:
-		logger.debug("Per Keyboard beendet")
-	# Egal ob erfolgreicher Durchlauf oder Exception: Finally wird am Ende dieses Blocks ausgeführt.
-	# Das erlaubt uns die Fehlerbehandlung und das Aufräumen von Ressourcen.
-	finally:
-		logger.debug('Beginne Aufräumarbeiten...')
-		if va.porcupine:
-			va.porcupine.delete()
-			
-		if va.audio_stream is not None:
-			va.audio_stream.close()
-			
-		if va.pa is not None:
-			va.pa.terminate()				
