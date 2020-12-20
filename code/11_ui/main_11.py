@@ -22,12 +22,7 @@ from audioplayer import AudioPlayer
 import wx.adv
 import wx
 
-# Konstanten für die Darstellung des Icons
-TRAY_TOOLTIP = 'Voice Assistant'
-TRAY_ICON_INITIALIZING = 'initializing.png'
-TRAY_ICON_IDLE = 'idle.png' 
-TRAY_ICON_LISTENING = 'listening.png'
-TRAY_ICON_SPEAKING = 'speaking.png'
+import constants
 
 CONFIG_FILE = "config.yml"
 
@@ -35,7 +30,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 	def __init__(self, frame):
 		self.frame = frame
 		super(TaskBarIcon, self).__init__()
-		self.set_icon(TRAY_ICON_INITIALIZING)
+		self.set_icon(constants.TRAY_ICON_INITIALIZING, constants.TRAY_TOOLTIP + ": Initialisiere...")
 		
 		# Erstelle einen Timer, der die Hauptschleife unseres Assistenten ausführt
 		self.timer = wx.Timer(self)
@@ -52,17 +47,16 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 		self.create_menu_item(menu, 'Beenden', self.on_exit)
 		return menu
 
-	def set_icon(self, path):
+	def set_icon(self, path, tooltip=constants.TRAY_TOOLTIP):
 		icon = wx.Icon(path)
-		self.SetIcon(icon, TRAY_TOOLTIP)
+		self.SetIcon(icon, tooltip)
 		
 	def on_exit(self, event):
 		if global_variables.voice_assistant:
 			self.frame.icon.RemoveIcon()
 			global_variables.voice_assistant.terminate()
 			wx.CallAfter(self.Destroy)
-			self.frame.Close()
-			#sys.exit()				
+			self.frame.Close()			
 		
 	def update(self, event):
 		if global_variables.voice_assistant:
@@ -152,8 +146,7 @@ class VoiceAssistant:
 		self.callbacks = self.intent_management.register_callbacks()
 		logger.info('{} callbacks gefunden', len(self.callbacks))
 		self.tts.say("Initialisierung abgeschlossen")
-		if global_variables.icon:
-			global_variables.icon.set_icon(TRAY_ICON_IDLE)
+		self.frame.icon.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
 	def __detectSpeaker__(self, input):
@@ -167,10 +160,7 @@ class VoiceAssistant:
 				if (cosDist < 0.3):
 					bestCosDist = cosDist
 					bestSpeaker = speaker.get('name')
-		return bestSpeaker		
-			
-	#def run(self):
-	#	logger.info("VoiceAssistant Instanz wurde gestartet.")
+		return bestSpeaker
 	
 	def terminate(self):
 		logger.debug('Beginne Aufräumarbeiten...')
@@ -204,6 +194,8 @@ class VoiceAssistant:
 			
 		# Spracherkennung
 		if global_variables.voice_assistant.is_listening:
+		
+			self.set_icon(constants.TRAY_ICON_LISTENING, constants.TRAY_TOOLTIP + ": Ich höre...")
 		
 			# Spielt derzeit Musik oder sonstiges Audio? Dann setze die Lautstärke runter
 			if global_variables.voice_assistant.audio_player.is_playing():
@@ -265,7 +257,7 @@ class VoiceAssistant:
 class DummyFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, title="")
-        self.icon = global_variables.icon = TaskBarIcon(self)
+        self.icon = TaskBarIcon(self)
         self.Bind(wx.EVT_CLOSE, self.onCloseWindow)
 
     def onCloseWindow(self, evt):

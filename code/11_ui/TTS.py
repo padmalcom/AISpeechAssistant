@@ -1,12 +1,19 @@
 import time, pyttsx3
 import multiprocessing
 
+import global_variables
+import constants
+
 def __speak__(text, voiceId, volume):
+	if global_variables.voice_assistant:
+		global_variables.voice_assistant.frame.set_icon(constants.TRAY_ICON_SPEAKING, constants.TRAY_TOOLTIP + ": " + text)
 	engine = pyttsx3.init()
 	engine.setProperty('volume', volume)
 	engine.setProperty('voice', voiceId)
 	engine.say(text)
 	engine.runAndWait()
+	if global_variables.voice_assistant:
+		global_variables.voice_assistant.frame.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
 		
 class Voice:
 
