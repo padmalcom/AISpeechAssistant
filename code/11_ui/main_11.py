@@ -36,9 +36,6 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 		self.frame = frame
 		super(TaskBarIcon, self).__init__()
 		self.set_icon(TRAY_ICON_INITIALIZING)
-
-		# Initialisiere den Voice Assistant
-		global_variables.voice_assistant = VoiceAssistant()	
 		
 		# Erstelle einen Timer, der die Hauptschleife unseres Assistenten ausführt
 		self.timer = wx.Timer(self)
@@ -52,7 +49,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 
 	def CreatePopupMenu(self):
 		menu = wx.Menu()
-		self.create_menu_item(menu, 'Exit', self.on_exit)
+		self.create_menu_item(menu, 'Beenden', self.on_exit)
 		return menu
 
 	def set_icon(self, path):
@@ -75,6 +72,10 @@ class VoiceAssistant:
 
 	def __init__(self):
 		logger.info("Initialisiere VoiceAssistant...")
+		
+		logger.info("Initialisiere UI...")
+		self.app = wx.App(clearSigInt=False, redirect=True, filename='log.txt')
+		self.frame = DummyFrame()
 		
 		logger.debug("Lese Konfiguration...")
 		
@@ -151,6 +152,8 @@ class VoiceAssistant:
 		self.callbacks = self.intent_management.register_callbacks()
 		logger.info('{} callbacks gefunden', len(self.callbacks))
 		self.tts.say("Initialisierung abgeschlossen")
+		if global_variables.icon:
+			global_variables.icon.set_icon(TRAY_ICON_IDLE)
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
 	def __detectSpeaker__(self, input):
@@ -191,82 +194,78 @@ class VoiceAssistant:
 			global_variables.voice_assistant.pa.terminate()			
 	
 	# Jegliche Logik aus der Main-Methode wird nun in die Update-Methode verlagert
-	def loop(self):
+	def loop(self):		
+		pcm = global_variables.voice_assistant.audio_stream.read(global_variables.voice_assistant.porcupine.frame_length)
+		pcm_unpacked = struct.unpack_from("h" * global_variables.voice_assistant.porcupine.frame_length, pcm)		
+		keyword_index = global_variables.voice_assistant.porcupine.process(pcm_unpacked)
+		if keyword_index >= 0:
+			logger.info("Wake Word {} wurde verstanden.", global_variables.voice_assistant.wake_words[keyword_index])
+			global_variables.voice_assistant.is_listening = True
 			
-		try:		
-			pcm = global_variables.voice_assistant.audio_stream.read(global_variables.voice_assistant.porcupine.frame_length)
-			pcm_unpacked = struct.unpack_from("h" * global_variables.voice_assistant.porcupine.frame_length, pcm)		
-			keyword_index = global_variables.voice_assistant.porcupine.process(pcm_unpacked)
-			if keyword_index >= 0:
-				logger.info("Wake Word {} wurde verstanden.", global_variables.voice_assistant.wake_words[keyword_index])
-				global_variables.voice_assistant.is_listening = True
-				
-			# Spracherkennung
-			if global_variables.voice_assistant.is_listening:
-			
-				# Spielt derzeit Musik oder sonstiges Audio? Dann setze die Lautstärke runter
-				if global_variables.voice_assistant.audio_player.is_playing():
-					global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume)
-						
-				if global_variables.voice_assistant.rec.AcceptWaveform(pcm):
-					recResult = json.loads(global_variables.voice_assistant.rec.Result())
+		# Spracherkennung
+		if global_variables.voice_assistant.is_listening:
+		
+			# Spielt derzeit Musik oder sonstiges Audio? Dann setze die Lautstärke runter
+			if global_variables.voice_assistant.audio_player.is_playing():
+				global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume)
 					
-					speaker = global_variables.voice_assistant.__detectSpeaker__(recResult['spk'])
-					if (speaker == None) and (global_variables.voice_assistant.allow_only_known_speakers == True):
-						global_variables.voice_assistant.tts.say("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
-						global_variables.voice_assistant.current_speaker = None
-					else:
-						if speaker:
-							logger.debug("Sprecher ist {}", speaker)
-						global_variables.voice_assistant.current_speaker = speaker
-						global_variables.voice_assistant.current_speaker_fingerprint = recResult['spk']
-						sentence = recResult['text']
-						logger.debug('Ich habe verstanden "{}"', sentence)
+			if global_variables.voice_assistant.rec.AcceptWaveform(pcm):
+				recResult = json.loads(global_variables.voice_assistant.rec.Result())
+				
+				speaker = global_variables.voice_assistant.__detectSpeaker__(recResult['spk'])
+				if (speaker == None) and (global_variables.voice_assistant.allow_only_known_speakers == True):
+					global_variables.voice_assistant.tts.say("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
+					global_variables.voice_assistant.current_speaker = None
+				else:
+					if speaker:
+						logger.debug("Sprecher ist {}", speaker)
+					global_variables.voice_assistant.current_speaker = speaker
+					global_variables.voice_assistant.current_speaker_fingerprint = recResult['spk']
+					sentence = recResult['text']
+					logger.debug('Ich habe verstanden "{}"', sentence)
+					
+					# Lasse den Assistenten auf die Spracheingabe reagieren
+					output = global_variables.voice_assistant.intent_management.process(sentence, speaker)
+					global_variables.voice_assistant.tts.say(output)
+					
+					global_variables.voice_assistant.is_listening = False
+					global_variables.voice_assistant.current_speaker = None
+		
+		# Wird derzeit nicht zugehört?
+		else:
+			# Setze die Lautstärke auf Normalniveau zurück
+			global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
+					
+			# Prozessiere alle registrierten Callback Funktionen, die manche Intents
+			# jede Iteration benötigen
+			for cb in global_variables.voice_assistant.callbacks:
+				output = cb()
+				
+				# Gibt die Callback Funktion einen Wert zurück? Dann versuche
+				# ihn zu sprechen.
+				if output:
+					if not global_variables.voice_assistant.tts.is_busy():
+				
+						# Wird etwas abgespielt? Dann schalte die Lautstärke runter
+						if global_variables.voice_assistant.audio_player.is_playing():
+							global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume))
 						
-						# Lasse den Assistenten auf die Spracheingabe reagieren
-						output = global_variables.voice_assistant.intent_management.process(sentence, speaker)
+						# 
 						global_variables.voice_assistant.tts.say(output)
 						
-						global_variables.voice_assistant.is_listening = False
-						global_variables.voice_assistant.current_speaker = None
-			
-			# Wird derzeit nicht zugehört?
-			else:
-				# Setze die Lautstärke auf Normalniveau zurück
-				global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
+						# Wir rufen die selbe Funktion erneut auf und geben mit,
+						# dass der zu behandelnde Eintrag abgearbeitet wurde.
+						# Im Falle der Reminder-Funktion wird dann z.B. der Datenbankeintrag
+						# für den Reminder gelöscht
+						cb(True)
 						
-				# Prozessiere alle registrierten Callback Funktionen, die manche Intents
-				# jede Iteration benötigen
-				for cb in global_variables.voice_assistant.callbacks:
-					output = cb()
-					
-					# Gibt die Callback Funktion einen Wert zurück? Dann versuche
-					# ihn zu sprechen.
-					if output:
-						if not global_variables.voice_assistant.tts.is_busy():
-					
-							# Wird etwas abgespielt? Dann schalte die Lautstärke runter
-							if global_variables.voice_assistant.audio_player.is_playing():
-								global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume))
-							
-							# 
-							global_variables.voice_assistant.tts.say(output)
-							
-							# Wir rufen die selbe Funktion erneut auf und geben mit,
-							# dass der zu behandelnde Eintrag abgearbeitet wurde.
-							# Im Falle der Reminder-Funktion wird dann z.B. der Datenbankeintrag
-							# für den Reminder gelöscht
-							cb(True)
-							
-							# Zurücksetzen der Lautstärke auf Normalniveau
-							global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)			
-		except KeyboardInterrupt:
-			logger.debug("Per Keyboard beendet")
+						# Zurücksetzen der Lautstärke auf Normalniveau
+						global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 
 class DummyFrame(wx.Frame):
     def __init__(self):
         wx.Frame.__init__(self, None, title="")
-        self.icon = TaskBarIcon(self)
+        self.icon = global_variables.icon = TaskBarIcon(self)
         self.Bind(wx.EVT_CLOSE, self.onCloseWindow)
 
     def onCloseWindow(self, evt):
@@ -275,8 +274,9 @@ class DummyFrame(wx.Frame):
 			
 
 if __name__ == '__main__':
-	multiprocessing.set_start_method('spawn')	
-	app = wx.App(redirect=False)
-	DummyFrame() # False sagt aus, dass der Frame keinen Parent hat
-	#global_variables.voice_assistant.MainLoop()
-	app.MainLoop()
+	multiprocessing.set_start_method('spawn')
+	
+	# Initialisiere den Voice Assistant
+	global_variables.voice_assistant = VoiceAssistant()
+	
+	global_variables.voice_assistant.app.MainLoop()

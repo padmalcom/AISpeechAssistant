@@ -1,1 +1,2 @@
-va = None
+voice_assistant = None
+icon = None

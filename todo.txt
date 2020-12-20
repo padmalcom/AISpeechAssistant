@@ -2,5 +2,6 @@ Kevin als Alternative zu Porcupine
 Englische Templates und deren Verwaltung
 name every intent and add authentication script
 befülle überall die run() Funktion
+va durch voice_assistant in global_variables ersetzen
 
 12 paketierung (conda constructor) pyflakes um zu checken was gebraucht wird und was nicht
