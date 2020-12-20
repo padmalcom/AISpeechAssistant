@@ -1,4 +1,5 @@
 Kevin als Alternative zu Porcupine
+sensitivity für keywords
 Englische Templates und deren Verwaltung
 name every intent and add authentication script
 befülle überall die run() Funktion

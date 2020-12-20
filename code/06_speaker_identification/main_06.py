@@ -104,6 +104,55 @@ class VoiceAssistant():
 			
 	def run(self):
 		logger.info("VoiceAssistant Instanz wurde gestartet.")
+		try:
+			while True:
+			
+				pcm = va.audio_stream.read(va.porcupine.frame_length)
+				pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
+				keyword_index = va.porcupine.process(pcm_unpacked)
+				if keyword_index >= 0:
+					logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
+					va.is_listening = True
+					
+				# Spracherkennung
+				if va.is_listening:
+					if va.rec.AcceptWaveform(pcm):
+						recResult = json.loads(va.rec.Result())
+						
+						# Hole den Namen des Sprechers falls bekannt.
+						speaker = va.__detectSpeaker__(recResult['spk'])
+						
+						# Zeige den "Fingerabdruck" deiner Stimme. Speichere diesen und füge
+						# ihn mit einer neuen ID in users.json ein, die nach dem ersten Aufruf
+						# im Projektverzeichnis erstellt wird.
+						logger.debug('Deine Stimme sieht so aus {}', recResult['spk'])
+						
+						# Sind nur bekannte sprecher erlaubt?
+						if (speaker == None) and (va.allow_only_known_speakers == True):
+							print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
+							va.current_speaker = None
+						else:
+							if speaker:
+								logger.debug("Sprecher ist {}", speaker)
+							va.current_speaker = speaker
+							va.current_speaker_fingerprint = recResult['spk']
+							sentence = recResult['text']
+							logger.debug('Ich habe verstanden "{}"', sentence)
+							va.is_listening = False
+							va.current_speaker = None
+					
+		except KeyboardInterrupt:
+			logger.debug("Per Keyboard beendet")
+		finally:
+			logger.debug('Beginne Aufräumarbeiten...')
+			if va.porcupine:
+				va.porcupine.delete()
+				
+			if va.audio_stream is not None:
+				va.audio_stream.close()
+				
+			if va.pa is not None:
+				va.pa.terminate()
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')
@@ -111,53 +160,3 @@ if __name__ == '__main__':
 	va = VoiceAssistant()
 	logger.info("Anwendung wurde gestartet")
 	va.run()
-		
-	try:
-		while True:
-		
-			pcm = va.audio_stream.read(va.porcupine.frame_length)
-			pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
-			keyword_index = va.porcupine.process(pcm_unpacked)
-			if keyword_index >= 0:
-				logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
-				va.is_listening = True
-				
-			# Spracherkennung
-			if va.is_listening:
-				if va.rec.AcceptWaveform(pcm):
-					recResult = json.loads(va.rec.Result())
-					
-					# Hole den Namen des Sprechers falls bekannt.
-					speaker = va.__detectSpeaker__(recResult['spk'])
-					
-					# Zeige den "Fingerabdruck" deiner Stimme. Speichere diesen und füge
-					# ihn mit einer neuen ID in users.json ein, die nach dem ersten Aufruf
-					# im Projektverzeichnis erstellt wird.
-					logger.debug('Deine Stimme sieht so aus {}', recResult['spk'])
-					
-					# Sind nur bekannte sprecher erlaubt?
-					if (speaker == None) and (va.allow_only_known_speakers == True):
-						print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
-						va.current_speaker = None
-					else:
-						if speaker:
-							logger.debug("Sprecher ist {}", speaker)
-						va.current_speaker = speaker
-						va.current_speaker_fingerprint = recResult['spk']
-						sentence = recResult['text']
-						logger.debug('Ich habe verstanden "{}"', sentence)
-						va.is_listening = False
-						va.current_speaker = None
-				
-	except KeyboardInterrupt:
-		logger.debug("Per Keyboard beendet")
-	finally:
-		logger.debug('Beginne Aufräumarbeiten...')
-		if va.porcupine:
-			va.porcupine.delete()
-			
-		if va.audio_stream is not None:
-			va.audio_stream.close()
-			
-		if va.pa is not None:
-			va.pa.terminate()			

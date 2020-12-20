@@ -49,6 +49,8 @@ class VoiceAssistant():
 			self.wake_words = ['bumblebee']
 		logger.debug("Wake Words sind {}", ','.join(self.wake_words))
 		self.porcupine = pvporcupine.create(keywords=self.wake_words)
+		# Sensitivities (sensitivities=[0.6, 0.35]) erweitert oder schränkt
+		# den Spielraum bei der Intepretation der Wake Words ein
 		logger.debug("Wake Word Erkennung wurde initialisiert.")
 		
 		# Initialisiere Audio stream

@@ -68,38 +68,37 @@ class VoiceAssistant():
 			
 	def run(self):
 		logger.info("VoiceAssistant Instanz wurde gestartet.")
+		try:
+			while True:
+			
+				pcm = va.audio_stream.read(va.porcupine.frame_length)
+					
+				if va.rec.AcceptWaveform(pcm):
+					recResult = json.loads(va.rec.Result())
+						
+					# Hole das Resultat aus dem JSON Objekt
+					sentence = recResult['text']
+					logger.debug('Ich habe verstanden "{}"', sentence)
+					
+					if sentence.lower().startswith("kevin"):
+						sentence = sentence [5:] # Schneide Kevin am Anfang des Satzes weg
+						sentence = sentence.strip() # Entferne Leerzeichen am Anfang und Ende des Satzes
+						logger.info("Prozessiere Befehl {}.", sentence)
+					
+		except KeyboardInterrupt:
+			logger.debug("Per Keyboard beendet")
+		finally:
+			logger.debug('Beginne Aufräumarbeiten...')
+				
+			if va.audio_stream is not None:
+				va.audio_stream.close()
+				
+			if va.pa is not None:
+				va.pa.terminate()
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')
 
 	va = VoiceAssistant()
 	logger.info("Anwendung wurde gestartet")
-	va.run()
-		
-	try:
-		while True:
-		
-			pcm = va.audio_stream.read(va.porcupine.frame_length)
-				
-			if va.rec.AcceptWaveform(pcm):
-				recResult = json.loads(va.rec.Result())
-					
-				# Hole das Resultat aus dem JSON Objekt
-				sentence = recResult['text']
-				logger.debug('Ich habe verstanden "{}"', sentence)
-				
-				if sentence.lower().startswith("kevin"):
-					sentence = sentence [5:] # Schneide Kevin am Anfang des Satzes weg
-					sentence = sentence.strip() # Entferne Leerzeichen am Anfang und Ende des Satzes
-					logger.info("Prozessiere Befehl {}.", sentence)
-				
-	except KeyboardInterrupt:
-		logger.debug("Per Keyboard beendet")
-	finally:
-		logger.debug('Beginne Aufräumarbeiten...')
-			
-		if va.audio_stream is not None:
-			va.audio_stream.close()
-			
-		if va.pa is not None:
-			va.pa.terminate()				
+	va.run()				

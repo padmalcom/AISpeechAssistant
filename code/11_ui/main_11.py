@@ -22,6 +22,7 @@ from audioplayer import AudioPlayer
 import wx.adv
 import wx
 
+# Konstanten für das Tray Icon
 import constants
 
 CONFIG_FILE = "config.yml"

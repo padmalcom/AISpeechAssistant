@@ -142,6 +142,61 @@ class VoiceAssistant():
 			
 	def run(self):
 		logger.info("VoiceAssistant Instanz wurde gestartet.")
+		
+		try:
+			while True:
+			
+				pcm = va.audio_stream.read(va.porcupine.frame_length)
+				pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
+				keyword_index = va.porcupine.process(pcm_unpacked)
+				if keyword_index >= 0:
+					logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
+					va.is_listening = True
+					
+				# Spracherkennung
+				if va.is_listening:
+					if va.rec.AcceptWaveform(pcm):
+						recResult = json.loads(va.rec.Result())
+						
+						speaker = va.__detectSpeaker__(recResult['spk'])
+						if (speaker == None) and (va.allow_only_known_speakers == True):
+							print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
+							va.current_speaker = None
+						else:
+							if speaker:
+								logger.debug("Sprecher ist {}", speaker)
+							va.current_speaker = speaker
+							va.current_speaker_fingerprint = recResult['spk']
+							sentence = recResult['text']
+							logger.debug('Ich habe verstanden "{}"', sentence)
+							
+							# Lasse den Assistenten auf die Spracheingabe reagieren
+							parsing = va.nlu_engine.parse(sentence)
+							print(parsing)
+							output = ""
+							if parsing["intent"]["intentName"] == "getTime":
+								if len(parsing["slots"]) == 0:
+									output = getTime("Germany")
+								elif parsing["slots"][0]["entity"] == "country":
+									# RawValue ist nicht der beste Ansatz, wie wir später sehen werden. Manchmal bereitet snips nlu für uns die Parameter zu.
+									output = getTime(parsing["slots"][0]["rawValue"])
+							va.tts.say(output)
+							
+							va.is_listening = False
+							va.current_speaker = None
+					
+		except KeyboardInterrupt:
+			logger.debug("Per Keyboard beendet")
+		finally:
+			logger.debug('Beginne Aufräumarbeiten...')
+			if va.porcupine:
+				va.porcupine.delete()
+				
+			if va.audio_stream is not None:
+				va.audio_stream.close()
+				
+			if va.pa is not None:
+				va.pa.terminate()			
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')
@@ -149,58 +204,3 @@ if __name__ == '__main__':
 	va = VoiceAssistant()
 	logger.info("Anwendung wurde gestartet")
 	va.run()
-		
-	try:
-		while True:
-		
-			pcm = va.audio_stream.read(va.porcupine.frame_length)
-			pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
-			keyword_index = va.porcupine.process(pcm_unpacked)
-			if keyword_index >= 0:
-				logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
-				va.is_listening = True
-				
-			# Spracherkennung
-			if va.is_listening:
-				if va.rec.AcceptWaveform(pcm):
-					recResult = json.loads(va.rec.Result())
-					
-					speaker = va.__detectSpeaker__(recResult['spk'])
-					if (speaker == None) and (va.allow_only_known_speakers == True):
-						print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
-						va.current_speaker = None
-					else:
-						if speaker:
-							logger.debug("Sprecher ist {}", speaker)
-						va.current_speaker = speaker
-						va.current_speaker_fingerprint = recResult['spk']
-						sentence = recResult['text']
-						logger.debug('Ich habe verstanden "{}"', sentence)
-						
-						# Lasse den Assistenten auf die Spracheingabe reagieren
-						parsing = va.nlu_engine.parse(sentence)
-						print(parsing)
-						output = ""
-						if parsing["intent"]["intentName"] == "getTime":
-							if len(parsing["slots"]) == 0:
-								output = getTime("Germany")
-							elif parsing["slots"][0]["entity"] == "country":
-								# RawValue ist nicht der beste Ansatz, wie wir später sehen werden. Manchmal bereitet snips nlu für uns die Parameter zu.
-								output = getTime(parsing["slots"][0]["rawValue"])
-						va.tts.say(output)
-						
-						va.is_listening = False
-						va.current_speaker = None
-				
-	except KeyboardInterrupt:
-		logger.debug("Per Keyboard beendet")
-	finally:
-		logger.debug('Beginne Aufräumarbeiten...')
-		if va.porcupine:
-			va.porcupine.delete()
-			
-		if va.audio_stream is not None:
-			va.audio_stream.close()
-			
-		if va.pa is not None:
-			va.pa.terminate()			

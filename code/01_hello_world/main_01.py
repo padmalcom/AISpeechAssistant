@@ -3,7 +3,8 @@ import sys
 
 
 
-# Gib alle Meldungen ab Level DEBUG aus
+# Gib alle Meldungen ab Level DEBUG aus. So können Level pro Modul gesteuert werden.
+# Wir werden das in Zu
 logger.remove()
 logger.add(sys.stdout, level="DEBUG")
 
