@@ -33,10 +33,6 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 		super(TaskBarIcon, self).__init__()
 		self.set_icon(constants.TRAY_ICON_INITIALIZING, constants.TRAY_TOOLTIP + ": Initialisiere...")
 		
-		# Erstelle einen Timer, der die Hauptschleife unseres Assistenten ausführt
-		self.timer = wx.Timer(self)
-		self.Bind(wx.EVT_TIMER, self.update, self.timer)
-		
 	def create_menu_item(self, menu, label, func):
 		item = wx.MenuItem(menu, -1, label)
 		menu.Bind(wx.EVT_MENU, func, id=item.GetId())
@@ -54,14 +50,10 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 		
 	def on_exit(self, event):
 		if global_variables.voice_assistant:
-			self.frame.icon.RemoveIcon()
+			#self.frame.icon.RemoveIcon()
 			global_variables.voice_assistant.terminate()
 			wx.CallAfter(self.Destroy)
-			self.frame.Close()			
-		
-	def update(self, event):
-		if global_variables.voice_assistant:
-			global_variables.voice_assistant.loop()
+			self.frame.Close()
 
 class VoiceAssistant:
 
@@ -69,8 +61,9 @@ class VoiceAssistant:
 		logger.info("Initialisiere VoiceAssistant...")
 		
 		logger.info("Initialisiere UI...")
-		self.app = wx.App(clearSigInt=False, redirect=True, filename='log.txt')
-		self.frame = DummyFrame()
+		#self.app = wx.App(clearSigInt=False, redirect=True, filename='log.txt')
+		#self.frame = DummyFrame()
+		self.app = MainApp(clearSigInt=False, redirect=True, filename='log.txt')
 		
 		logger.debug("Lese Konfiguration...")
 		
@@ -147,7 +140,9 @@ class VoiceAssistant:
 		self.callbacks = self.intent_management.register_callbacks()
 		logger.info('{} callbacks gefunden', len(self.callbacks))
 		self.tts.say("Initialisierung abgeschlossen")
-		self.frame.icon.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
+		self.app.icon.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
+		timer_start_result = self.app.timer.Start(milliseconds=2, oneShot=wx.TIMER_CONTINUOUS)
+		logger.info("Timer erfolgreich gestartet? {}", timer_start_result)
 	
 	# Finde den besten Sprecher aus der Liste aller bekannter Sprecher aus dem User Management
 	def __detectSpeaker__(self, input):
@@ -165,6 +160,9 @@ class VoiceAssistant:
 	
 	def terminate(self):
 		logger.debug('Beginne Aufräumarbeiten...')
+		
+		# Stoppe den Timer
+		self.app.timer.Stop()
 		
 		# Speichern der Konfiguration
 		global_variables.voice_assistant.cfg["assistant"]["volume"] = global_variables.voice_assistant.volume
@@ -255,16 +253,26 @@ class VoiceAssistant:
 						# Zurücksetzen der Lautstärke auf Normalniveau
 						global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 
-class DummyFrame(wx.Frame):
-    def __init__(self):
-        wx.Frame.__init__(self, None, title="")
-        self.icon = TaskBarIcon(self)
-        self.Bind(wx.EVT_CLOSE, self.onCloseWindow)
+class MainApp(wx.App):
+	def OnInit(self):
+		frame = wx.Frame(None)
+		self.SetTopWindow(frame)
+		self.icon = TaskBarIcon(frame)
+		self.Bind(wx.EVT_CLOSE, self.onCloseWindow)
+		
+		# Erstelle einen Timer, der die Hauptschleife unseres Assistenten ausführt
+		self.timer = wx.Timer(self)
+		self.Bind(wx.EVT_TIMER, self.update, self.timer)
+		
+		return True
+		
+	def update(self, event):
+		if global_variables.voice_assistant:
+			global_variables.voice_assistant.loop()
 
-    def onCloseWindow(self, evt):
-        self.icon.Destroy()
-        evt.Skip()
-			
+	def onCloseWindow(self, evt):
+		self.icon.Destroy()
+		evt.Skip()	
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')

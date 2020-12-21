@@ -15,6 +15,9 @@ import multiprocessing
 
 CONFIG_FILE = "config.yml"
 
+SAMPLE_RATE = 16000
+FRAME_LENGTH = 512
+
 class VoiceAssistant():
 
 	def __init__(self):
@@ -39,11 +42,11 @@ class VoiceAssistant():
 		self.pa = pyaudio.PyAudio()
 		
 		self.audio_stream = self.pa.open(
-			rate=self.porcupine.sample_rate,
+			rate=SAMPLE_RATE,
 			channels=1,
 			format=pyaudio.paInt16,
 			input=True,
-			frames_per_buffer=self.porcupine.frame_length,
+			frames_per_buffer=FRAME_LENGTH,
 			input_device_index=0)
 		logger.debug("Audiostream geöffnet.")
 
@@ -71,7 +74,7 @@ class VoiceAssistant():
 		try:
 			while True:
 			
-				pcm = va.audio_stream.read(va.porcupine.frame_length)
+				pcm = va.audio_stream.read(FRAME_LENGTH)
 					
 				if va.rec.AcceptWaveform(pcm):
 					recResult = json.loads(va.rec.Result())

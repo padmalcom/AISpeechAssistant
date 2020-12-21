@@ -137,7 +137,7 @@ class VoiceAssistant():
 						
 						speaker = global_variables.voice_assistant.__detectSpeaker__(recResult['spk'])
 						if (speaker == None) and (global_variables.voice_assistant.allow_only_known_speakers == True):
-							global_variables.voice_assistant.tts.say("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
+							logger.info("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
 							global_variables.voice_assistant.current_speaker = None
 						else:
 							if speaker:

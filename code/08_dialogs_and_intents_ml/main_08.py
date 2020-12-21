@@ -160,7 +160,7 @@ class VoiceAssistant():
 						
 						speaker = va.__detectSpeaker__(recResult['spk'])
 						if (speaker == None) and (va.allow_only_known_speakers == True):
-							print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
+							logger.info("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
 							va.current_speaker = None
 						else:
 							if speaker:
@@ -172,7 +172,6 @@ class VoiceAssistant():
 							
 							# Lasse den Assistenten auf die Spracheingabe reagieren
 							parsing = va.nlu_engine.parse(sentence)
-							print(parsing)
 							output = ""
 							if parsing["intent"]["intentName"] == "getTime":
 								if len(parsing["slots"]) == 0:

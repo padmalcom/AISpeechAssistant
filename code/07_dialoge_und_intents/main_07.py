@@ -141,7 +141,7 @@ class VoiceAssistant():
 						
 						speaker = va.__detectSpeaker__(recResult['spk'])
 						if (speaker == None) and (va.allow_only_known_speakers == True):
-							print("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
+							logger.info("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
 							va.current_speaker = None
 						else:
 							if speaker:
