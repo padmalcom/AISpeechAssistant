@@ -12,8 +12,8 @@ def __speak__(text, voiceId, volume):
 	engine.setProperty('voice', voiceId)
 	engine.say(text)
 	engine.runAndWait()
-	if global_variables.voice_assistant:
-		global_variables.voice_assistant.app.icon.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
+	#if global_variables.voice_assistant:
+	#	global_variables.voice_assistant.app.icon.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
 		
 class Voice:
 
