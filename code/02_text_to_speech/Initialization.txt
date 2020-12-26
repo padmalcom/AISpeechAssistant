@@ -1,19 +1,16 @@
 Dinge, die du hier lernen wirst:
-- Installation eines Paketes (pyttsx3) in ein Environment
-- Anzeigen aller Versionen eines bestimmten Paketes
-- Installation einer bestimmten Version eines Paketes
-- Deinstallation eines Paketes in ein Environment
-- Ausgabe aller verfügbaren Sprachengines
-- Initialisierung von pyttsx3
-- Ausgabe von Sprache
-- Kalibrierung des Logging Frameworks (von Debug auf Info)
-- Schreiben einer requirements.txt
-- Installation aller Pakete eines Projekts über die requirements.txt
-- Anlegen einer eigenen Klasse und deren Referenzierung
-- Multi Processing
-- Die Verwendung von Try-Catch und Finally
+-Anzeigen aller Versionen eines bestimmten Paketes
+-Installation einer bestimmten Version eines Paketes
+-Deinstallation eines Paketes in ein Environment
+-Ausgabe aller verfügbaren Sprachengines
+-Initialisierung von pyttsx3
+-Ausgabe von Sprache
+-Schreiben einer requirements.txt
+-Installation aller Pakete eines Projekts über die requirements.txt
+-Verwendung mehrerer Prozesse in einer Anwendung
+-Die Verwendung von Try-Catch und Finally
 
-conda create -n 02_text_to_speech python=3.7
+conda create -n 02_text_to_speech python=3.8
 
 Hint:
 Raspberry Pi supports python up to 3.6:

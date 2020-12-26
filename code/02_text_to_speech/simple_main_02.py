@@ -1,12 +1,9 @@
-import logging
+from loguru import logger
 import pyttsx3
+import logging
 
 logger = logging.getLogger(__name__)
 
-# Der Logger wird hier auf INFO gesetzt, da sonst durch pyttsx3 viel zu spezieller
-# Output erzeugt wird.
-logging.basicConfig(level=logging.INFO)
-logger.setLevel(logging.INFO)
 
 # Unterdrücke Logausgaben der Hintergrunddienste von pyttsx3
 logging.getLogger('comtypes._comobject').setLevel(logging.WARNING)

@@ -6,7 +6,7 @@ Dinge, die du hier lernen wirst:
 - Speichern der Sprache
 - Verwenden einzelner Konfigurationen
 
-conda create -n 03_configuration_management python=3.7
+conda create -n 03_configuration_management python=3.8
 
 Hint:
 Raspberry Pi supports python up to 3.6:

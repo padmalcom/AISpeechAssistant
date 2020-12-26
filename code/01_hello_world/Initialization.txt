@@ -6,7 +6,7 @@ Dinge, die du hier lernen wirst:
 - Erstellen einer __init__-Funktion
 - Benamung des Python Files ohne Unterstriche
 
-conda create -n 01_hello_world python=3.7
+conda create -n 01_hello_world python=3.8
 
 Hint:
 Raspberry Pi supports python up to 3.6:
