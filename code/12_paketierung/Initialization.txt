@@ -1,0 +1,24 @@
+Dinge, die du hier lernen wirst:
+- Säubern der Abhängigkeiten
+- Erstellen eines Installers
+
+TODO:
+- copy dylib
+- modify snips_nlu_utils/utils.py according to https://github.com/snipsco/snips-nlu/issues/812
+- create hook file according to https://github.com/snipsco/snips-nlu/issues/812
+- create build.bat
+- create icon
+- maybe hook is not requred when giving fixed path
+
+conda create -n 12_paketierung python=3.8
+
+conda install ffmpeg
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 12_paketierung python=3.6
+
+conda activate 12_paketierung
+
+Als root:
+python -m snips_nlu download de
