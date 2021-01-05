@@ -5,10 +5,12 @@ Dinge, die du hier lernen wirst:
 TODO:
 - copy dylib
 - modify snips_nlu_utils/utils.py according to https://github.com/snipsco/snips-nlu/issues/812
-- create hook file according to https://github.com/snipsco/snips-nlu/issues/812
 - create build.bat
 - create icon
-- maybe hook is not requred when giving fixed path
+- copy lib directory from porcupine github
+- Wenn PyInstaller notwendige Pakete nicht identifizieren kann-> hidden imports
+- Make multiprocessing work with pyinstaller https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
+requests.certs change to "certifi/cacert.pem"
 
 conda create -n 12_paketierung python=3.8
 

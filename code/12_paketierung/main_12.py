@@ -27,6 +27,7 @@ import constants
 
 CONFIG_FILE = "config.yml"
 
+
 # Eine Klasse, die die Logik unseres TrayIcons abbildet.
 class TaskBarIcon(wx.adv.TaskBarIcon):
 	def __init__(self, frame):
@@ -112,8 +113,9 @@ class VoiceAssistant:
 		self.wake_words = self.cfg['assistant']['wakewords']
 		if not self.wake_words:
 			self.wake_words = ['bumblebee']
-		logger.debug("Wake words are {}", ','.join(self.wake_words))
+		logger.debug("Wake words sind {}", ','.join(self.wake_words))
 		self.porcupine = pvporcupine.create(keywords=self.wake_words)
+		#self.porcupine = pvporcupine.create(keyword_paths=['pvporcupine\resources\keyword_files\windows\bumblebee_windows.ppn'])
 		logger.debug("Wake Word Erkennung wurde initialisiert.")
 		
 		logger.debug("Initialisiere Audioeingabe...")
@@ -283,8 +285,31 @@ class VoiceAssistant:
 						# Zurücksetzen der Lautstärke auf Normalniveau
 						global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 
+# Funktion zum Reparieren des Zertifikatspfades (Quelle: https://stackoverflow.com/questions/46119901/python-requests-cant-find-a-folder-with-a-certificate-when-converted-to-exe)
+def override_where():
+	return os.path.abspath("certifi/cacert.pem")
+
+def repair_certificate_paths():
+	# Wird das Programm kompiliert?
+	if hasattr(sys, "frozen"):
+		import certifi.core
+
+		os.environ["REQUESTS_CA_BUNDLE"] = override_where()
+		certifi.core.where = override_where
+
+		import requests.utils
+		import requests.adapters
+		
+		requests.utils.DEFAULT_CA_BUNDLE_PATH = override_where()
+		requests.adapters.DEFAULT_CA_BUNDLE_PATH = override_where()
+			
 if __name__ == '__main__':
+
+	# Notwendig für die Verwendung mit PyInstaller (siehe https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing)
+	multiprocessing.freeze_support()
 	multiprocessing.set_start_method('spawn')
+	
+	repair_certificate_paths()
 	
 	# Initialisiere den Voice Assistant
 	global_variables.voice_assistant = VoiceAssistant()
