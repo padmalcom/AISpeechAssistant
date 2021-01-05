@@ -10,7 +10,10 @@ TODO:
 - copy lib directory from porcupine github
 - Wenn PyInstaller notwendige Pakete nicht identifizieren kann-> hidden imports
 - Make multiprocessing work with pyinstaller https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
-requests.certs change to "certifi/cacert.pem"
+- Fix request certificates in main
+- collect all requirements from intents and add to main requirement
+- add all requirements from intents to hidden imports
+- edit pycountry/__init__.py according to https://github.com/flyingcircusio/pycountry/pull/52/commits/33b60a929d8d56b41225214e08f4e0c58ec624fb
 
 conda create -n 12_paketierung python=3.8
 

@@ -74,3 +74,15 @@ win-inet-pton @ file:///C:/ci/win_inet_pton_1605306167264/work
 win32-setctime==1.0.3
 wincertstore==0.2
 wxPython==4.1.1
+pytz==2020.4
+geocoder==1.38.1
+fuzzywuzzy==0.18.0
+text2numde==1.0.0
+sounddevice==0.4.1
+python-dateutil==2.8.1
+num2words==0.5.10
+text2numde==1.0.0
+pyowm==3.1.1
+geocoder==1.38.1
+pycountry==20.7.3
+wikipedia==1.4.0

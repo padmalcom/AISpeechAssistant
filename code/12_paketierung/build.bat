@@ -17,6 +17,18 @@ pyinstaller ^
 	--hidden-import=pyttsx3.drivers ^
 	--hidden-import=pyttsx3.drivers.sapi5 ^
 	--hidden-import=pip._internal.commands.install ^
+	--hidden-import=pytz ^
+	--hidden-import=geocoder ^
+	--hidden-import=fuzzywuzzy.fuzz ^
+	--hidden-import=text2numde ^
+	--hidden-import=sounddevice ^
+	--hidden-import=dateutil ^
+	--hidden-import=dateutil.parser ^
+	--hidden-import=num2words ^
+	--hidden-import=text2numde ^
+	--hidden-import=pyowm ^
+	--hidden-import=pycountry ^
+	--hidden-import=wikipedia ^
 	--log-level DEBUG ^
 	main_12.py
 
