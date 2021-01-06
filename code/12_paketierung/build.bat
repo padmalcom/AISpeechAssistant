@@ -1,7 +1,8 @@
 pyinstaller ^
 	--noconfirm ^
-	--additional-hooks-dir "hooks" ^
+	--clean ^
 	--name AISpeechAssistant ^
+	--additional-hooks-dir=hooks ^
 	--add-data="dylib;dylib" ^
 	--add-data="pvporcupine;pvporcupine" ^
 	--add-data="idle.png;." ^
@@ -29,7 +30,7 @@ pyinstaller ^
 	--hidden-import=pyowm ^
 	--hidden-import=pycountry ^
 	--hidden-import=wikipedia ^
-	--log-level DEBUG ^
+	--log-level INFO ^
 	main_12.py
 
 REM	--windowed ^	
