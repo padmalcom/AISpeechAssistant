@@ -1,8 +1,0 @@
-intent:
-    stop:
-        de:
-            not_saying_anything: ["Ich sage doch garnichts.", "Habe ich was gesagt?"]
-            be_silent: ["Okay, ich bin still.", "Ich bin ruhig.", "Okay"]
-        en:
-            not_saying_anything: ["I am not saying anything.", "Did I say something?"]
-            be_silent: ["Okay, I am silent.", "Understood, you need silence.", "okay"]

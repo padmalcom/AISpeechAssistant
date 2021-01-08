@@ -1,4 +1,0 @@
-{% block %}
-    {% client %}(Weißt du was über|Weißt du etwas über|Wer ist|was ist|Erzähle mir was über|Kennst du) (?P<query>.*){% endclient %}
-    {% response %}{% call wiki: %query %}{% endresponse %}
-{% endblock %}

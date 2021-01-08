@@ -1,4 +1,0 @@
-{% block %}
-    {% client %}(wo bin ich|wo befinde ich mich|wo sind wir hier|wo befinden wir uns){% endclient %}
-    {% response %}{% call location: 0 %}{% endresponse %}
-{% endblock %}

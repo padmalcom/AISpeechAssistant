@@ -1,1 +1,0 @@
-voice_assistant = None

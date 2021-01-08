@@ -1,4 +1,0 @@
-{% block %}
-    {% client %}(Spiele den Radiosender|Spiele Radio) (?P<station>.*){% endclient %}
-    {% response %}{% call playRadio: %station %}{% endresponse %}
-{% endblock %}
