@@ -1,0 +1,17 @@
+intent:
+    musicstream:
+        de:
+            unknown_station: ["Den Radiosender kenne ich nicht."]
+        en:
+            unknown_station: ["I don't know that station."]
+        stations:
+            "Deutschlandfunk": "http://st01.dlf.de/dlf/01/64/mp3/stream.mp3"
+            "HR 1": "http://hr-hr1-live.cast.addradio.de/hr/hr1/live/mp3/128/stream.mp3"
+            "MDR aktuell": "http://mdr-284340-0.cast.mdr.de/mdr/284340/0/mp3/high/stream.mp3"
+            "N-JOY": "http://ndr-njoy-live.cast.addradio.de/ndr/njoy/live/mp3/128/stream.mp3"
+            "NDR 2": "http://ndr-ndr2-niedersachsen.cast.addradio.de/ndr/ndr2/niedersachsen/mp3/128/stream.mp3"
+            "Bremen 1": "http://rb-bremeneins-live.cast.addradio.de/rb/bremeneins/live/mp3/128/stream.mp3"
+            "Fritz": "http://fritz.de/livemp3"
+            "WDR 1": "http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3"
+            "RPR 1": "https://streams.rpr1.de/rpr-simulcast-128-mp3"
+            
