@@ -26,6 +26,9 @@ def musicstream(station=None):
 	# Meldung falls der Sender nicht gefunden wurde
 	UNKNOWN_STATION = random.choice(cfg['intent']['musicstream'][LANGUAGE]['unknown_station'])
 	
+	if (station == None) or (station == ""):
+		return UNKNOWN_STATION
+	
 	# Radiosender haben häufig Zahlen in den Namen, weswegen wir für einen besseren Abgleich
 	# Zahlenwörter in Zahlenwerte umwandeln.
 	station = text2numde.sentence2num(station)

@@ -155,45 +155,47 @@ class VoiceAssistant():
 							global_variables.voice_assistant.tts.say(output)
 							
 							# Geht der Dialog über diese Interaktion hinaus?
-							if global_variables.reset_session:
-								global_variables.voice_assistant.is_listening = False
-								global_variables.voice_assistant.current_speaker = None
-								global_variables.session = "general"
-							else:
-								global_variables.reset_session = True
-								
+							global_variables.voice_assistant.is_listening = False
+							global_variables.voice_assistant.current_speaker = None
 				
 				# Wird derzeit nicht zugehört?
 				else:
-					# Setze die Lautstärke auf Normalniveau zurück
-					global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
+				
+					# Reaktiviere is_listening, wenn der Skill weitere Eingaben erforder
+					if not global_variables.context is None:
+						# ... aber erst, wenn ausgeredet wurde
+						if not global_variables.voice_assistant.tts.is_busy():
+							global_variables.voice_assistant.is_listening = True
+					else:
+						# Setze die Lautstärke auf Normalniveau zurück
+						global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
+								
+						# Prozessiere alle registrierten Callback Funktionen, die manche Intents
+						# jede Iteration benötigen
+						for cb in global_variables.voice_assistant.callbacks:
+							output = cb()
 							
-					# Prozessiere alle registrierten Callback Funktionen, die manche Intents
-					# jede Iteration benötigen
-					for cb in global_variables.voice_assistant.callbacks:
-						output = cb()
+							# Gibt die Callback Funktion einen Wert zurück? Dann versuche
+							# ihn zu sprechen.
+							if output:
+								if not global_variables.voice_assistant.tts.is_busy():
+							
+									# Wird etwas abgespielt? Dann schalte die Lautstärke runter
+									if global_variables.voice_assistant.audio_player.is_playing():
+										global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume))
+									
+									# 
+									global_variables.voice_assistant.tts.say(output)
+									
+									# Wir rufen die selbe Funktion erneut auf und geben mit,
+									# dass der zu behandelnde Eintrag abgearbeitet wurde.
+									# Im Falle der Reminder-Funktion wird dann z.B. der Datenbankeintrag
+									# für den Reminder gelöscht
+									cb(True)
+									
+									# Zurücksetzen der Lautstärke auf Normalniveau
+									global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 						
-						# Gibt die Callback Funktion einen Wert zurück? Dann versuche
-						# ihn zu sprechen.
-						if output:
-							if not global_variables.voice_assistant.tts.is_busy():
-						
-								# Wird etwas abgespielt? Dann schalte die Lautstärke runter
-								if global_variables.voice_assistant.audio_player.is_playing():
-									global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume))
-								
-								# 
-								global_variables.voice_assistant.tts.say(output)
-								
-								# Wir rufen die selbe Funktion erneut auf und geben mit,
-								# dass der zu behandelnde Eintrag abgearbeitet wurde.
-								# Im Falle der Reminder-Funktion wird dann z.B. der Datenbankeintrag
-								# für den Reminder gelöscht
-								cb(True)
-								
-								# Zurücksetzen der Lautstärke auf Normalniveau
-								global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
-					
 		except KeyboardInterrupt:
 			logger.debug("Per Keyboard beendet")
 		finally:

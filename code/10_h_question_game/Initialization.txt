@@ -1,5 +1,6 @@
 Dinge, die du hier lernen wirst:
 - Dialoge über mehrere Sätze hinweg
+- Einführung eines Context und Integration in den Stop Intent
 
 conda create -n 10_h_question_game python=3.8
 

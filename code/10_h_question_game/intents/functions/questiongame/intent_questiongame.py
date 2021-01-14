@@ -1,6 +1,8 @@
 from chatbot import register_call
 import random
 import sys
+import os
+import global_variables
 
 YES = ["JA", "J", "YES", "Y"]
 NO = ["NEIN", "N", "NO"]
@@ -12,27 +14,37 @@ DID_NOT_UNDESTAND = "Ich habe die Antwort nicht verstanden"
 question_game_session = None
 
 @register_call("startQuestionGame")
-def startQuestionGame(session_id = "general"):
+def startQuestionGame(session_id = "general", dummy=0):
+	print("Starte neues Spiel")
+	global question_game_session
 	question_game_session = Q20Session()
-	global_variables.reset_session = False # Das Spiel ist noch nicht vorbei, die Session muss erhalten bleiben
+	global_variables.context = questionGameAnswer
 	return question_game_session.askQuestion()
-	
-@register_call("questionGameAnswer")
-def questionGameAnswer(session_id = "general", answer=""):
-	if question_game_session:
-		answer_value = self.evaluateAnswer(answer)
-		for i in range(len(items)):
-			items[i].updateCertainty(answer_value)			
+
+def questionGameAnswer(answer=""):
+	print("Antwort " + str(answer) + " erhalten.")
+	global question_game_session
+	if not question_game_session is None:
+		print("Session existiert")
+		answer_value = question_game_session.evaluateAnswer(answer)
+		for i in range(len(question_game_session.items)):
+			question_game_session.items[i].updateCertainty(answer_value, len(question_game_session.questions))			
 		question = question_game_session.askQuestion()
 		if question:
+			print("Frage gefunden: " + str(question))
 			global_variables.reset_session = False
 			return question
 		else:
+			print("Keine Frage gefunden.")
 			final_answer = question_game_session.getAnswer()
-			self.clearSession()
+			print("Antwort ist " + str(final_answer))
+			question_game_session.clearSession()
 			global_variables.reset_session = True
 			question_game_session = None
+			print("No more session")
 			return final_answer
+	else:
+		return "Bitte starte neues Spiel mit 'Starte Fragespiel'"
 
 class Q20Session():
 	
@@ -42,7 +54,10 @@ class Q20Session():
 		#self.guessed = False
 		self.current_question = 0
 		
-		itemData=open("items.txt")
+		items_path = os.path.join('intents','functions','questiongame', 'items.txt')
+		questions_path = os.path.join('intents','functions','questiongame', 'questions.txt')
+		
+		itemData=open(items_path, encoding="utf-8")
 		data=itemData.readlines()
 		for i in range(len(data)):
 			subdata=data[i].rstrip("\n").split(":")
@@ -50,7 +65,7 @@ class Q20Session():
 			for i in range(len(questionFloats)):
 				questionFloats[i]=round(float(questionFloats[i]),4)
 			self.items.append(Item(subdata[0],int(subdata[1]),questionFloats, len(self.items)))
-		questionData=open("questions.txt")
+		questionData=open(questions_path, encoding="utf-8")
 		data=questionData.readlines()
 		for i in range(len(data)):
 			self.questions.append(Question(data[i].rstrip("\n"), len(self.questions)))
@@ -117,8 +132,8 @@ class Item():
 		self.index=id
 		self.certainty=0
 		
-	def updateCertainty(self,val):
-		self.certainty+=(1-abs(val-self.questionFloats[len(questions)-1]))/len(questions)
+	def updateCertainty(self, val, num_questions):
+		self.certainty+=(1-abs(val-self.questionFloats[num_questions-1]))/num_questions
 			
 if __name__ == '__main__':
 	session = Q20Session()
