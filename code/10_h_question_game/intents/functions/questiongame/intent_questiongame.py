@@ -1,61 +1,70 @@
+from loguru import logger
 from chatbot import register_call
 import random
 import sys
 import os
 import global_variables
+import yaml
 
 YES = ["JA", "J", "YES", "Y"]
 NO = ["NEIN", "N", "NO"]
 PROBABLY = ["VIELLEICHT", "PROBABLY"]
 PROBABLY_NOT = ["WAHRSCHEINLICH NICHT", "EHER NICHT", "PROBABLY NOT"]
 
-DID_NOT_UNDESTAND = "Ich habe die Antwort nicht verstanden"
-
 question_game_session = None
 
 @register_call("startQuestionGame")
-def startQuestionGame(session_id = "general", dummy=0):
-	print("Starte neues Spiel")
+def startQuestionGame(session_id = "general", dummy=0):		
+	logger.info("Starte neues Fragespiel.")
 	global question_game_session
 	question_game_session = Q20Session()
 	global_variables.context = questionGameAnswer
 	return question_game_session.askQuestion()
 
 def questionGameAnswer(answer=""):
-	print("Antwort " + str(answer) + " erhalten.")
+	answer = answer.strip()
+	logger.debug("Antwort '" + str(answer) + "' erhalten.")
 	global question_game_session
 	if not question_game_session is None:
-		print("Session existiert")
 		answer_value = question_game_session.evaluateAnswer(answer)
 		for i in range(len(question_game_session.items)):
 			question_game_session.items[i].updateCertainty(answer_value, len(question_game_session.questions))			
 		question = question_game_session.askQuestion()
 		if question:
-			print("Frage gefunden: " + str(question))
-			global_variables.reset_session = False
+			logger.info("Die nächste Frage ist {}.", question)
 			return question
 		else:
-			print("Keine Frage gefunden.")
+			logger.info("Das war die letzte Frage.")
 			final_answer = question_game_session.getAnswer()
-			print("Antwort ist " + str(final_answer))
+			logger.info("Ermittelte Antwort für Fragespiel ist: {} ", str(final_answer))
 			question_game_session.clearSession()
-			global_variables.reset_session = True
+			global_variables.context = None
 			question_game_session = None
-			print("No more session")
 			return final_answer
 	else:
-		return "Bitte starte neues Spiel mit 'Starte Fragespiel'"
+		return question_game_session.PLEASE_START_NEW_GAME
 
 class Q20Session():
 	
 	def __init__(self):
 		self.questions = []
 		self.items = []
-		#self.guessed = False
 		self.current_question = 0
 		
-		items_path = os.path.join('intents','functions','questiongame', 'items.txt')
-		questions_path = os.path.join('intents','functions','questiongame', 'questions.txt')
+		# Lese die Konfiguration
+		config_path = os.path.join('intents','functions','questiongame','config_questiongame.yml')
+		cfg = None
+		with open(config_path, "r", encoding='utf8') as ymlfile:
+			cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+
+		# Holen der Sprache aus der globalen Konfigurationsdatei
+		LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']		
+		
+		self.PLEASE_START_NEW_GAME = cfg['intent']['questiongame'][LANGUAGE]['please_start_new_game']
+		self.GUESS = cfg['intent']['questiongame'][LANGUAGE]['i_guess']
+		
+		items_path = os.path.join('intents','functions','questiongame', 'items_' + LANGUAGE + '.txt')
+		questions_path = os.path.join('intents','functions','questiongame', 'questions_' + LANGUAGE + '.txt')
 		
 		itemData=open(items_path, encoding="utf-8")
 		data=itemData.readlines()
@@ -81,7 +90,7 @@ class Q20Session():
 			
 	def getAnswer(self):
 		selectedData = self.evaluateCertainties()
-		result = "Mit einer Wahrscheinlichkeit von " + str(round(100*selectedData[1],2)) + " Prozent denkst du an den Begriff " + self.items[selectedData[0]].name.capitalize()
+		result = self.GUESS.format(str(round(100*selectedData[1],2)), self.items[selectedData[0]].name.capitalize())
 		return result
 			
 	def evaluateAnswer(self, answer):
@@ -100,15 +109,13 @@ class Q20Session():
 	def evaluateCertainties(self):
 		maxi=0
 		selected=-1
-		for i in range(len(items)):
-			if items[i].certainty>maxi:
-				maxi=items[i].certainty
+		for i in range(len(self.items)):
+			if self.items[i].certainty>maxi:
+				maxi=self.items[i].certainty
 				selected=i
 		return [selected, maxi]
 
 	def clearSession(self):
-		#self.answers=[]
-		#self.guessed=False
 		for i in range(len(self.items)):
 			self.items[i].certainty=0
 
@@ -116,13 +123,6 @@ class Question():
 	def __init__(self, string, id):
 		self.string=string
 		self.index=id  
-#	def ask(self):
-		#global items, answers
-#		print(self.string)
-#		a=getInput()
-#		for i in range(len(items)):
-#			items[i].updateCertainty(a)
-		#answers.append(a)
 		
 class Item():
 	def __init__(self, name, guessNum, questionFloats, id):
@@ -134,7 +134,3 @@ class Item():
 		
 	def updateCertainty(self, val, num_questions):
 		self.certainty+=(1-abs(val-self.questionFloats[num_questions-1]))/num_questions
-			
-if __name__ == '__main__':
-	session = Q20Session()
-	session.run()
