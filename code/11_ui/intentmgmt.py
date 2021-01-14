@@ -178,6 +178,16 @@ class IntentMgmt:
 	
 	def process(self, text, speaker):
 	
-		# Evaluiere ChatbotAI, wenn keines der strikten Intents greift, wird die Eingabe über die dialogs.template
-		# automatisch an snips nlu umgeleitet.
-		return self.chat.respond(text)
+		# Speichere den alten Context ab, falls durch den Aufruf von respond ein neuer Context gesetzt wird.
+		old_context = global_variables.context
+		
+		# Berechne die Response zuerst, damit ggf der Context zurückgesetzt werden kann. Das geschieht im Stop-Intent
+		response = self.chat.respond(text)
+		
+		# Sollte es einen Context geben (also ein Intent aufgerufen worden sein, der mehrmals interagiere muss).
+		# Der context ist ein Zeiger auf die nächste, verarbeitende Methode
+		if not old_context is None:
+			# Rufe die entsprechende Methode auf
+			return global_variables.context(text)
+		else:
+			return response

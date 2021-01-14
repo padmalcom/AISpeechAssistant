@@ -154,7 +154,7 @@ class VoiceAssistant():
 							output = global_variables.voice_assistant.intent_management.process(sentence, speaker)
 							global_variables.voice_assistant.tts.say(output)
 							
-							# Geht der Dialog über diese Interaktion hinaus?
+							# Setze globale Variablen zurück
 							global_variables.voice_assistant.is_listening = False
 							global_variables.voice_assistant.current_speaker = None
 				

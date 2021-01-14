@@ -35,6 +35,8 @@ def stop(session_id = "general", dummy=0):
 			global_variables.voice_assistant.audio_player.stop()
 			result = random.choice(cfg['intent']['stop'][LANGUAGE]['be_silent'])
 			
+		# Setze den Context zurück und unterbrich etwaige Intents, die mehrere Dialogzeilen haben
+		global_variables.context = None
 		return result
 	else:
 		logger.error("Konnte Konfigurationsdatei für Intent 'stop' nicht laden.")

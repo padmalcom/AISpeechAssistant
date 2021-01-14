@@ -1,2 +1,3 @@
 Dinge, die du hier lernen wirst:
-- Weitergeben der Anwendung, durch speichern des Environements
+- Weitergeben der Anwendung, durch speichern des Environements (conda env export > environment.yml)
+- Push auf github -> clonen -> env aufsetzen (conda env create -f environment. yml)
