@@ -9,11 +9,70 @@ from pathlib import Path
 from snips_nlu import SnipsNLUEngine
 from snips_nlu.default_configs import CONFIG_DE
 from snips_nlu.dataset import Dataset
-from chatbot import Chat, register_call
+from chatbot import Chat, register_call, mapper
 import json
 import random
 import global_variables
 
+# Erweitere die Klasse Chat durch die Funktion get_intend_name
+class Chat(Chat):
+    def get_intend_name(self, text, session_id="general"):
+        session = mapper.Session(self, session_id)
+		
+        text = self.__normalize(text)
+        try:
+            previous_text = self.__normalize(session.conversation.get_bot_message(-1))
+        except IndexError:
+            previous_text = ""		
+        text_correction = self.spell_checker.correction(text)
+        current_topic = session.topic
+			
+        match = self.__intend_selection(text, previous_text, current_topic) or self.__intend_selection(text_correction, previous_text, current_topic)
+		
+        if match:
+            match, parent_match, response, learn = match
+            resp = random.choice(response)
+            response, condition = resp
+            action_start = response.find("{% call ")
+            action_end = response.find("%}")
+            if action_start >= 0 and action_end >= 0:
+                action_corpus = "'" + response[action_start + len("{% call ") + 1:action_end - 1] +"'"
+                if action_corpus.find(":") > 0:
+                    action_name = action_corpus.split(':')[0]
+                    return action_name
+        return ""
+
+def get_snips_nlu_intent(text):
+	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
+	output = "Ich verstehe deine Frage nicht. Kannst du sie umformulieren?"
+	
+	# Schaue, ob es einen Intent gibt, der zu dem NLU intent passt
+	intent_found = False
+	
+	# Lese die Sprache des Assistenten aus der Konfigurationsdatei
+	ASSISTANT_LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
+	
+	# Hole die Liste aller Antworten, die darauf hindeuten, dass kein Intent detektiert wurde
+	if ASSISTANT_LANGUAGE:
+		NO_INTENT_RECOGNIZED = global_variables.voice_assistant.cfg['defaults'][ASSISTANT_LANGUAGE]['no_intent_recognized']
+	else:
+		NO_INTENT_RECOGNIZED = ['I did not understand']
+	
+	# Wähle ein zufälliges Item, das erstmal aussagt, dass kein Intent gefunden wurde.
+	# WIRD ein Intent gefunden, dann wird output durch eine vernünftige Antwort ersetzt.
+	output = random.choice(NO_INTENT_RECOGNIZED)
+	
+	for intent in global_variables.voice_assistant.intent_management.dynamic_intents:
+		
+		# Wurde überhaupt ein Intent erkannt?
+		if parsing["intent"]["intentName"]:
+		
+			# Die Wahrscheinlichkeit wird geprüft, um sicherzustellen, dass nicht irgendein Intent angewendet wird,
+			# der garnicht gemeint war
+			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
+				return parsing["intent"]["intentName"]
+	return ""
+			
 @register_call("default_snips_nlu_handler")
 def default_snips_nlu_handler(session, text):
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
@@ -44,10 +103,7 @@ def default_snips_nlu_handler(session, text):
 			# der garnicht gemeint war
 			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
 				intent_found = True
-				
-				# Überprüfe, ob der Benutzer diesen Intent ausführen darf
-				# TODO
-				
+								
 				# Parse alle Parameter
 				arguments = dict()
 				for slot in parsing["slots"]:
@@ -183,8 +239,14 @@ class IntentMgmt:
 	
 		# Evaluiere ChatbotAI, wenn keines der strikten Intents greift, wird die Eingabe über die dialogs.template
 		# automatisch an snips nlu umgeleitet.
-		response = self.chat.respond(text)
-		
-		# Überprüfe, ob der Sprecher diese Aktion ausführen darf
-		# TODO
+		intent_name = self.chat.get_intend_name(text)
+		if intent_name == "default_snips_nlu_handler":
+			intent_name = get_snips_nlu_intent(text)
+			
+		# Überprüfe, ob der Benutzer diesen Intent ausführen darf
+		if global_variables.voice_assistant.user_management.authenticate_intent(speaker, intent_name):
+			response = self.chat.respond(text)
+		else:
+			response = speaker + " darf den Befehl " + intent_name + " nicht ausführen." # TODO besser nichts sagen
+
 		return response
