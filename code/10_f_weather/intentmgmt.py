@@ -247,6 +247,8 @@ class IntentMgmt:
 		if global_variables.voice_assistant.user_management.authenticate_intent(speaker, intent_name):
 			response = self.chat.respond(text)
 		else:
-			response = speaker + " darf den Befehl " + intent_name + " nicht ausführen." # TODO besser nichts sagen
+			# In diesem Beispiel lassen wir den Assistenten antworten. In Zukunft wird er einfach nicht
+			# reagieren, um das Abspielen gar nicht erst zu unterbrechen
+			response = speaker + " darf den Befehl " + intent_name + " nicht ausführen."
 
 		return response

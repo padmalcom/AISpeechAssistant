@@ -16,7 +16,7 @@ class UserMgmt:
 	def authenticate_intent(self, speaker, intent):
 		Speaker = Query()
 		# Hole den Eintrag für den Sprecher
-		result = speaker_table.get(Speaker.name == speaker)
+		result = self.speaker_table.get(Speaker.name == speaker)
 		if not result is None:
 			# Hole die Intents, die der Sprechner nutzen darf
 			intents = result['intents']
