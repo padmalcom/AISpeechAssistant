@@ -74,10 +74,10 @@ class VoiceAssistant():
 		try:
 			while True:
 			
-				pcm = va.audio_stream.read(FRAME_LENGTH)
+				pcm = self.audio_stream.read(FRAME_LENGTH)
 					
-				if va.rec.AcceptWaveform(pcm):
-					recResult = json.loads(va.rec.Result())
+				if self.rec.AcceptWaveform(pcm):
+					recResult = json.loads(self.rec.Result())
 						
 					# Hole das Resultat aus dem JSON Objekt
 					sentence = recResult['text']
@@ -93,11 +93,11 @@ class VoiceAssistant():
 		finally:
 			logger.debug('Beginne Aufräumarbeiten...')
 				
-			if va.audio_stream is not None:
-				va.audio_stream.close()
+			if self.audio_stream is not None:
+				self.audio_stream.close()
 				
-			if va.pa is not None:
-				va.pa.terminate()
+			if self.pa is not None:
+				self.pa.terminate()
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')

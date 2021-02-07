@@ -81,36 +81,36 @@ class VoiceAssistant():
 		try:
 			while True:
 			
-				pcm = va.audio_stream.read(va.porcupine.frame_length)
-				pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
-				keyword_index = va.porcupine.process(pcm_unpacked)
+				pcm = self.audio_stream.read(self.porcupine.frame_length)
+				pcm_unpacked = struct.unpack_from("h" * self.porcupine.frame_length, pcm)		
+				keyword_index = self.porcupine.process(pcm_unpacked)
 				if keyword_index >= 0:
-					logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
-					va.is_listening = True
+					logger.info("Wake Word {} wurde verstanden.", self.wake_words[keyword_index])
+					self.is_listening = True
 					
 				# Spracherkennung
-				if va.is_listening:
-					if va.rec.AcceptWaveform(pcm):
-						recResult = json.loads(va.rec.Result())
+				if self.is_listening:
+					if self.rec.AcceptWaveform(pcm):
+						recResult = json.loads(self.rec.Result())
 						
 						# Hole das Resultat aus dem JSON Objekt
 						sentence = recResult['text']
 						logger.debug('Ich habe verstanden "{}"', sentence)
 
-						va.is_listening = False
+						self.is_listening = False
 					
 		except KeyboardInterrupt:
 			logger.debug("Per Keyboard beendet")
 		finally:
 			logger.debug('Beginne Aufräumarbeiten...')
-			if va.porcupine:
-				va.porcupine.delete()
+			if self.porcupine:
+				self.porcupine.delete()
 				
-			if va.audio_stream is not None:
-				va.audio_stream.close()
+			if self.audio_stream is not None:
+				self.audio_stream.close()
 				
-			if va.pa is not None:
-				va.pa.terminate()
+			if self.pa is not None:
+				self.pa.terminate()
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')

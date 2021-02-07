@@ -127,51 +127,51 @@ class VoiceAssistant():
 		try:
 			while True:
 			
-				pcm = va.audio_stream.read(va.porcupine.frame_length)
-				pcm_unpacked = struct.unpack_from("h" * va.porcupine.frame_length, pcm)		
-				keyword_index = va.porcupine.process(pcm_unpacked)
+				pcm = self.audio_stream.read(self.porcupine.frame_length)
+				pcm_unpacked = struct.unpack_from("h" * self.porcupine.frame_length, pcm)		
+				keyword_index = self.porcupine.process(pcm_unpacked)
 				if keyword_index >= 0:
-					logger.info("Wake Word {} wurde verstanden.", va.wake_words[keyword_index])
-					va.is_listening = True
+					logger.info("Wake Word {} wurde verstanden.", self.wake_words[keyword_index])
+					self.is_listening = True
 					
 				# Spracherkennung
-				if va.is_listening:
-					if va.rec.AcceptWaveform(pcm):
-						recResult = json.loads(va.rec.Result())
+				if self.is_listening:
+					if self.rec.AcceptWaveform(pcm):
+						recResult = json.loads(self.rec.Result())
 						
-						speaker = va.__detectSpeaker__(recResult['spk'])
-						if (speaker == None) and (va.allow_only_known_speakers == True):
+						speaker = self.__detectSpeaker__(recResult['spk'])
+						if (speaker == None) and (self.allow_only_known_speakers == True):
 							logger.info("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
-							va.current_speaker = None
+							self.current_speaker = None
 						else:
 							if speaker:
 								logger.debug("Sprecher ist {}", speaker)
-							va.current_speaker = speaker
-							va.current_speaker_fingerprint = recResult['spk']
+							self.current_speaker = speaker
+							self.current_speaker_fingerprint = recResult['spk']
 							sentence = recResult['text']
 							logger.debug('Ich habe verstanden "{}"', sentence)
 							
 							
 							# Lasse den Assistenten auf die Spracheingabe reagieren.
 							# Problem: Es wird das Default Template aufgerufen, wenn kein Intent erkannt wurde. Und das ist in Englisch.
-							output = va.chat.respond(sentence)
-							va.tts.say(output)
+							output = self.chat.respond(sentence)
+							self.tts.say(output)
 							
-							va.is_listening = False
-							va.current_speaker = None
+							self.is_listening = False
+							self.current_speaker = None
 					
 		except KeyboardInterrupt:
 			logger.debug("Per Keyboard beendet")
 		finally:
 			logger.debug('Beginne Aufräumarbeiten...')
-			if va.porcupine:
-				va.porcupine.delete()
+			if self.porcupine:
+				self.porcupine.delete()
 				
-			if va.audio_stream is not None:
-				va.audio_stream.close()
+			if self.audio_stream is not None:
+				self.audio_stream.close()
 				
-			if va.pa is not None:
-				va.pa.terminate()
+			if self.pa is not None:
+				self.pa.terminate()
 
 if __name__ == '__main__':
 	multiprocessing.set_start_method('spawn')
