@@ -1,7 +1,17 @@
 # AISpeechAssistant
 
-## Vorgehen
-- Wir werden immer auf dem vorherigen Kapitel aufsetzen
+## TODOs
+
+### Done
+- name every intent and add authentication script
+
+### Open
+- Englische Templates und deren Verwaltung
+- 12 paketierung (conda constructor) pyflakes um zu checken was gebraucht wird und was nicht
+- Sprechblase in 12, um Dialoge zu visualisieren
+- Schwarm Cluster - jeder bekommt einen Namen und ein Response-Ton
+- Passwort Skill: "Passwort PKI"
+- Geburtstagsskill
 
 ## Chapters
 1. Introduction

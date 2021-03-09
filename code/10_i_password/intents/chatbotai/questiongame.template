@@ -1,0 +1,4 @@
+{% block %}
+    {% client %}((fragespiel)|(starte fragespiel)|(frage spiel)|(starte frage spiel)){% endclient %}
+    {% response %}{% call startQuestionGame: 0 %}{% endresponse %}
+{% endblock %}
