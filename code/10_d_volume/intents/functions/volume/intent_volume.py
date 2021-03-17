@@ -69,7 +69,7 @@ def volumeUp(session_id = "general", volume=None):
 	if cfg:
 
 		if isinstance(volume, str):
-			vol_up = 1 + volume.split().count(cfg['intent']['volume'][language]['volume_up']) # Erlaube etwas wie "lauter, lauter, lauter"
+			vol_up = volume.split().count(cfg['intent']['volume'][language]['volume_up']) # Erlaube etwas wie "lauter, lauter, lauter"
 		
 		vol = global_variables.voice_assistant.volume
 				
@@ -95,7 +95,7 @@ def volumeDown(session_id = "general", volume=None):
 			if text2numde.is_number(volume):
 				vol_down = text2numde.text2num(volume.strip())
 			else:
-				vol_down = 1 + volume.split().count(cfg['intent']['volume'][language]['volume_down']) # Erlaube etwas wie "lauter, lauter, lauter"
+				vol_down = volume.split().count(cfg['intent']['volume'][language]['volume_down']) # Erlaube etwas wie "lauter, lauter, lauter"
 		
 		vol = global_variables.voice_assistant.volume
 				

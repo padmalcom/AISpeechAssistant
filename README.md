@@ -1,6 +1,10 @@
 # AISpeechAssistant
 
 ## TODOs
+- 11 als Bugfixing Kapitel
+	- in intentmgmt "		if parsing["intent"]["intentName"]:"
+	- utf-8
+	
 
 ### Done
 - name every intent and add authentication script

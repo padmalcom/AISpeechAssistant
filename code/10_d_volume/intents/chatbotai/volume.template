@@ -7,10 +7,10 @@
     {% response %}{% call setVolume: %volume %}{% endresponse %}
 {% endblock %}
 {% block %}
-    {% client %}lauter(\s*)(?P<volume>.*)?{% endclient %}
-    {% response %}{% call volumeUp: %volume %}{% endresponse %}
+    {% client %}lauter.*{% endclient %}
+    {% response %}{% call volumeUp: %0 %}{% endresponse %}
 {% endblock %}
 {% block %}
-    {% client %}leiser(\s*)(?P<volume>.*)?{% endclient %}
-    {% response %}{% call volumeDown: %volume %}{% endresponse %}
+    {% client %}leiser.*{% endclient %}
+    {% response %}{% call volumeDown: %0 %}{% endresponse %}
 {% endblock %}
