@@ -36,7 +36,7 @@ class Chat(Chat):
             action_start = response.find("{% call ")
             action_end = response.find("%}")
             if action_start >= 0 and action_end >= 0:
-                action_corpus = "'" + response[action_start + len("{% call ") + 1:action_end - 1] +"'"
+                action_corpus = response[action_start + len("{% call "):action_end - 1]
                 if action_corpus.find(":") > 0:
                     action_name = action_corpus.split(':')[0]
                     return action_name
@@ -44,24 +44,7 @@ class Chat(Chat):
 
 def get_snips_nlu_intent(text):
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
-	output = "Ich verstehe deine Frage nicht. Kannst du sie umformulieren?"
-	
-	# Schaue, ob es einen Intent gibt, der zu dem NLU intent passt
-	intent_found = False
-	
-	# Lese die Sprache des Assistenten aus der Konfigurationsdatei
-	ASSISTANT_LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
-	
-	# Hole die Liste aller Antworten, die darauf hindeuten, dass kein Intent detektiert wurde
-	if ASSISTANT_LANGUAGE:
-		NO_INTENT_RECOGNIZED = global_variables.voice_assistant.cfg['defaults'][ASSISTANT_LANGUAGE]['no_intent_recognized']
-	else:
-		NO_INTENT_RECOGNIZED = ['I did not understand']
-	
-	# Wähle ein zufälliges Item, das erstmal aussagt, dass kein Intent gefunden wurde.
-	# WIRD ein Intent gefunden, dann wird output durch eine vernünftige Antwort ersetzt.
-	output = random.choice(NO_INTENT_RECOGNIZED)
-	
+		
 	for intent in global_variables.voice_assistant.intent_management.dynamic_intents:
 		
 		# Wurde überhaupt ein Intent erkannt?

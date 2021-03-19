@@ -1,0 +1,33 @@
+type: entity
+name: state_ent
+automatically_extensible: true
+use_synonyms: false
+matching_strictness: 0.8
+values:
+    - an
+    - ein
+    - aus
+    
+type: entity
+name: device_ent
+automatically_extensible: true
+use_synonyms: false
+matching_strictness: 0.8
+values:
+    - Küche
+    - Licht in Küche
+    - Licht im Wohnzimmer
+    - Licht
+    - Büro
+    - Licht im Büro
+    
+---
+type: intent
+name: smarthome
+utterances:
+    - Schalte [device:device_ent](Licht) [state:state_ent](aus)
+    - Schalte [device:device_ent](Licht in der Küche) [state:state_ent](an)
+    - Schalte [device:device_ent](Büro) [state:state_ent](ein)
+    - Mache [device:device_ent](Licht im Büro) [state:state_ent](aus)
+    - Mache [device:device_ent](Licht im Wohnzimmer) [state:state_ent](an)
+    - Mache [device:device_ent](Büro) [state:state_ent](an)

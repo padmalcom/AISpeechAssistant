@@ -1,4 +1,0 @@
-{% block %}
-    {% client %}(Schalte|Mache)(\s*)(?P<switch>.*)(?P<state>.*){% endclient %}
-    {% response %}{% call smarthome: %switch %state %}{% endresponse %}
-{% endblock %}

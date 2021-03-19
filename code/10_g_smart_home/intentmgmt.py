@@ -36,7 +36,7 @@ class Chat(Chat):
             action_start = response.find("{% call ")
             action_end = response.find("%}")
             if action_start >= 0 and action_end >= 0:
-                action_corpus = "'" + response[action_start + len("{% call ") + 1:action_end - 1] +"'"
+                action_corpus = response[action_start + len("{% call "):action_end - 1]
                 if action_corpus.find(":") > 0:
                     action_name = action_corpus.split(':')[0]
                     return action_name
@@ -44,24 +44,7 @@ class Chat(Chat):
 
 def get_snips_nlu_intent(text):
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
-	output = "Ich verstehe deine Frage nicht. Kannst du sie umformulieren?"
-	
-	# Schaue, ob es einen Intent gibt, der zu dem NLU intent passt
-	intent_found = False
-	
-	# Lese die Sprache des Assistenten aus der Konfigurationsdatei
-	ASSISTANT_LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
-	
-	# Hole die Liste aller Antworten, die darauf hindeuten, dass kein Intent detektiert wurde
-	if ASSISTANT_LANGUAGE:
-		NO_INTENT_RECOGNIZED = global_variables.voice_assistant.cfg['defaults'][ASSISTANT_LANGUAGE]['no_intent_recognized']
-	else:
-		NO_INTENT_RECOGNIZED = ['I did not understand']
-	
-	# Wähle ein zufälliges Item, das erstmal aussagt, dass kein Intent gefunden wurde.
-	# WIRD ein Intent gefunden, dann wird output durch eine vernünftige Antwort ersetzt.
-	output = random.choice(NO_INTENT_RECOGNIZED)
-	
+		
 	for intent in global_variables.voice_assistant.intent_management.dynamic_intents:
 		
 		# Wurde überhaupt ein Intent erkannt?
@@ -72,7 +55,7 @@ def get_snips_nlu_intent(text):
 			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
 				return parsing["intent"]["intentName"]
 	return ""
-	
+			
 @register_call("default_snips_nlu_handler")
 def default_snips_nlu_handler(session, text):
 	parsing = global_variables.voice_assistant.intent_management.nlu_engine.parse(text)
@@ -103,7 +86,7 @@ def default_snips_nlu_handler(session, text):
 			# der garnicht gemeint war
 			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
 				intent_found = True
-				
+								
 				# Parse alle Parameter
 				arguments = dict()
 				for slot in parsing["slots"]:
@@ -245,6 +228,10 @@ class IntentMgmt:
 			
 		# Überprüfe, ob der Benutzer diesen Intent ausführen darf
 		if global_variables.voice_assistant.user_management.authenticate_intent(speaker, intent_name):
-			return self.chat.respond(text)
-			
-		return ""
+			response = self.chat.respond(text)
+		else:
+			# In diesem Beispiel lassen wir den Assistenten antworten. In Zukunft wird er einfach nicht
+			# reagieren, um das Abspielen gar nicht erst zu unterbrechen
+			response = speaker + " darf den Befehl " + intent_name + " nicht ausführen."
+
+		return response

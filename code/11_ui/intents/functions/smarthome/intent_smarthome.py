@@ -7,7 +7,7 @@ import yaml
 import requests
 
 @register_call("smarthome")
-def smarthome(session_id = "general", switch="", state=""):
+def smarthome(session_id = "general", device="", state=""):
 
 	config_path = os.path.join('intents','functions','smarthome','config_smarthome.yml')
 	cfg = None
@@ -16,31 +16,35 @@ def smarthome(session_id = "general", switch="", state=""):
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	if not cfg:
-		logger.error("Konnte Konfigurationsdatei für das Smart Home nicht lesen.")
+		logger.error("Konnte Konfigurationsdatei für den Intent 'smarthome' nicht lesen.")
 		return ""
 
 	LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
-	
 	# Lese alle bekannten Smart Home Devices aus
 	devices = {}
 	for key, value in cfg['intent']['smarthome']['devices'].items():
 		devices[key] = value
-		
+	
 	# Gibt es das angefragte Device?
-	if devices[switch]:	
+	if devices[device]:	
 		s = None
 		# Interpretiere den Zustand
-		if state in cfg['intent']['smarthome'][LANGUAGE]['on']:
+		if state in cfg['intent']['smarthome'][LANGUAGE]['state_on']:
 			s = "on"
-		elif state in cfg['intent']['smarthome'][LANGUAGE]['off']:
+		elif state in cfg['intent']['smarthome'][LANGUAGE]['state_off']:
 			s = "off"
 		else:
-			return cfg['intent']['smarthome']['state_unknown']
+			return cfg['intent']['smarthome'][LANGUAGE]['state_unknown'].format(state)
 			
 		# Setze einen Get-Request ab, der das Gerät ein- oder ausschaltet
-		PARAMS = {'turn', s}
-		r = requests.get(url = "http://" + devices[switch] + "/relay/0", params = PARAMS) 
+		PARAMS = {'turn': s}
+
+		try:
+			r = requests.get(url = "http://" + devices[device] + "/relay/0", params = PARAMS)
+		except:
+			return cfg['intent']['smarthome'][LANGUAGE]['request_failed'].format(device)
+
 		data = r.json()
 		logger.debug(data)
-	else:
-		return cfg['intent']['smarthome']['device_unknown']
+		return ""
+	return cfg['intent']['smarthome'][LANGUAGE]['device_unknown'].format(device)

@@ -7,6 +7,7 @@ import yaml
 
 import pyowm
 from pyowm.utils.config import get_default_config
+import geocoder
 
 @register_call("weather")
 def weather(session_id = "general", location=""):
@@ -38,12 +39,12 @@ def weather(session_id = "general", location=""):
 	location = location.strip()
 	if (location == HERE) or (location == ""):
 		g = geocoder.ip('me')
-		w = va.weather_mgr.weather_at_coords(g.latlng[0], g.latlng[1]).weather
+		w = weather_mgr.weather_at_coords(g.latlng[0], g.latlng[1]).weather
 		return WEATHER_IS.format(g.city, w.status, str(w.temperature('celsius')['temp']))
 	else:
-		obs_list = va.weather_mgr.weather_at_places(location, 'like', limit=5)
+		obs_list = weather_mgr.weather_at_places(location, 'like', limit=5)
 		if len(obs_list) > 0:
 			w = obs_list[0].weather
-			return WEATHER_IS.format(g.city, w.status, str(w.temperature('celsius')['temp']))
-		else:
-			return LOCATION_NOT_FOUND.format(location)
+			return WEATHER_IS.format(location, w.status, str(w.temperature('celsius')['temp']))
+	
+	return LOCATION_NOT_FOUND.format(location)
