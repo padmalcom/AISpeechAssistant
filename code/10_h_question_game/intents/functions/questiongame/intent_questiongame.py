@@ -44,6 +44,7 @@ def questionGameAnswer(answer=""):
 	else:
 		return question_game_session.PLEASE_START_NEW_GAME
 
+# Danke an https://github.com/FergusGriggs/20q
 class Q20Session():
 	
 	def __init__(self):
