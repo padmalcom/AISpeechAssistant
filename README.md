@@ -4,6 +4,7 @@
 - 11 als Bugfixing Kapitel
 	- in intentmgmt "		if parsing["intent"]["intentName"]:"
 	- utf-8
+- https://github.com/csparpa/pyowm/issues/375 (pyowm language)
 	
 
 ### Done

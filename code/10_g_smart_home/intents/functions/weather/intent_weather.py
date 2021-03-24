@@ -40,11 +40,11 @@ def weather(session_id = "general", location=""):
 	if (location == HERE) or (location == ""):
 		g = geocoder.ip('me')
 		w = weather_mgr.weather_at_coords(g.latlng[0], g.latlng[1]).weather
-		return WEATHER_IS.format(g.city, w.status, str(w.temperature('celsius')['temp']))
+		return WEATHER_IS.format(g.city, w.detailed_status, str(w.temperature('celsius')['temp']))
 	else:
 		obs_list = weather_mgr.weather_at_places(location, 'like', limit=5)
 		if len(obs_list) > 0:
 			w = obs_list[0].weather
-			return WEATHER_IS.format(location, w.status, str(w.temperature('celsius')['temp']))
+			return WEATHER_IS.format(location, w.detailed_status, str(w.temperature('celsius')['temp']))
 	
 	return LOCATION_NOT_FOUND.format(location)

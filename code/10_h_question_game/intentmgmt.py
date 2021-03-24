@@ -81,17 +81,17 @@ def default_snips_nlu_handler(session, text):
 		
 		# Wurde überhaupt ein Intent erkannt?
 		if parsing["intent"]["intentName"]:
-		
+
 			# Die Wahrscheinlichkeit wird geprüft, um sicherzustellen, dass nicht irgendein Intent angewendet wird,
 			# der garnicht gemeint war
 			if (parsing["intent"]["intentName"].lower() == intent.lower()) and (parsing["intent"]["probability"] > 0.5):
 				intent_found = True
-								
+
 				# Parse alle Parameter
 				arguments = dict()
 				for slot in parsing["slots"]:
 					arguments[slot["slotName"]] = slot["value"]["value"]
-					
+
 				# Rufe Methode dynamich mit der Parameterliste auf
 				argument_string = json.dumps(arguments)
 				logger.debug("Rufe {} auf mit den Argumenten {}.", intent, argument_string)
@@ -228,7 +228,16 @@ class IntentMgmt:
 			
 		# Überprüfe, ob der Benutzer diesen Intent ausführen darf
 		if global_variables.voice_assistant.user_management.authenticate_intent(speaker, intent_name):
+		
+			old_context = global_variables.context
+			
+			
 			response = self.chat.respond(text)
+			
+			if not old_context is None:
+				return global_variables.context(text)
+			else:
+				return response
 		else:
 			# In diesem Beispiel lassen wir den Assistenten antworten. In Zukunft wird er einfach nicht
 			# reagieren, um das Abspielen gar nicht erst zu unterbrechen

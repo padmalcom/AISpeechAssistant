@@ -228,7 +228,16 @@ class IntentMgmt:
 			
 		# Überprüfe, ob der Benutzer diesen Intent ausführen darf
 		if global_variables.voice_assistant.user_management.authenticate_intent(speaker, intent_name):
+		
+			old_context = global_variables.context
+			
+			
 			response = self.chat.respond(text)
+			
+			if not old_context is None:
+				return global_variables.context(text)
+			else:
+				return response
 		else:
 			# In diesem Beispiel lassen wir den Assistenten antworten. In Zukunft wird er einfach nicht
 			# reagieren, um das Abspielen gar nicht erst zu unterbrechen
