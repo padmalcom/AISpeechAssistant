@@ -2,9 +2,9 @@
 
 ## TODOs
 - 11 als Bugfixing Kapitel
-	- in intentmgmt "		if parsing["intent"]["intentName"]:"
+	- in intentmgmt "		if parsing["intent"]["intentName"]:" ERLEDIGT
 	- utf-8
-- https://github.com/csparpa/pyowm/issues/375 (pyowm language)
+- https://github.com/csparpa/pyowm/issues/375 (pyowm language) KEIN EFFEKT
 	
 
 ### Done

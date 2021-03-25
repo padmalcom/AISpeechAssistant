@@ -7,6 +7,8 @@ import os
 from pykeepass import PyKeePass
 from pynput.keyboard import Key, Listener, Controller as keyboard_controller
 from fuzzywuzzy import fuzz
+import json
+import numpy as np
 
 @register_call("getPassword")
 def getPassword(session_id = "general", entry="none"):
@@ -36,6 +38,8 @@ def getPassword(session_id = "general", entry="none"):
 	UNKNOWN_ENTRY = random.choice(cfg['intent']['password'][LANGUAGE]['unknown_entry'])
 	UNKNOWN_ENTRY = UNKNOWN_ENTRY.format(entry)
 	
+	NO_VOICE_MATCH = cfg['intent']['password'][LANGUAGE]['no_voice_match']
+	
 	# Konnte die Konfigurationsdatei des Intents geladen werden?
 	if cfg:
 		try:
@@ -43,6 +47,17 @@ def getPassword(session_id = "general", entry="none"):
 		except Exception as e:
 			return cfg['intent']['password'][LANGUAGE]['could_not_access_keystore']
 
+		# Verifiziere Stimme
+		fp_entry = kp.find_entries(title='_fingerprint', first=True)
+		if fp_entry:
+			a = json.loads(fp_entry.notes)
+			b = global_variables.voice_assistant.current_speaker_fingerprint			
+			nx = np.array(a)
+			ny = np.array(b)
+			cosDist = 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
+			if (cosDist >= 0.3):
+				return NO_VOICE_MATCH
+				
 		entries = kp.entries
 		
 		for title in entries:
@@ -88,6 +103,8 @@ def getUsername(session_id = "general", entry="none"):
 	UNKNOWN_ENTRY = random.choice(cfg['intent']['password'][LANGUAGE]['unknown_entry'])
 	UNKNOWN_ENTRY = UNKNOWN_ENTRY.format(entry)
 	
+	NO_VOICE_MATCH = cfg['intent']['password'][LANGUAGE]['no_voice_match']
+	
 	# Konnte die Konfigurationsdatei des Intents geladen werden?
 	if cfg:
 		try:
@@ -95,7 +112,18 @@ def getUsername(session_id = "general", entry="none"):
 		except Exception as e:
 			return cfg['intent']['password'][LANGUAGE]['could_not_access_keystore']
 		
-		
+		# Verifiziere Stimme
+		fp_entry = kp.find_entries(title='_fingerprint', first=True)
+		if fp_entry:
+			a = json.loads(fp_entry.notes)
+			b = global_variables.voice_assistant.current_speaker_fingerprint			
+			nx = np.array(a)
+			ny = np.array(b)
+			cosDist = 1 - np.dot(nx, ny) / np.linalg.norm(nx) / np.linalg.norm(ny)
+			if (cosDist >= 0.3):
+				return NO_VOICE_MATCH
+
+				
 		entries = kp.entries
 		
 		for title in entries:

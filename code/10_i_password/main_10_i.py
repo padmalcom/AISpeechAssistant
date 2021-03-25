@@ -142,6 +142,7 @@ class VoiceAssistant():
 						if (speaker == None) and (global_variables.voice_assistant.allow_only_known_speakers == True):
 							logger.info("Ich kenne deine Stimme nicht und darf damit keine Befehle von dir entgegen nehmen.")
 							global_variables.voice_assistant.current_speaker = None
+							global_variables.voice_assistant.current_speaker_fingerprint = None
 						else:
 							if speaker:
 								logger.debug("Sprecher ist {}", speaker)
@@ -157,6 +158,7 @@ class VoiceAssistant():
 							# Setze globale Variablen zurück
 							global_variables.voice_assistant.is_listening = False
 							global_variables.voice_assistant.current_speaker = None
+							global_variables.voice_assistant.current_speaker_fingerprint = None
 				
 				# Wird derzeit nicht zugehört?
 				else:
