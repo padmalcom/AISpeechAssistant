@@ -5,6 +5,7 @@
 	- in intentmgmt "		if parsing["intent"]["intentName"]:" ERLEDIGT
 	- utf-8
 - https://github.com/csparpa/pyowm/issues/375 (pyowm language) KEIN EFFEKT
+- UI: ShowBallon
 	
 
 ### Done

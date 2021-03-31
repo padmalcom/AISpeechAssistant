@@ -18,6 +18,7 @@ geojson==2.5.0
 idna==2.10
 joblib==0.17.0
 loguru==0.5.3
+notify-py==0.3.1
 num2words==0.5.10
 numpy==1.19.3
 packaging==20.4
@@ -57,6 +58,7 @@ tqdm==4.51.0
 urllib3==1.25.11
 vosk==0.3.7
 wikipedia==1.4.0
+win10toast==0.9
 win32-setctime==1.0.3
 wincertstore==0.2
 wxPython==4.1.1

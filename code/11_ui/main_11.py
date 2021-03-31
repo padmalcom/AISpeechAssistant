@@ -25,6 +25,8 @@ import wx
 # Konstanten für das Tray Icon
 import constants
 
+from notification import Notification
+
 CONFIG_FILE = "config.yml"
 
 # Eine Klasse, die die Logik unseres TrayIcons abbildet.
@@ -92,7 +94,7 @@ class VoiceAssistant:
 		# Weiterhin leiten wir die Ausgabe der Konsole und die dazugehörigen
 		# Fehlermeldungen in die Datei "log.txt" um.
 		self.app = MainApp(clearSigInt=False, redirect=True, filename='log.txt')
-		
+				
 		logger.debug("Lese Konfiguration...")
 		
 		global CONFIG_FILE
@@ -107,6 +109,8 @@ class VoiceAssistant:
 		if not language:
 			language = "de"
 		logger.info("Verwende Sprache {}", language)
+		
+		self.show_balloon = self.cfg['assistant']['show_balloon']
 			
 		logger.debug("Initialisiere Wake Word Erkennung...")
 		self.wake_words = self.cfg['assistant']['wakewords']
@@ -142,6 +146,9 @@ class VoiceAssistant:
 			logger.warning("Es wurden keine Stimmen gefunden.")
 		self.tts.set_volume(self.volume)
 		self.tts.say("Sprachausgabe aktiviert.")
+		if self.show_balloon:
+			Notification.show('Initialisierung', 'Sprachausgabe aktiviert', ttl=4000)
+			
 		logger.debug("Sprachausgabe initialisiert")
 		
 		logger.info("Initialisiere Spracherkennung...")
@@ -168,6 +175,9 @@ class VoiceAssistant:
 		self.callbacks = self.intent_management.register_callbacks()
 		logger.info('{} callbacks gefunden', len(self.callbacks))
 		self.tts.say("Initialisierung abgeschlossen")
+		if self.show_balloon:
+			Notification.show('Initialisierung', 'Abgeschlossen', ttl=4000)
+
 		self.app.icon.set_icon(constants.TRAY_ICON_IDLE, constants.TRAY_TOOLTIP + ": Bereit")
 		timer_start_result = self.app.timer.Start(milliseconds=1, oneShot=wx.TIMER_CONTINUOUS)
 		logger.info("Timer erfolgreich gestartet? {}", timer_start_result)
@@ -246,6 +256,8 @@ class VoiceAssistant:
 					# Lasse den Assistenten auf die Spracheingabe reagieren
 					output = global_variables.voice_assistant.intent_management.process(sentence, speaker)
 					global_variables.voice_assistant.tts.say(output)
+					if self.show_balloon:
+						Notification.show("Interaktion", "Eingabe (" + speaker + "): " + sentence + ". Ausgabe: " + output, ttl=4000)
 					
 					global_variables.voice_assistant.is_listening = False
 					global_variables.voice_assistant.current_speaker = None
@@ -280,6 +292,8 @@ class VoiceAssistant:
 							
 							# 
 							global_variables.voice_assistant.tts.say(output)
+							if self.show_balloon:
+								Notification.show('Callback', output, ttl=4000)
 							
 							# Wir rufen die selbe Funktion erneut auf und geben mit,
 							# dass der zu behandelnde Eintrag abgearbeitet wurde.
