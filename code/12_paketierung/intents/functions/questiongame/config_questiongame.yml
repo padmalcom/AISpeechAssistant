@@ -1,0 +1,8 @@
+intent:
+    questiongame:
+        de:
+            please_start_new_game: "Bitte starte erst ein neues Spiel mit 'Starte Fragespie'."
+            i_guess: "Ich bin mir zu {} Prozent sicher, dass du an den Begriff {} denkst."
+        en:
+            please_start_new_game: "Please start a new game first by saying 'start question game'."
+            i_guess: "I'm sure to {} percent, that you think about a {}."
