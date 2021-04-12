@@ -3,17 +3,20 @@ from cx_Freeze import setup, Executable
 
 includefiles = ['config.yml', 'empty.wav', 'idle.png', 'initializing.png', 'listening.png', 'speaking.png', 'users.json', 'va.ico', 'vosk-model-de-0.6/', 'vosk-model-spk-0.4/', 'intents/']
 
-build_exe_options = {"packages": ["pyttsx3.drivers.sapi5", "pip._internal.commands.install", "idna", "pip", "geocoder", "text2numde", "fuzzywuzzy", "dateutil", "pyowm", "wikipedia", "pycountry", "pycrfsuite", "pip._vendor.distlib", "pykeepass", "pynput", "scipy"], "excludes": [], 'include_files':includefiles}
+build_exe_options = {"packages": ["pyttsx3.drivers.sapi5", "pip", "idna", "geocoder", "text2numde", "fuzzywuzzy", "dateutil", "pyowm", "wikipedia", "pycountry", "pycrfsuite", "pip._vendor.distlib", "pip._internal.commands.install", "pykeepass", "pynput", "scipy"], "excludes": [], "include_files": includefiles}
 
 base = "Win32GUI"
 #base = None
 
-bdist_msi_options = {"install_icon":"va.ico"}
+#bdist_msi_options = {"install_icon":"va.ico"}
 
 setup(  name = "guifoo",
         version = "0.1",
         description = "My GUI application!",
-        options = {"build_exe": build_exe_options, "bdist_msi": bdist_msi_options},
+        options = {
+			"build_exe": build_exe_options#,
+			#"bdist_msi": bdist_msi_options
+		},
         executables = [Executable("main_12.py", base=base)])
 		
 
