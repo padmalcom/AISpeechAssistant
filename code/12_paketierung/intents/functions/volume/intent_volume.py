@@ -5,6 +5,7 @@ import yaml
 import random
 import os
 import text2numde
+import constants
 
 # Konfiguration muss in jedem Call neu gelesen werden, da beim Laden des gesamten Moduls
 # die global_variables.voice_assistant noch nicht gesetzt ist und somit die Sprache nicht
@@ -16,8 +17,8 @@ def __read_config__():
 	LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
 		
 	# Laden der intent-eigenen Konfigurationsdatei
-	config_path = os.path.join('intents','functions','volume','config_volume.yml')
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	config_path = constants.find_data_file(os.path.join('intents','functions','volume','config_volume.yml'))
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	return cfg, LANGUAGE
 

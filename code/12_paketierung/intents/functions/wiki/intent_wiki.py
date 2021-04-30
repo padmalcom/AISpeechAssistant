@@ -6,14 +6,15 @@ import random
 import os
 import wikipedia
 import pycountry
+import constants
 
 @register_call("wiki")
 def wiki(session_id = "general", query="none"):
 	cfg = None
 	
 	# Laden der intent-eigenen Konfigurationsdatei
-	config_path = os.path.join('intents','functions','wiki','config_wiki.yml')
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	config_path = constants.find_data_file(os.path.join('intents','functions','wiki','config_wiki.yml'))
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	# Holen der Sprache aus der globalen Konfigurationsdatei

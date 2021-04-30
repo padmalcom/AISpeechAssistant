@@ -13,6 +13,7 @@ from chatbot import Chat, register_call, mapper
 import json
 import random
 import global_variables
+import constants
 
 # Erweitere die Klasse Chat durch die Funktion get_intend_name
 class Chat(Chat):
@@ -126,7 +127,7 @@ class IntentMgmt:
 	def __init__(self):
 	
 		# 1. Registriere Funktionen, die von snips-nlu und chatbotai aufgerufen werden
-		self.functions_folders = [os.path.abspath(name) for name in glob.glob("./intents/functions/*/")]
+		self.functions_folders = [os.path.abspath(name) for name in glob.glob(constants.find_data_file("intents/functions") + "/*/")]
 		self.dynamic_intents = []
 		
 		self.intent_count = 0
@@ -155,7 +156,7 @@ class IntentMgmt:
 				
 		# 2. Finde alle Dialoge, die über snips nlu abgehandelt werden
 		logger.info("Initialisiere snips nlu...")
-		snips_files = glob.glob(os.path.join("./intents/snips-nlu", '*.yaml'))
+		snips_files = glob.glob(constants.find_data_file(os.path.join("intents/snips-nlu", '*.yaml')))
 		self.snips_nlu_engine = SnipsNLUEngine(Config=CONFIG_DE)
 		dataset = Dataset.from_yaml_files("de", snips_files)
 		nlu_engine = SnipsNLUEngine(config=CONFIG_DE)
@@ -171,9 +172,9 @@ class IntentMgmt:
 		# 3. Finde alle Dialoge, die über ChatbotAI abgehandelt werden
 		logger.info("Initialisiere ChatbotAI...")
 		
-		chatbotai_files = glob.glob(os.path.join("./intents/chatbotai", '*.template'))
-		WILDCARD_FILE = './intents/chatbotai/wildcard.template'
-		MERGED_FILE = './intents/chatbotai/_merger.template'
+		chatbotai_files = glob.glob(os.path.join(constants.find_data_file("intents/chatbotai"), '*.template'))
+		WILDCARD_FILE = constants.find_data_file('intents/chatbotai/wildcard.template')
+		MERGED_FILE = constants.find_data_file('intents/chatbotai/_merger.template')
 		
 		# Füge alle Dateien zusammen
 		with open(MERGED_FILE, 'w') as outfile:

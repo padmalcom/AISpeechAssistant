@@ -1,4 +1,5 @@
 from notifypy import Notify
+import constants
 
 class Notification:
 
@@ -6,7 +7,7 @@ class Notification:
 		notification = Notify()
 		notification.title = title
 		notification.message = message
-		notification.audio = "empty.wav"
-		notification.icon = "va.ico"
+		notification.audio = constants.find_data_file("empty.wav")
+		notification.icon = constants.find_data_file("va.ico")
 		notification.application_name = "Sprachasssistent"
 		notification.send()

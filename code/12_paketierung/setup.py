@@ -1,5 +1,6 @@
 import sys
 from cx_Freeze import setup, Executable
+import os
 
 includefiles = ['config.yml', 'empty.wav', 'idle.png', 'initializing.png', 'listening.png', 'speaking.png', 'users.json', 'va.ico', 'vosk-model-de-0.6/', 'vosk-model-spk-0.4/', 'intents/']
 
@@ -8,14 +9,15 @@ build_exe_options = {"packages": ["pyttsx3.drivers.sapi5", "pip", "idna", "geoco
 base = "Win32GUI"
 #base = None
 
-#bdist_msi_options = {"install_icon":"va.ico"}
 
-setup(  name = "guifoo",
-        version = "0.1",
-        description = "My GUI application!",
+bdist_msi_options = {"install_icon":"va.ico", "summary_data": {"author": "Jonas Freiknecht"}}
+
+setup(  name = "Sprachassistent",
+        version = "1.0",
+        description = "Mein erster Sprachassistent",
         options = {
-			"build_exe": build_exe_options#,
-			#"bdist_msi": bdist_msi_options
+			"build_exe": build_exe_options,
+			"bdist_msi": bdist_msi_options
 		},
         executables = [Executable("main_12.py", base=base)])
 		

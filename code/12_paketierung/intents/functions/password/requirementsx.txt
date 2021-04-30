@@ -1,0 +1,3 @@
+pykeepass==3.2.1
+pynput==1.7.3
+fuzzywuzzy==0.18.0

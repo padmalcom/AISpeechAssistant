@@ -4,13 +4,14 @@ import global_variables
 import os
 import random
 import yaml
+import constants
 
 def gettime(place="default"):
 
 	
-	config_path = os.path.join('intents','functions','gettime','config_gettime.yml')
+	config_path = constants.find_data_file(os.path.join('intents','functions','gettime','config_gettime.yml'))
 	cfg = None
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	if not cfg:

@@ -4,16 +4,17 @@ import global_variables
 import random
 import os
 import yaml
+import constants
 
 import text2numde
 from fuzzywuzzy import fuzz
 
 def musicstream(station=None):
 
-	config_path = os.path.join('intents','functions','musicstream','config_musicstream.yml')
+	config_path = constants.find_data_file(os.path.join('intents','functions','musicstream','config_musicstream.yml'))
 	cfg = None
 	
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	if not cfg:

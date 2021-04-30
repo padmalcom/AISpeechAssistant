@@ -5,24 +5,25 @@ import os
 import random
 import yaml
 from loguru import logger
+import constants
 
 from dateutil.parser import parse
 from num2words import num2words
 from tinydb import TinyDB, Query
 
 # Initialisiere Datenbankzugriff auf Modulebene
-reminder_db_path = os.path.join('intents','functions','reminder','reminder_db.json')
+reminder_db_path = constants.find_data_file(os.path.join('intents','functions','reminder','reminder_db.json'))
 reminder_db = TinyDB(reminder_db_path)
 reminder_table = reminder_db.table('reminder')
 
 # Lade die Config global
-CONFIG_PATH = os.path.join('intents','functions','reminder','config_reminder.yml')
+CONFIG_PATH = constants.find_data_file(os.path.join('intents','functions','reminder','config_reminder.yml'))
 
 # Wir führen ein, dass die Callback Funktion eines Moduls immer 'callback' heißen muss.
 def callback(processed=False):
 	LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
 	cfg = None
-	with open(CONFIG_PATH, "r", encoding='utf8') as ymlfile:
+	with open(CONFIG_PATH, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	if not cfg:
@@ -89,7 +90,7 @@ def reminder(time=None, reminder_to=None, reminder_infinitive=None):
 
 	LANGUAGE = global_variables.voice_assistant.cfg['assistant']['language']
 	cfg = None
-	with open(CONFIG_PATH, "r", encoding='utf8') as ymlfile:
+	with open(CONFIG_PATH, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 

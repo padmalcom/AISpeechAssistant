@@ -5,14 +5,15 @@ import random
 import os
 import yaml
 import requests
+import constants
 
 @register_call("smarthome")
 def smarthome(session_id = "general", device="", state=""):
 
-	config_path = os.path.join('intents','functions','smarthome','config_smarthome.yml')
+	config_path = constants.find_data_file(os.path.join('intents','functions','smarthome','config_smarthome.yml'))
 	cfg = None
 	
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	if not cfg:

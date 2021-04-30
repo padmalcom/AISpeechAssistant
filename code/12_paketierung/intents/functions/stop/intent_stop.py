@@ -4,6 +4,7 @@ import global_variables
 import yaml
 import random
 import os
+import constants
 
 # Spezieller Intent, der Zugriff auf voice_assistant braucht	
 @register_call("stop")
@@ -12,8 +13,8 @@ def stop(session_id = "general", dummy=0):
 	cfg = None
 	
 	# Laden der intent-eigenen Konfigurationsdatei
-	config_path = os.path.join('intents','functions','stop','config_stop.yml')
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	config_path = constants.find_data_file(os.path.join('intents','functions','stop','config_stop.yml'))
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	# Holen der Sprache aus der globalen Konfigurationsdatei

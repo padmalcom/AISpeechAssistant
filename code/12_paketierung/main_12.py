@@ -27,7 +27,7 @@ import constants
 
 from notification import Notification
 
-CONFIG_FILE = "config.yml"
+CONFIG_FILE = constants.find_data_file("config.yml")
 
 # Eine Klasse, die die Logik unseres TrayIcons abbildet.
 class TaskBarIcon(wx.adv.TaskBarIcon):
@@ -98,7 +98,7 @@ class VoiceAssistant:
 		logger.debug("Lese Konfiguration...")
 		
 		global CONFIG_FILE
-		with open(CONFIG_FILE, "r", encoding='utf8') as ymlfile:
+		with open(CONFIG_FILE, "r", encoding='utf-8') as ymlfile:
 			self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 		if self.cfg:
 			logger.debug("Konfiguration gelesen.")
@@ -152,8 +152,8 @@ class VoiceAssistant:
 		logger.debug("Sprachausgabe initialisiert")
 		
 		logger.info("Initialisiere Spracherkennung...")
-		stt_model = Model('./vosk-model-de-0.6')
-		speaker_model = SpkModel('./vosk-model-spk-0.4')
+		stt_model = Model(constants.find_data_file('vosk-model-de-0.6'))
+		speaker_model = SpkModel(constants.find_data_file('vosk-model-spk-0.4'))
 		self.rec = KaldiRecognizer(stt_model, speaker_model, 16000)
 		self.is_listening = False
 		logger.info("Initialisierung der Spracherkennung abgeschlossen.")
@@ -305,10 +305,12 @@ class VoiceAssistant:
 							global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.volume)
 
 if __name__ == '__main__':
+	multiprocessing.freeze_support()
 	sys.stdout = open('x.out', 'a')
 	sys.stderr = open('x.err', 'a')
-	multiprocessing.freeze_support()
 	multiprocessing.set_start_method('spawn')
+	
+	wx.Log.SetLogLevel(wx.LOG_Trace)
 	
 	# Initialisiere den Voice Assistant
 	global_variables.voice_assistant = VoiceAssistant()

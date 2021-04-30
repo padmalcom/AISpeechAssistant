@@ -3,14 +3,15 @@ import global_variables
 import random
 import os
 import yaml
+import constants
 
 @register_call("animalSound")
 def animalSound(session_id = "general", animal="none"):
 
-	config_path = os.path.join('intents','functions','animalsounds','config_animalsounds.yml')
-	ogg_path = os.path.join('intents','functions','animalsounds','animals')
+	config_path = constants.find_data_file(os.path.join('intents','functions','animalsounds','config_animalsounds.yml'))
+	ogg_path = constants.find_data_file(os.path.join('intents','functions','animalsounds','animals'))
 	cfg = None
-	with open(config_path, "r", encoding='utf8') as ymlfile:
+	with open(config_path, "r", encoding='utf-8') as ymlfile:
 		cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 	
 	if not cfg:
