@@ -20,7 +20,7 @@ idna==2.10
 importlib-metadata==3.10.0
 joblib==0.17.0
 loguru==0.5.3
-notify-py @ git+https://github.com/ms7m/notify-py/
+notify_py-0.3.2-py3-none-any.whl
 num2words==0.5.10
 numpy==1.19.3
 packaging==20.4

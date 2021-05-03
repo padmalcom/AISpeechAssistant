@@ -3,4 +3,4 @@ Dinge, die du hier lernen wirst:
 - Push auf github -> clonen -> env aufsetzen (conda env create -f environment. yml)
 - find_data_file in constants, dann in main, notification, intentmgmt einfügen und in jeden intent
 - freeze support in erste zeile von main
-- Try to remove requriements.txt
+- Remove requriements.txt

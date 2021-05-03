@@ -1,5 +1,5 @@
 intent:
-    location:
+    weather:
         de:
             weatheris: ["Das Wetter in {} ist {} bei einer Temperatur von {} Grad Celsius."]
             location_not_found: "Ich konnte der Ort {} nicht finden."

@@ -27,4 +27,5 @@ def location(session_id = "general", dummy=0):
 	
 	# Ermittle den Standort mittels IP
 	loc = geocoder.ip('me')
-	return random.choice(YOU_ARE_HERE).format(loc.city)
+	logger.debug("Random template {} and city {}", YOU_ARE_HERE, loc.city)
+	return YOU_ARE_HERE.format(loc.city)

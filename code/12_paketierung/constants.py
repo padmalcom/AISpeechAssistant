@@ -13,7 +13,7 @@ def find_data_file(filename):
     return os.path.join(datadir, filename)
 
 # Konstanten für die Darstellung des Icons
-TRAY_TOOLTIP = find_data_file('Voice Assistant')
+TRAY_TOOLTIP = 'Voice Assistant'
 TRAY_ICON_INITIALIZING = find_data_file('initializing.png')
 TRAY_ICON_IDLE = find_data_file('idle.png')
 TRAY_ICON_LISTENING = find_data_file('listening.png')
