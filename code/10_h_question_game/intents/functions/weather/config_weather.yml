@@ -8,5 +8,5 @@ intent:
             weatheris: ["The weather in {} is {} at a temperatur of {} degrees."]
             location_not_found: "I could not find a place called {}."
             here: "here"
-        owm_api_key: "9a68c78b517a402b4d6ea609b0c7beba"
+        owm_api_key: ""
             
