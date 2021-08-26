@@ -1,0 +1,18 @@
+Dinge, die du hier lernen wirst:
+-Einbinden einer Deep Learning basierten TTS Engine von https://github.com/padmalcom/Real-Time-Voice-Cloning-German
+
+Installiert die für euch passende Version von PyTorch. Wenn ihr CUDA verwenden könnt, ersetzt die Version im folgenden Statement durch die von euch verwendete Version (10.1=101, 10.2=lasst das+cuxxx weg, 11.0=110, 9.2=92)
+
+pip install torch==1.7.1+cu101 torchvision==0.8.2+cu101 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+
+Falls ihr keine CUDA-fähige GPU habt, nehmt die CPU-Variante:
+pip install torch==1.7.1+cpu torchvision==0.8.2+cpu torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
+
+conda create -n 02_b_text_to_speech_deep_learning python=3.8
+
+Hint:
+Raspberry Pi supports python up to 3.6:
+conda create -n 02_b_text_to_speech_deep_learning python=3.6
+
+
+conda activate 02_b_text_to_speech_deep_learning 
