@@ -53,9 +53,9 @@ if __name__ == '__main__':
 			validation_csv_writer = csv.writer(validation_file)
 			
 			# write headers
-			train_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent'])
-			test_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent'])
-			validation_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent'])
+			train_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
+			test_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
+			validation_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
 			
 			# Read all JSON files
 			for file in glob.glob(os.path.join(current_dir, "data", "*_full.json")):
