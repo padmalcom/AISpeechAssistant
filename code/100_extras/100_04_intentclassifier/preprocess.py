@@ -62,6 +62,7 @@ if __name__ == '__main__':
 			
 				# Detect the file encoding
 				detected_encoding = get_encoding_type(file)
+				intent_index = 0
 				with open(file, 'r', encoding=detected_encoding, errors='ignore') as json_file:
 					data = json.load(json_file)
 					title = list(data.keys())[0]
@@ -78,18 +79,19 @@ if __name__ == '__main__':
 						translated_de = translate_en_to_de(intent_text)
 						translated_fr = translate_en_to_fr(intent_text)
 						translated_es = translate_en_to_es(intent_text)
-						all_texts.append({'text_en': intent_text, 'text_de': translated_de, 'text_fr': translated_fr, 'text_es': translated_es, 'intent': title})
+						all_texts.append({'text_en': intent_text, 'text_de': translated_de, 'text_fr': translated_fr, 'text_es': translated_es, 'intent': title, 'intent_index': intent_index})
 					print("Data for ", title, ":", len(all_texts))
 					
 					# Split at 60% and 80%, so that ratio = 60, 20, 20
 					train, validate, test = np.split(all_texts, [int(len(all_texts)*0.6), int(len(all_texts)*0.8)])
 					
 					for t in train:
-						train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip()])
+						train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
 						
 					for t in test:
-						test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip()])
+						test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
 						
 					for v in validate:
-						validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip()])
+						validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
 					print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
+					intent_index += 1
