@@ -60,7 +60,7 @@ if __name__ == '__main__':
 						for text in texts:
 							intent_text += text['text']
 						translated_text = translate_en_to_de(intent_text)
-						all_texts.append({'text': intent_text, 'intent': title})
+						all_texts.append({'text': translated_text, 'intent': title})
 					print("Data for ", title, ":", len(all_texts))
 					
 					# Split at 60% and 80%, so that ratio = 60, 20, 20
@@ -69,6 +69,9 @@ if __name__ == '__main__':
 					for t in train:
 						train_csv_writer.writerow([t['text'].strip(), t['intent'].strip()])
 						
-					test_csv_writer.writerows(test)
-					validation_csv_writer.writerows(validate)
+					for t in test:
+						test_csv_writer.writerow([t['text'].strip(), t['intent'].strip()])
+						
+					for v in validate:
+						validation_csv_writer.writerow([v['text'].strip(), v['intent'].strip()])
 					print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
