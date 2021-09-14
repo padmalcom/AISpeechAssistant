@@ -42,9 +42,12 @@ if __name__ == '__main__':
 		with open(file, 'r', encoding=detected_encoding, errors='ignore') as json_file:
 			data = json.load(json_file)
 			title = list(data.keys())[0]
+			print("Processing intent " + title + " ...")
 			
 			all_texts = []
-			for entry in data[title]:
+			length = len(data[title])
+			for index, entry in enumerate(data[title]):
+				print("Processing entry " + str(index) + " of " + str(length) + " ...")
 				intent_text = ""
 				texts = entry['data']
 				for text in texts:
