@@ -3,17 +3,19 @@ import csv
 import numpy as np
 from chardet import detect
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import torch
 
 # Data source https://github.com/sonos/nlu-benchmark/tree/master/2017-06-custom-intent-engines
 
 # prepare models for translation. Replace with any other model if required.
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
-model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-de")
+model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-de").to(device)
 
 # use transformers for translation task
 def translate_en_to_de(text):
 	with tokenizer.as_target_tokenizer():
-		tokenized_text = tokenizer(text, return_tensors='pt')
+		tokenized_text = tokenizer(text, return_tensors='pt').to(device)
 	translation = model.generate(**tokenized_text)
 	return tokenizer.batch_decode(translation, skip_special_tokens=True)[0]
 	
