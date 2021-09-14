@@ -53,9 +53,9 @@ if __name__ == '__main__':
 			validation_csv_writer = csv.writer(validation_file)
 			
 			# write headers
-			train_csv_writer.writerow(['text', 'intent'])
-			test_csv_writer.writerow(['text', 'intent'])
-			validation_csv_writer.writerow(['text', 'intent'])
+			train_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent'])
+			test_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent'])
+			validation_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent'])
 			
 			# Read all JSON files
 			for file in glob.glob(os.path.join(current_dir, "data", "*_full.json")):
@@ -85,11 +85,11 @@ if __name__ == '__main__':
 					train, validate, test = np.split(all_texts, [int(len(all_texts)*0.6), int(len(all_texts)*0.8)])
 					
 					for t in train:
-						train_csv_writer.writerow([t['text'].strip(), t['intent'].strip()])
+						train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip()])
 						
 					for t in test:
-						test_csv_writer.writerow([t['text'].strip(), t['intent'].strip()])
+						test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip()])
 						
 					for v in validate:
-						validation_csv_writer.writerow([v['text'].strip(), v['intent'].strip()])
+						validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip()])
 					print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
