@@ -9,15 +9,31 @@ import torch
 
 # prepare models for translation. Replace with any other model if required.
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
-tokenizer = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
-model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-de").to(device)
+tokenizer_en_de = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-de")
+model_en_de = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-de").to(device)
+tokenizer_en_fr = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-fr")
+model_en_fr = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-fr").to(device)
+tokenizer_en_es = AutoTokenizer.from_pretrained("Helsinki-NLP/opus-mt-en-es")
+model_en_es = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-en-es").to(device)
 
 # use transformers for translation task
 def translate_en_to_de(text):
-	with tokenizer.as_target_tokenizer():
-		tokenized_text = tokenizer(text, return_tensors='pt').to(device)
-	translation = model.generate(**tokenized_text)
-	return tokenizer.batch_decode(translation, skip_special_tokens=True)[0]
+	with tokenizer_en_de.as_target_tokenizer():
+		tokenized_text = tokenizer_en_de(text, return_tensors='pt').to(device)
+	translation = model_en_de.generate(**tokenized_text)
+	return tokenizer_en_de.batch_decode(translation, skip_special_tokens=True)[0]
+	
+def translate_en_to_fr(text):
+	with tokenizer_en_fr.as_target_tokenizer():
+		tokenized_text = tokenizer_en_fr(text, return_tensors='pt').to(device)
+	translation = model_en_fr.generate(**tokenized_text)
+	return tokenizer_en_fr.batch_decode(translation, skip_special_tokens=True)[0]
+	
+def translate_en_to_es(text):
+	with tokenizer_en_es.as_target_tokenizer():
+		tokenized_text = tokenizer_en_es(text, return_tensors='pt').to(device)
+	translation = model_en_es.generate(**tokenized_text)
+	return tokenizer_en_es.batch_decode(translation, skip_special_tokens=True)[0]
 	
 # get the encoding of a file using chardet
 def get_encoding_type(file):
@@ -59,8 +75,10 @@ if __name__ == '__main__':
 						texts = entry['data']
 						for text in texts:
 							intent_text += text['text']
-						translated_text = translate_en_to_de(intent_text)
-						all_texts.append({'text': translated_text, 'intent': title})
+						translated_de = translate_en_to_de(intent_text)
+						translated_fr = translate_en_to_fr(intent_text)
+						translated_es = translate_en_to_es(intent_text)
+						all_texts.append({'text_en': intent_text, 'text_de': translated_de, 'text_fr': translated_fr, 'text_es': translated_es, 'intent': title})
 					print("Data for ", title, ":", len(all_texts))
 					
 					# Split at 60% and 80%, so that ratio = 60, 20, 20
