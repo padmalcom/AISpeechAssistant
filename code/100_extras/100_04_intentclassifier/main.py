@@ -5,6 +5,7 @@ import random
 from sklearn.metrics import classification_report
 import os
 import string
+import pandas as pd
 
 # Todo remove puctuation, try other models
 #https://github.com/rsreetech/TextClassificationWithSpacy/blob/master/TweetTextClassificationWithSpacy.ipynb
@@ -72,9 +73,23 @@ def evaluate(tokenizer, textcat, test_texts, test_cats ):
 			catList.append(score[0])
 		preds.append(catList[0])
 		
-	labels = ['time', 'music']
+	labels = ["AddToPlaylist", "BookRestaurant", "GetWeather", "PlayMusic", "RateBook", "SearchCreativeWork", "SearchScreeningEvent"]
 	
 	print(classification_report(test_cats,preds,labels=labels))
+	
+def load():
+	df_train = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "train.csv"))
+	train_sentences = df_train.text_de
+	train_intents = df_train.intent_index
+	
+	df_test = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "test.csv"))
+	test_sentences = df_test.text_de
+	test_intents = df_test.intent
+		
+	train_set = {'sentences': train_sentences.tolist(), 'intents': train_intents.tolist()}
+	test_set = {'sentences': test_sentences.tolist(), 'intents': test_intents.tolist()}
+	
+	return train_set, test_set
 
 def train(train_data, iterations, test_texts,test_cats, model_arch, dropout = 0.3, model=None,init_tok2vec=None):
 	nlp = spacy.load("de_core_news_sm")
@@ -92,8 +107,13 @@ def train(train_data, iterations, test_texts,test_cats, model_arch, dropout = 0.
 		textcat = nlp.get_pipe("textcat")
 
 	# add label to text classifier
-	textcat.add_label("time")
-	textcat.add_label("music")
+	textcat.add_label("AddToPlaylist")
+	textcat.add_label("BookRestaurant")
+	textcat.add_label("GetWeather")
+	textcat.add_label("PlayMusic")
+	textcat.add_label("RateBook")
+	textcat.add_label("SearchCreativeWork")
+	textcat.add_label("SearchScreeningEvent")
 
 	# get names of other pipes to disable them during training
 	pipe_exceptions = ["textcat", "trf_wordpiecer", "trf_tok2vec"]
@@ -128,31 +148,45 @@ def train(train_data, iterations, test_texts,test_cats, model_arch, dropout = 0.
 	
 if __name__ == '__main__':
 
-	train_texts = [d.lower() for d in TRAINING_DATA['sentences']]
-	train_cats = TRAINING_DATA['intents']
+	#train_texts = [d.lower() for d in TRAINING_DATA['sentences']]
+	#train_cats = TRAINING_DATA['intents']
+	train_set, test_set = load()
+	train_texts = train_set['sentences'] 
+	train_cats = train_set['intents']
+	
+	print(train_texts[0:5])
+	print(1)
+	print(train_cats[0:5])
+	print(2)
+	
 	final_train_cats=[]
 	for cat in train_cats:
-		cat_list = {'time': 1 if cat == 1 else 0, 'music': 1 if cat == 0 else 1}
-		#if cat == 1:
-		#	cat_list['time'] =  1
-		#	cat_list['calendar'] =  0
-		#else:
-		#	cat_list['time'] =  0
-		#	cat_list['calendar'] =  1
+
+		cat_list = {'AddToPlaylist': 1 if cat == 0 else 0,
+			'BookRestaurant': 1 if cat == 1 else 0,
+			'GetWeather': 1 if cat == 2 else 0,
+			'PlayMusic': 1 if cat == 3 else 0,
+			'RateBook': 1 if cat == 4 else 0,
+			'SearchCreativeWork': 1 if cat == 5 else 0,
+			'SearchScreeningEvent': 1 if cat == 6 else 0,
+		}
 		final_train_cats.append(cat_list)
-		
+	
+	print(final_train_cats[0:5])
 	training_data = list(zip(train_texts, [{"cats": cats} for cats in final_train_cats]))
 	
-	test_texts = [d.lower() for d in TEST_DATA['sentences']]
-	test_cats = TEST_DATA['intents']
+	#test_texts = [d.lower() for d in TEST_DATA['sentences']]
+	#test_cats = TEST_DATA['intents']
+	test_texts = test_set['sentences'] 
+	test_cats = test_set['intents']
 	
-	print(test_texts)
-	print(test_cats)
-	
+	print(test_texts[0:5])
+	print(test_cats[0:5])
+
 	nlp = train(training_data, 10, test_texts, test_cats, "ensemble")
 	
-	test1 = "Wie spät ist es?"
-	test2 = "Spiele Musik von Blink 182."
+	test1 = "Buche ein Restaurant für heute abend"
+	test2 = "Füge alle Musik von Blink 182 meiner Playlist hinzu"
 	nlp2 = spacy.load(os.path.join(os.getcwd(), "ensemble_model"))
 	doc2 = nlp2(test1)
 	print("Text: "+ test1)
