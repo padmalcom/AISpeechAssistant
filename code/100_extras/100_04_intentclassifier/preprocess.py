@@ -4,6 +4,7 @@ import numpy as np
 from chardet import detect
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
+import random
 
 # Data source https://github.com/sonos/nlu-benchmark/tree/master/2017-06-custom-intent-engines
 
@@ -58,6 +59,7 @@ if __name__ == '__main__':
 			validation_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
 			
 			# Read all JSON files
+			all_texts = []
 			for file in glob.glob(os.path.join(current_dir, "data", "*_full.json")):
 			
 				# Detect the file encoding
@@ -68,7 +70,7 @@ if __name__ == '__main__':
 					title = list(data.keys())[0]
 					print("Processing intent " + title + " ...")
 					
-					all_texts = []
+					
 					length = len(data[title])
 					for index, entry in enumerate(data[title]):
 						print("Processing entry " + str(index) + " of " + str(length) + " ...")
@@ -80,18 +82,23 @@ if __name__ == '__main__':
 						translated_fr = translate_en_to_fr(intent_text)
 						translated_es = translate_en_to_es(intent_text)
 						all_texts.append({'text_en': intent_text, 'text_de': translated_de, 'text_fr': translated_fr, 'text_es': translated_es, 'intent': title, 'intent_index': intent_index})
-					print("Data for ", title, ":", len(all_texts))
-					
-					# Split at 60% and 80%, so that ratio = 60, 20, 20
-					train, validate, test = np.split(all_texts, [int(len(all_texts)*0.6), int(len(all_texts)*0.8)])
-					
-					for t in train:
-						train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
-						
-					for t in test:
-						test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
-						
-					for v in validate:
-						validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
-					print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
+					print("Data for ", title, ":", length)
 					intent_index += 1
+
+			# Shuffle entire data
+			random.shuffle(all_texts)
+			
+			# Split at 60% and 80%, so that ratio = 60, 20, 20
+			train, validate, test = np.split(all_texts, [int(len(all_texts)*0.6), int(len(all_texts)*0.8)])
+			
+			
+			for t in train:
+				train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
+				
+			for t in test:
+				test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
+				
+			for v in validate:
+				validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
+			print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
+					
