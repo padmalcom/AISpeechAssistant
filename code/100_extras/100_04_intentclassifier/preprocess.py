@@ -48,15 +48,18 @@ if __name__ == '__main__':
 	current_dir = os.path.dirname(os.path.abspath(__file__))
 	
 	# Open an individual train, test and validation data file
-	with open(os.path.join(current_dir, 'train.csv'), 'w', encoding='utf-8', newline='') as train_file, open(os.path.join(current_dir, 'test.csv'), 'w', encoding='utf-8', newline='') as test_file, open(os.path.join(current_dir, 'validation.csv'), 'w', encoding='utf-8', newline='') as validation_file:
-			train_csv_writer = csv.writer(train_file)
-			test_csv_writer = csv.writer(test_file)
-			validation_csv_writer = csv.writer(validation_file)
+	#with open(os.path.join(current_dir, 'train.csv'), 'w', encoding='utf-8', newline='') as train_file, open(os.path.join(current_dir, 'test.csv'), 'w', encoding='utf-8', newline='') as test_file, open(os.path.join(current_dir, 'validation.csv'), 'w', encoding='utf-8', newline='') as validation_file:
+	with open(os.path.join(current_dir, 'data.csv'), 'w', encoding="utf-8", newline='') as data_file:
+			#train_csv_writer = csv.writer(train_file)
+			#test_csv_writer = csv.writer(test_file)
+			##validation_csv_writer = csv.writer(validation_file)
+			csv_writer = csv.writer(data_file)
 			
 			# write headers
-			train_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
-			test_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
-			validation_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
+			#train_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
+			#test_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
+			#validation_csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
+			csv_writer.writerow(['text_en', 'text_de', 'text_fr', 'text_es', 'intent', 'intent_index'])
 			
 			# Read all JSON files
 			all_texts = []
@@ -86,19 +89,23 @@ if __name__ == '__main__':
 					intent_index += 1
 
 			# Shuffle entire data
-			random.shuffle(all_texts)
+			#random.shuffle(all_texts)
 			
 			# Split at 60% and 80%, so that ratio = 60, 20, 20
-			train, validate, test = np.split(all_texts, [int(len(all_texts)*0.6), int(len(all_texts)*0.8)])
+			#train, validate, test = np.split(all_texts, [int(len(all_texts)*0.6), int(len(all_texts)*0.8)])
 			
 			
-			for t in train:
-				train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
+			#for t in train:
+				#train_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
 				
-			for t in test:
-				test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
+			#for t in test:
+			#	test_csv_writer.writerow([t['text_en'].strip(), t['text_de'].strip(), t['text_fr'].strip(), t['text_es'].strip(), t['intent'].strip(), t['intent_index']])
 				
-			for v in validate:
-				validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
+			#for v in validate:
+			#	validation_csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
+
+			for v in all_texts:
+				csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
+			
 			print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
 					
