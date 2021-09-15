@@ -6,6 +6,7 @@ from sklearn.metrics import classification_report
 import os
 import string
 import pandas as pd
+from sklearn.utils import shuffle
 
 # Todo remove puctuation, try other models
 #https://github.com/rsreetech/TextClassificationWithSpacy/blob/master/TweetTextClassificationWithSpacy.ipynb
@@ -79,15 +80,15 @@ def evaluate(tokenizer, textcat, test_texts, test_cats ):
 	
 def load():
 	df_train = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "train.csv"))
-	train_sentences = df_train.text_de
-	train_intents = df_train.intent_index
 	
-	df_test = pd.read_csv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "test.csv"))
-	test_sentences = df_test.text_de
-	test_intents = df_test.intent
+	# Shuffle entire data
+	df_train = shuffle(df_train)
+	df_train.reset_index(inplace=True, drop=True)
+	
+	train, test = np.split(all_texts, [int(len(all_texts)*0.8))])
 		
-	train_set = {'sentences': train_sentences.tolist(), 'intents': train_intents.tolist()}
-	test_set = {'sentences': test_sentences.tolist(), 'intents': test_intents.tolist()}
+	train_set = {'sentences': train.text_de.tolist(), 'intents': train.intent_index.tolist()}
+	test_set = {'sentences': test.text_de.tolist(), 'intents': test.intent.tolist()}
 	
 	return train_set, test_set
 
