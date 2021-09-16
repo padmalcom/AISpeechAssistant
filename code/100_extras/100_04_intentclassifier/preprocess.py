@@ -63,16 +63,16 @@ if __name__ == '__main__':
 			
 			# Read all JSON files
 			all_texts = []
+			intent_index = 0
 			for file in glob.glob(os.path.join(current_dir, "data", "*_full.json")):
 			
 				# Detect the file encoding
 				detected_encoding = get_encoding_type(file)
-				intent_index = 0
+				
 				with open(file, 'r', encoding=detected_encoding, errors='ignore') as json_file:
 					data = json.load(json_file)
 					title = list(data.keys())[0]
 					print("Processing intent " + title + " ...")
-					
 					
 					length = len(data[title])
 					for index, entry in enumerate(data[title]):
