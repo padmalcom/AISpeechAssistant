@@ -107,5 +107,6 @@ if __name__ == '__main__':
 			for v in all_texts:
 				csv_writer.writerow([v['text_en'].strip(), v['text_de'].strip(), v['text_fr'].strip(), v['text_es'].strip(), v['intent'].strip(), v['intent_index']])
 			
-			print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
+			#print("Train size: ", len(train), " test size: ", len(validate), "validation size: ", len(test))
+			print("Data count: ", len(all_texts))
 					
