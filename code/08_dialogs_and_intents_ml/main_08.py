@@ -179,6 +179,8 @@ class VoiceAssistant():
 								elif parsing["slots"][0]["entity"] == "country":
 									# RawValue ist nicht der beste Ansatz, wie wir später sehen werden. Manchmal bereitet snips nlu für uns die Parameter zu.
 									output = getTime(parsing["slots"][0]["rawValue"])
+							elif parsing["intent"]["intentName"] == "stop":
+								stop()
 							self.tts.say(output)
 							
 							self.is_listening = False
