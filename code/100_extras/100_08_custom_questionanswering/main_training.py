@@ -26,17 +26,13 @@ training_args = {
 	"n_gpu":1,
 	"model_name_or_path":"bert-base-uncased",
 	"dataset_name":"squad_v2",
-	#"version_2_with_negative":True,
 	"max_seq_length":384, 
 	"output_dir":"./models",
-	#"overwrite_output_dir":True,
 	"per_device_train_batch_size":12,
 	"per_device_eval_batch_size":12, 
 	"learning_rate":3e-05,
-	"num_train_epochs":2,
+	"num_train_epochs":10,
 	"doc_stride":128,
-	#"do_train":True,
-	#"do_eval":True,
 	"save_steps":5000,
 	"logging_steps":5000,
 	"seed":42
@@ -52,8 +48,7 @@ if __name__ == '__main__':
 	
 	set_seed(training_args.seed)
 		
-	datasets = load_dataset(data_args.dataset_name, None)
-		
+	datasets = load_dataset(data_args.dataset_name, None)		
 	config = AutoConfig.from_pretrained(
 		model_args.model_name_or_path
 	)
@@ -74,7 +69,6 @@ if __name__ == '__main__':
 	answer_column_name = "answers" if "answers" in column_names else column_names[2]
 	pad_on_right = tokenizer.padding_side == "right"
 	
-	
 	train_dataset = datasets["train"].map(
 		prepare_train_features,
 		batched=True,
@@ -83,7 +77,7 @@ if __name__ == '__main__':
 			max_seq_length=data_args.max_seq_length, doc_stride=data_args.doc_stride)
 	)
 	
-	
+	print(data_args.pad_to_max_length)
 	validation_dataset = datasets["validation"].map(
 		prepare_validation_features,
 		batched=True,
@@ -114,7 +108,8 @@ if __name__ == '__main__':
 		n_best_size = data_args.n_best_size,
 		max_answer_length = data_args.max_answer_length,
 		null_score_diff_threshold=data_args.null_score_diff_threshold,
-		output_dir=training_args.output_dir
+		output_dir=training_args.output_dir,
+		answer_column_name=answer_column_name
 	)
 	
 	last_checkpoint = get_last_checkpoint(training_args.output_dir)
@@ -124,6 +119,7 @@ if __name__ == '__main__':
 		checkpoint = model_args.model_name_or_path
 	else:
 		checkpoint = None
+		
 	train_result = trainer.train(resume_from_checkpoint=checkpoint)
 	trainer.save_model()  # Saves the tokenizer too for easy upload
 
@@ -141,7 +137,7 @@ if __name__ == '__main__':
 	# Evaluation
 	results = {}
 	logger.info("*** Evaluate ***")
-	results = trainer.evaluate()
+	results = trainer.evaluate(datasets["validation"])
 
 	output_eval_file = os.path.join(training_args.output_dir, "eval_results.txt")
 	if trainer.is_world_process_zero():

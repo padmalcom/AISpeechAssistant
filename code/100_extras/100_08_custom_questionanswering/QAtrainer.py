@@ -11,7 +11,7 @@ if is_torch_tpu_available():
 
 
 class QuestionAnsweringTrainer(Trainer):
-	def __init__(self, *args, eval_examples=None, post_process_function=None, n_best_size, max_answer_length, null_score_diff_threshold, output_dir, **kwargs):
+	def __init__(self, *args, eval_examples=None, post_process_function=None, n_best_size, max_answer_length, null_score_diff_threshold, output_dir, answer_column_name, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.eval_examples = eval_examples
 		self.post_process_function = post_process_function
@@ -19,6 +19,7 @@ class QuestionAnsweringTrainer(Trainer):
 		self.max_answer_length = max_answer_length
 		self.null_score_diff_threshold = null_score_diff_threshold
 		self.output_dir = output_dir
+		self.answer_column_name = answer_column_name
 
 	def evaluate(self, eval_dataset=None, eval_examples=None, ignore_keys=None):
 		eval_dataset = self.eval_dataset if eval_dataset is None else eval_dataset
@@ -45,7 +46,7 @@ class QuestionAnsweringTrainer(Trainer):
 			eval_dataset.set_format(type=eval_dataset.format["type"], columns=list(eval_dataset.features.keys()))
 
 		if self.post_process_function is not None and self.compute_metrics is not None:
-			eval_preds = self.post_process_function(eval_examples, eval_dataset, output.predictions, self.n_best_size, self.max_answer_length, self.null_score_diff_threshold, self.output_dir)
+			eval_preds = self.post_process_function(eval_examples, eval_dataset, output.predictions, self.n_best_size, self.max_answer_length, self.null_score_diff_threshold, self.output_dir, self.answer_column_name)
 			metrics = self.compute_metrics(eval_preds)
 
 			self.log(metrics)
