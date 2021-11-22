@@ -1,37 +1,17 @@
-import torch
-from transformers import (
-    AutoConfig,
-    AutoModelForQuestionAnswering,
-    AutoTokenizer
-)
+from transformers import pipeline
+from multiprocessing import freeze_support
 
-tokenizer = AutoTokenizer.from_pretrained("./models/checkpoint-20000")
-config = AutoConfig.from_pretrained("./models/checkpoint-20000")
-model = AutoModelForQuestionAnswering.from_pretrained("./models/checkpoint-20000", config=config)
+if __name__ == '__main__':
+	freeze_support()
+	qa_pipeline = pipeline(
+		"question-answering",
+		model="./models",
+		tokenizer="./models"
+	)
+	
+	contexts = ['''Obamas Vater, Barack Hussein Obama Senior (1936–1982), stammte aus Nyang’oma Kogelo in Kenia und gehörte der Ethnie der Luo an. Obamas Mutter, Stanley Ann Dunham (1942–1995), stammte aus Wichita im US-Bundesstaat Kansas und hatte irische, britische, deutsche und Schweizer Vorfahren.[6] Obamas Eltern lernten sich als Studenten an der University of Hawaii at Manoa kennen. Sie heirateten 1961 in Hawaii, als Ann bereits schwanger war. Damals waren in anderen Teilen der USA Ehen zwischen Schwarzen und Weißen noch verboten. 1964 ließ sich das Paar scheiden. Der Vater setzte sein Studium an der Harvard University fort. Obama sah ihn als Zehnjähriger zum letzten Mal.''']*2
 
-text = "i live in berlin."
-question = "where do i live?"
-enforce_answer = True
+	questions = ["Woher kommt Obamas Vater?", 
+				"Wann sah Obama seinen Vater zum letzten Mal?"]
 
-encoding = tokenizer.encode_plus(question, text, return_tensors="pt")
-input_ids = encoding["input_ids"]
-
-# default is local attention everywhere
-# the forward method will automatically set global attention on question tokens
-attention_mask = encoding["attention_mask"]
-model.cuda()
-
-with torch.no_grad():
-  logits = model(input_ids.cuda(), attention_mask.cuda())
-  
-all_tokens = tokenizer.convert_ids_to_tokens(input_ids[0].tolist())
-print(all_tokens)
-
-st = 1 if enforce_answer else 0
-print(torch.argmax(logits.start_logits[0][st:]))
-print(torch.argmax(logits.end_logits[0][st:]))
-
-answer_tokens = all_tokens[torch.argmax(logits.start_logits[0][st:]) :torch.argmax(logits.end_logits[0][st:])+1]
-answer = tokenizer.decode(tokenizer.convert_tokens_to_ids(answer_tokens))
-
-print("Predicted Answer:", answer)
+	print(qa_pipeline(context=contexts, question=questions))

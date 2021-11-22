@@ -1,5 +1,6 @@
-# source: https://github.com/AristotelisPap/Question-Answering-with-BERT-and-Knowledge-Distillation/blob/main/Fine_Tune_BERT_SQuAD_2_0.ipynb
-import logging
+# Inspiration: https://github.com/AristotelisPap/Question-Answering-with-BERT-and-Knowledge-Distillation/blob/main/Fine_Tune_BERT_SQuAD_2_0.ipynb
+# Modelle und Trainingsdaten: https://www.deepset.ai/
+from loguru import logger
 import os
 
 from transformers import (
@@ -18,14 +19,16 @@ from datasets import load_dataset, load_metric
 
 from preprocess import prepare_train_features, prepare_validation_features
 from postprocess import post_processing_function
-from QAtrainer import QuestionAnsweringTrainer
+from qatrainer import QuestionAnsweringTrainer
 from arguments import ModelArguments, DataTrainingArguments
 
+# Deaktiviere Weights&Biases (WandB) Online Service (deprecated, aber funktioniert)
+os.environ["WANDB_DISABLED"] = "true"
 
 training_args = {
 	"n_gpu":1,
-	"model_name_or_path":"bert-base-uncased",
-	"dataset_name":"squad_v2",
+	"model_name_or_path":"bert-base-german-cased",
+	"dataset_name":"deepset/germanquad",
 	"max_seq_length":384, 
 	"output_dir":"./models",
 	"per_device_train_batch_size":12,
@@ -40,15 +43,17 @@ training_args = {
 
 if __name__ == '__main__':
 
-	logger = logging.getLogger(__name__)
-	logger.setLevel(logging.INFO)
-	
+	logger.info("Parse Parameter...")
 	parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
 	model_args, data_args, training_args = parser.parse_dict(training_args)
 	
 	set_seed(training_args.seed)
-		
+	
+	logger.info("Lade Trainings- und Testdaten...")
 	datasets = load_dataset(data_args.dataset_name, None)		
+	print(datasets)
+	
+	logger.info("Erstelle Konfiguration, Tokenizer und Modell für QA...")
 	config = AutoConfig.from_pretrained(
 		model_args.model_name_or_path
 	)
@@ -69,6 +74,9 @@ if __name__ == '__main__':
 	answer_column_name = "answers" if "answers" in column_names else column_names[2]
 	pad_on_right = tokenizer.padding_side == "right"
 	
+	logger.info("Spalte für Fragen {}, Kontexte {} und Antworten {} gesetzt.", question_column_name, context_column_name, answer_column_name)
+	
+	logger.info("Bereite Trainingsdaten vor...")
 	train_dataset = datasets["train"].map(
 		prepare_train_features,
 		batched=True,
@@ -77,8 +85,9 @@ if __name__ == '__main__':
 			max_seq_length=data_args.max_seq_length, doc_stride=data_args.doc_stride)
 	)
 	
-	print(data_args.pad_to_max_length)
-	validation_dataset = datasets["validation"].map(
+	
+	logger.info("Bereite Testdaten vor...")
+	validation_dataset = datasets["test"].map(
 		prepare_validation_features,
 		batched=True,
 		remove_columns=column_names,
@@ -88,18 +97,19 @@ if __name__ == '__main__':
 
 	data_collator = default_data_collator
 
+	logger.info("Lade Metriken für SQuAD2 ...")
 	metric = load_metric("squad_v2")
 	
 	def compute_metrics(p: EvalPrediction):
 		return metric.compute(predictions=p.predictions, references=p.label_ids)
 	
-	# Initialize our Trainer
+	logger.info("Initialisiere Training...")
 	trainer = QuestionAnsweringTrainer(
 		model=model,
 		args=training_args,
 		train_dataset=train_dataset,
 		eval_dataset=validation_dataset,
-		eval_examples=datasets["validation"],
+		eval_examples=datasets["test"],
 		tokenizer=tokenizer,
 		data_collator=data_collator,
 		post_process_function=post_processing_function,
@@ -119,10 +129,13 @@ if __name__ == '__main__':
 		checkpoint = model_args.model_name_or_path
 	else:
 		checkpoint = None
-		
+	logger.info("Suche letzten Checkpoint... {}", checkpoint)
+	
+	logger.info("Starte Training...")
 	train_result = trainer.train(resume_from_checkpoint=checkpoint)
 	trainer.save_model()  # Saves the tokenizer too for easy upload
 
+	logger.info("Speichere Ergebnis...")
 	output_train_file = os.path.join(training_args.output_dir, "train_results.txt")
 	if trainer.is_world_process_zero():
 		with open(output_train_file, "w") as writer:
@@ -135,10 +148,13 @@ if __name__ == '__main__':
 		trainer.state.save_to_json(os.path.join(training_args.output_dir, "trainer_state.json"))
 
 	# Evaluation
+	logger.info("Evaluiere Modell...")
 	results = {}
 	logger.info("*** Evaluate ***")
-	results = trainer.evaluate(datasets["validation"])
+	#results = trainer.evaluate(datasets["validation"])
+	results = trainer.evaluate()
 
+	logger.info("Speichere Evaluationsdaten...")
 	output_eval_file = os.path.join(training_args.output_dir, "eval_results.txt")
 	if trainer.is_world_process_zero():
 		with open(output_eval_file, "w") as writer:
@@ -146,6 +162,6 @@ if __name__ == '__main__':
 			for key, value in sorted(results.items()):
 				logger.info(f"  {key} = {value}")
 				writer.write(f"{key} = {value}\n")
-
+	logger.info("Ergebnis:")
 	print(results)
 	
