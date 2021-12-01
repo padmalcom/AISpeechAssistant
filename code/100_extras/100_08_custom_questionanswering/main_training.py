@@ -1,4 +1,4 @@
-# Inspiration: https://github.com/AristotelisPap/Question-Answering-with-BERT-and-Knowledge-Distillation/blob/main/Fine_Tune_BERT_SQuAD_2_0.ipynb
+# Inspiration: https://github.com/huggingface/transformers/tree/master/examples/pytorch/question-answering
 # Modelle und Trainingsdaten: https://www.deepset.ai/
 from loguru import logger
 import os
@@ -29,7 +29,7 @@ training_args = {
 	"n_gpu":1,
 	"model_name_or_path":"bert-base-german-cased",
 	"dataset_name":"deepset/germanquad",
-	"max_seq_length":384, 
+	"max_seq_length":384,
 	"output_dir":"./models",
 	"per_device_train_batch_size":12,
 	"per_device_eval_batch_size":12, 
@@ -38,7 +38,7 @@ training_args = {
 	"doc_stride":128,
 	"save_steps":5000,
 	"logging_steps":5000,
-	"seed":42
+	"seed":42 
 }
 
 if __name__ == '__main__':
@@ -47,11 +47,12 @@ if __name__ == '__main__':
 	parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
 	model_args, data_args, training_args = parser.parse_dict(training_args)
 	
+	# Setze festen Start für Zufallswerte von NumPy, Torch etc. -> Reproduzierbarkeit
 	set_seed(training_args.seed)
 	
 	logger.info("Lade Trainings- und Testdaten...")
 	datasets = load_dataset(data_args.dataset_name, None)		
-	print(datasets)
+	logger.info("Aufbau des Datensatzes: {}.", datasets)
 	
 	logger.info("Erstelle Konfiguration, Tokenizer und Modell für QA...")
 	config = AutoConfig.from_pretrained(
@@ -68,13 +69,16 @@ if __name__ == '__main__':
 		config=config
 	)
 	
+	logger.info("Beispielhafter Datensatz: {}", datasets["train"][0])
+	logger.info("Beispiel Tokenisierung: {}", tokenizer(datasets["train"][10]["context"]))
+	
+	# Auswahl der Spalten für Frage, Kontext und Antwort
 	column_names = datasets["train"].column_names
 	question_column_name = "question" if "question" in column_names else column_names[0]
 	context_column_name = "context" if "context" in column_names else column_names[1]
 	answer_column_name = "answers" if "answers" in column_names else column_names[2]
-	pad_on_right = tokenizer.padding_side == "right"
 	
-	logger.info("Spalte für Fragen {}, Kontexte {} und Antworten {} gesetzt.", question_column_name, context_column_name, answer_column_name)
+	logger.info("Spalte für Fragen '{}', Kontexte '{}' und Antworten '{}' gesetzt.", question_column_name, context_column_name, answer_column_name)
 	
 	logger.info("Bereite Trainingsdaten vor...")
 	train_dataset = datasets["train"].map(
@@ -84,7 +88,7 @@ if __name__ == '__main__':
 		fn_kwargs=dict(tokenizer=tokenizer, question_column_name=question_column_name, context_column_name=context_column_name, answer_column_name=answer_column_name, 
 			max_seq_length=data_args.max_seq_length, doc_stride=data_args.doc_stride)
 	)
-	
+
 	
 	logger.info("Bereite Testdaten vor...")
 	validation_dataset = datasets["test"].map(
@@ -93,7 +97,7 @@ if __name__ == '__main__':
 		remove_columns=column_names,
 		fn_kwargs=dict(tokenizer=tokenizer, question_column_name=question_column_name, context_column_name=context_column_name, max_seq_length=data_args.max_seq_length,
 			doc_stride=data_args.doc_stride)
-	)	
+	)
 
 	data_collator = default_data_collator
 
@@ -129,39 +133,36 @@ if __name__ == '__main__':
 		checkpoint = model_args.model_name_or_path
 	else:
 		checkpoint = None
-	logger.info("Suche letzten Checkpoint... {}", checkpoint)
+	logger.info("Letzter Trainings-Checkpoint: {}", checkpoint)
 	
 	logger.info("Starte Training...")
 	train_result = trainer.train(resume_from_checkpoint=checkpoint)
-	trainer.save_model()  # Saves the tokenizer too for easy upload
+	
+	# Speichere das Modell nach dem Training
+	trainer.save_model()
 
 	logger.info("Speichere Ergebnis...")
 	output_train_file = os.path.join(training_args.output_dir, "train_results.txt")
 	if trainer.is_world_process_zero():
 		with open(output_train_file, "w") as writer:
-			logger.info("***** Train results *****")
+			logger.info("Ergebnis des Trainings:")
 			for key, value in sorted(train_result.metrics.items()):
 				logger.info(f"  {key} = {value}")
 				writer.write(f"{key} = {value}\n")
 
-		# Need to save the state, since Trainer.save_model saves only the tokenizer with the model
 		trainer.state.save_to_json(os.path.join(training_args.output_dir, "trainer_state.json"))
 
 	# Evaluation
 	logger.info("Evaluiere Modell...")
 	results = {}
-	logger.info("*** Evaluate ***")
-	#results = trainer.evaluate(datasets["validation"])
 	results = trainer.evaluate()
 
 	logger.info("Speichere Evaluationsdaten...")
 	output_eval_file = os.path.join(training_args.output_dir, "eval_results.txt")
 	if trainer.is_world_process_zero():
 		with open(output_eval_file, "w") as writer:
-			logger.info("***** Eval results *****")
+			logger.info("Evaluationsergebnisse:")
 			for key, value in sorted(results.items()):
 				logger.info(f"  {key} = {value}")
 				writer.write(f"{key} = {value}\n")
-	logger.info("Ergebnis:")
-	print(results)
-	
+	logger.info("Ergebnis: {}", results)	

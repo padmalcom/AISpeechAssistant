@@ -24,3 +24,5 @@ if __name__ == '__main__':
     # Berechne Score
     print(sent_scoring(model, tokenizer, "Goldfische sind pflegeleicht.", cuda))
     print(sent_scoring(model, tokenizer, "Gold Fische sind pflegeleicht.", cuda))
+	
+	

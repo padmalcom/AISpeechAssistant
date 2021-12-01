@@ -2,6 +2,11 @@
 def prepare_train_features(examples, tokenizer, question_column_name, context_column_name, answer_column_name, max_seq_length, doc_stride):
 	pad_on_right = tokenizer.padding_side == "right"
 	
+	# Some of the questions have lots of whitespace on the left, which is not useful and will make the
+	# truncation of the context fail (the tokenized question will take a lots of space). So we remove that
+	# left whitespace
+	examples[question_column_name] = [q.lstrip() for q in examples[question_column_name]]	
+	
 	# Tokenize our examples with truncation and maybe padding, but keep the overflows using a stride. This results
 	# in one example possible giving several features when a context is long, each of those features having a
 	# context that overlaps a bit the context of the previous feature.

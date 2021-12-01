@@ -29,7 +29,6 @@ class QuestionAnsweringTrainer(Trainer):
 		# Temporarily disable metric computation, we will do it in the loop here.
 		compute_metrics = self.compute_metrics
 		self.compute_metrics = None
-		print("Data loader: " + str(eval_dataloader))
 		try:
 			output = self.prediction_loop(
 				eval_dataloader,
@@ -39,7 +38,6 @@ class QuestionAnsweringTrainer(Trainer):
 				prediction_loss_only=True if compute_metrics is None else None,
 				ignore_keys=ignore_keys,
 			)
-			print(output)
 		finally:
 			self.compute_metrics = compute_metrics
 
@@ -62,32 +60,32 @@ class QuestionAnsweringTrainer(Trainer):
 		self.control = self.callback_handler.on_evaluate(self.args, self.state, self.control, metrics)
 		return metrics
 
-	def predict(self, test_dataset, test_examples, ignore_keys=None):
-		test_dataloader = self.get_test_dataloader(test_dataset)
-
-		# Temporarily disable metric computation, we will do it in the loop here.
-		compute_metrics = self.compute_metrics
-		self.compute_metrics = None
-		try:
-			output = self.prediction_loop(
-				test_dataloader,
-				description="Evaluation",
-				# No point gathering the predictions if there are no metrics, otherwise we defer to
-				# self.args.prediction_loss_only
-				prediction_loss_only=True if compute_metrics is None else None,
-				ignore_keys=ignore_keys,
-			)
-		finally:
-			self.compute_metrics = compute_metrics
-
-		if self.post_process_function is None or self.compute_metrics is None:
-			return output
-
-		# We might have removed columns from the dataset so we put them back.
-		if isinstance(test_dataset, datasets.Dataset):
-			test_dataset.set_format(type=test_dataset.format["type"], columns=list(test_dataset.features.keys()))
-
-		eval_preds = self.post_process_function(test_examples, test_dataset, output.predictions)
-		metrics = self.compute_metrics(eval_preds)
-
-		return PredictionOutput(predictions=eval_preds.predictions, label_ids=eval_preds.label_ids, metrics=metrics)
+#	def predict(self, test_dataset, test_examples, ignore_keys=None):
+#		test_dataloader = self.get_test_dataloader(test_dataset)
+#
+#		# Temporarily disable metric computation, we will do it in the loop here.
+#		compute_metrics = self.compute_metrics
+#		self.compute_metrics = None
+#		try:
+#			output = self.prediction_loop(
+#				test_dataloader,
+#				description="Evaluation",
+#				# No point gathering the predictions if there are no metrics, otherwise we defer to
+#				# self.args.prediction_loss_only
+#				prediction_loss_only=True if compute_metrics is None else None,
+#				ignore_keys=ignore_keys,
+#			)
+#		finally:
+#			self.compute_metrics = compute_metrics
+#
+#		if self.post_process_function is None or self.compute_metrics is None:
+#			return output
+#
+#		# We might have removed columns from the dataset so we put them back.
+#		if isinstance(test_dataset, datasets.Dataset):
+#			test_dataset.set_format(type=test_dataset.format["type"], columns=list(test_dataset.features.keys()))
+#
+#		eval_preds = self.post_process_function(test_examples, test_dataset, output.predictions)
+#		metrics = self.compute_metrics(eval_preds)
+#
+#		return PredictionOutput(predictions=eval_preds.predictions, label_ids=eval_preds.label_ids, metrics=metrics)
