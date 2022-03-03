@@ -174,7 +174,7 @@ class VoiceAssistant():
 						
 								# Wird etwas abgespielt? Dann schalte die Lautstärke runter
 								if global_variables.voice_assistant.audio_player.is_playing():
-									global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume))
+									global_variables.voice_assistant.audio_player.set_volume(global_variables.voice_assistant.silenced_volume)
 								
 								# 
 								global_variables.voice_assistant.tts.say(output)
