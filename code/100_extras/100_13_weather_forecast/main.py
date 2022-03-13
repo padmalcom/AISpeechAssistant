@@ -118,12 +118,12 @@ def plot_correlation(station_data):
 def prepare_training_and_validation_data(station_data, parameters):
 	train_split = int(split_fraction * int(station_data.shape[0]))
 
-	# normalize data to range [0, 1]
-	def normalize(data, train_split):
+	# Feature value ranges differ, so standardize
+	def standardize(data, train_split):
 		data_mean = data[:train_split].mean(axis=0)
 		data_std = data[:train_split].std(axis=0)
-		print(data_mean)
-		print(data_std)
+		
+		# return mean and std for 
 		return (data - data_mean) / data_std, data_mean[2], data_std[2] # Index 2 for temperature
 		
 	print("The selected parameters are:", ", ".join([parameters[i] for i in [5-1, 8-1, 10-1, 11-1]])) # 10-1 because date is still in the dataframe
@@ -132,7 +132,7 @@ def prepare_training_and_validation_data(station_data, parameters):
 	features.index = station_data['date']
 	print(features.head())
 
-	features, mean, std = normalize(features.values, train_split)
+	features, mean, std = standardize(features.values, train_split)
 	features = pd.DataFrame(features)
 	print(features.head())
 
@@ -173,6 +173,8 @@ def prepare_training_and_validation_data(station_data, parameters):
 		batch_size=batch_size,
 	)
 	
+	print("Training data length:", len(dataset_train))
+	print("Validation data length:", len(dataset_val))
 	return dataset_train, dataset_val, mean, std
 
 def train(dataset_train, dataset_val):
@@ -213,6 +215,9 @@ def plot_data_prediction(plot_data, delta, title):
 	labels = ["History", "True Future", "Model Prediction"]
 	marker = [".-", "rx", "go"]
 	time_steps = list(range(-(plot_data[0].shape[0]), 0))
+	print("Timesteps:")
+	print(time_steps)
+	
 	if delta:
 		future = delta
 	else:
@@ -220,19 +225,25 @@ def plot_data_prediction(plot_data, delta, title):
 
 	plt.title(title)
 	for i, val in enumerate(plot_data):
+		print("i: " + str(i))
 		if i:
 			plt.plot(future, plot_data[i], marker[i], markersize=10, label=labels[i])
+			print("Plot_data: " + str(plot_data[i]))
 		else:
 			plt.plot(time_steps, plot_data[i].flatten(), marker[i], label=labels[i])
+			print("Plot_data (not i): " + str(plot_data[i].flatten()))
+			
 	plt.legend()
 	plt.xlim([time_steps[0], (future + 5) * 2])
 	plt.xlabel("Time-Step")
 	plt.show()
-	return
+
 	
-def human_readable(value, mean, std):
-	new_value = (value * std + mean) # - 273.15
+def inverse_standardization(value, mean, std):
+	return value * std + mean
 	
+def kelvin_to_celsius(value):
+	return value - 273.15
 	
 
 def main():
@@ -253,15 +264,18 @@ def main():
 	
 	model = train(dataset_train, dataset_val)
 	
-	for x, y in dataset_val.take(5):
+	for x, y in dataset_val.take(1):
+		print(x)
+		print(y)
+		return
 		history = x[0][:, 1].numpy()
 		ground_truth = y[0].numpy()
 		prediction = model.predict(x)[0]
-		
-		history = np.array([human_readable(xi, mean, std) for xi in history])
-		ground_truth = np.array([human_readable(xi, mean, std) for xi in ground_truth])
-		prediction = np.array([human_readable(xi, mean, std) for xi in prediction])
 				
+		history = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in history])
+		ground_truth = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in ground_truth])
+		prediction = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in prediction])
+						
 		plot_data_prediction([history, ground_truth, prediction], 12, "Single Step Prediction")
 	
 if __name__ == "__main__":
