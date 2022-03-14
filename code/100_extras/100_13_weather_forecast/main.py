@@ -1,8 +1,7 @@
 # Source = https://keras.io/examples/timeseries/timeseries_weather_forecasting/
 
 from loguru import logger
-from datetime import datetime
-#from wetterdienst import Settings
+from datetime import datetime, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -10,31 +9,20 @@ import json
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+from tabulate import tabulate
 
 from wetterdienst.provider.dwd.observation import DwdObservationRequest, DwdObservationPeriod, DwdObservationResolution, DwdObservationDataset
-#Settings.humanize = True
 
 WEATHER_FILE = 'weather_data.csv'
 PARAMETERS_FILE = 'parameters.csv'
 
-colors = [
-	"blue",
-	"orange",
-	"green",
-	"red",
-	"purple",
-	"brown",
-	"pink",
-	"gray",
-	"olive",
-	"cyan",
-]
+colors = ["blue", "orange", "green", "red",	"purple", "brown", "pink", "gray", "olive", "cyan"]
 
 # Training parameter
-split_fraction = 0.75 # 75 percent of the data is used for training
-step = 1 # this samples 6 points (1 = 10 minutes) to 1 (1 hour), since we have hours, we don't need this
-past = 120 #Look in the past 120 hours to predict... # 720 hours
-future = 1 #the next 12 hours in the future # 72 hours
+split_fraction = 0.75 	# 75 percent of the data is used for training
+step = 1 				# this samples 6 points (1 = 1 day) to 1
+past = 120 				# Look in the past 120 hours to predict...
+future = 1 				# Look one day in the future
 learning_rate = 0.001
 batch_size = 256
 epochs = 10
@@ -46,7 +34,7 @@ def get_station():
 		period=DwdObservationPeriod.RECENT,
 	).filter_by_rank(49.19780976647141, 8.135207205143768, 20).df
 	
-	print(stations)
+	logger.info("\n"+tabulate(stations, headers='keys'))
 
 	if (len(stations)) > 0:
 		return stations.iloc[0]
@@ -54,11 +42,17 @@ def get_station():
 
 def get_data(station):
 
+	start_date = (datetime.now() - timedelta(days=4*365)).strftime('%Y-%m-%d')
+	end_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+	
+	logger.info("start date: {} ", start_date)
+	logger.info("end date: {}", end_date)
+	
 	request = DwdObservationRequest(
 		parameter=DwdObservationDataset.CLIMATE_SUMMARY,
 		resolution=DwdObservationResolution.DAILY,
-		start_date="2005-01-01",
-		end_date="2022-01-01"
+		start_date=start_date,
+		end_date=end_date
 	)
 	station_data = request.filter_by_station_id(station['station_id']).values.all().df
 	parameters =  pd.unique(station_data['parameter']).tolist()
@@ -70,7 +64,7 @@ def get_data(station):
 def preprocess_data(station_data, parameters):
 
 	unique_dates =  pd.unique(station_data['date'])
-	print("Unique dates: " + str(len(unique_dates)))
+	logger.info("Unique dates: {} ", len(unique_dates))
 		
 	# drop nan
 	station_data.dropna(subset=['value'])
@@ -80,7 +74,7 @@ def preprocess_data(station_data, parameters):
 	for p in parameters:
 		station_data.loc[station_data['parameter'] == p, p] = station_data['value']
 		aggregegation_functions[p] = 'sum'
-	print(aggregegation_functions)		
+	logger.info("Aggregation function: {}", aggregegation_functions)		
 	
 	station_data = station_data.groupby('date').aggregate(aggregegation_functions)
 		
@@ -114,9 +108,12 @@ def plot_correlation(station_data):
     cb.ax.tick_params(labelsize=10)
     plt.title("Feature Correlation Heatmap", fontsize=10)
     plt.show()
-
+	
 def prepare_training_and_validation_data(station_data, parameters):
-	train_split = int(split_fraction * int(station_data.shape[0]))
+	#train_split = int(split_fraction * int(station_data.shape[0]))
+	train_split = int(split_fraction * station_data.shape[0])
+	
+	logger.info("Station data length (in days): {}", station_data.shape[0])
 
 	# Feature value ranges differ, so standardize
 	def standardize(data, train_split):
@@ -126,18 +123,18 @@ def prepare_training_and_validation_data(station_data, parameters):
 		# return mean and std for 
 		return (data - data_mean) / data_std, data_mean[2], data_std[2] # Index 2 for temperature
 		
-	print("The selected parameters are:", ", ".join([parameters[i] for i in [5-1, 8-1, 10-1, 11-1]])) # 10-1 because date is still in the dataframe
+	logger.info("Selected parameters are: {}", ", ".join([parameters[i] for i in [5-1, 8-1, 10-1, 11-1]])) # 10-1 because date is still in the dataframe
 	selected_features = [parameters[i] for i in [5-1, 8-1, 10-1, 11-1]]
 	features = station_data[selected_features]
 	features.index = station_data['date']
-	print(features.head())
+	logger.info(features.head())
 
 	features, mean, std = standardize(features.values, train_split)
 	features = pd.DataFrame(features)
-	print(features.head())
+	logger.info("\n"+tabulate(features.head(), headers='keys'))
 
 	train_data = features.loc[0 : train_split - 1]
-	print("Train data count: " + str(len(train_data)))
+	logger.info("Train data count: {}", len(train_data))
 	val_data = features.loc[train_split:]
 
 	# training dataset
@@ -173,16 +170,26 @@ def prepare_training_and_validation_data(station_data, parameters):
 		batch_size=batch_size,
 	)
 	
-	print("Training data length:", len(dataset_train))
-	print("Validation data length:", len(dataset_val))
-	return dataset_train, dataset_val, mean, std
+	x_infer = val_data.iloc[x_end:][[i for i in range(len(selected_features))]].values
+	
+	dataset_infer = keras.preprocessing.timeseries_dataset_from_array(
+		x_infer,
+		None,
+		sequence_length=sequence_length,
+		sampling_rate=step,
+		batch_size=batch_size,
+	)
+	
+	logger.info("Training data length: {}", len(dataset_train))
+	logger.info("Validation data length: {}", len(dataset_val))
+	return dataset_train, dataset_val, dataset_infer, mean, std
 
 def train(dataset_train, dataset_val):
 	for batch in dataset_train.take(1):
 		inputs, targets = batch
 
-	print("Input shape:", inputs.numpy().shape)
-	print("Target shape:", targets.numpy().shape)
+	logger.info("Input shape: {}", inputs.numpy().shape)
+	logger.info("Target shape: {}", targets.numpy().shape)
 		
 	inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
 	lstm_out = keras.layers.LSTM(32)(inputs)
@@ -215,8 +222,6 @@ def plot_data_prediction(plot_data, delta, title):
 	labels = ["History", "True Future", "Model Prediction"]
 	marker = [".-", "rx", "go"]
 	time_steps = list(range(-(plot_data[0].shape[0]), 0))
-	print("Timesteps:")
-	print(time_steps)
 	
 	if delta:
 		future = delta
@@ -224,14 +229,19 @@ def plot_data_prediction(plot_data, delta, title):
 		future = 0
 
 	plt.title(title)
+	
+	# Plot history (0), true future (1) and model prediction (2)
 	for i, val in enumerate(plot_data):
-		print("i: " + str(i))
+	
+		# Are we in prediction mode?
+		if i == 1 and val == None:
+			continue
+			
 		if i:
 			plt.plot(future, plot_data[i], marker[i], markersize=10, label=labels[i])
-			print("Plot_data: " + str(plot_data[i]))
+
 		else:
 			plt.plot(time_steps, plot_data[i].flatten(), marker[i], label=labels[i])
-			print("Plot_data (not i): " + str(plot_data[i].flatten()))
 			
 	plt.legend()
 	plt.xlim([time_steps[0], (future + 5) * 2])
@@ -244,7 +254,6 @@ def inverse_standardization(value, mean, std):
 	
 def kelvin_to_celsius(value):
 	return value - 273.15
-	
 
 def main():
 	if (not os.path.exists(WEATHER_FILE)):
@@ -260,15 +269,12 @@ def main():
 	#plot_raw_data(data, parameters)
 	#plot_correlation(data)
 	
-	dataset_train, dataset_val, mean, std = prepare_training_and_validation_data(data, parameters)
+	dataset_train, dataset_val, dataset_infer, mean, std = prepare_training_and_validation_data(data, parameters)
 	
 	model = train(dataset_train, dataset_val)
-	
+		
 	for x, y in dataset_val.take(1):
-		print(x)
-		print(y)
-		return
-		history = x[0][:, 1].numpy()
+		history = x[0][:, 2].numpy() # 2 for temperature
 		ground_truth = y[0].numpy()
 		prediction = model.predict(x)[0]
 				
@@ -276,7 +282,18 @@ def main():
 		ground_truth = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in ground_truth])
 		prediction = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in prediction])
 						
-		plot_data_prediction([history, ground_truth, prediction], 12, "Single Step Prediction")
-	
+		plot_data_prediction([history, ground_truth, prediction], 12, "Validation")
+		
+	# predict the actual temperature
+	for x in dataset_infer.take(1):
+		history = x[0][:, 2].numpy() # 2 for temperature
+		#ground_truth = y[0].numpy() # We don't have a ground truth
+		prediction = model.predict(x)[0]
+				
+		history = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in history])
+		prediction = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in prediction])
+						
+		plot_data_prediction([history, None, prediction], 12, "Prediction")		
+			
 if __name__ == "__main__":
 	main()
