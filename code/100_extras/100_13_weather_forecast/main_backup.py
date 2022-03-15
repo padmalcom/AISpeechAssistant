@@ -21,15 +21,17 @@ USE_CACHE = False
 colors = ["blue", "orange", "green", "red",	"purple", "brown", "pink", "gray", "olive", "cyan"]
 
 # Training parameter
-sampling_rate = 6		# sample six data points (6 hours) to one
-sequence_length = 120	# look at 5 days
-delay = sampling_rate * (sequence_length + 24 - 1)
+step = 1 				# this samples 6 points (1 = 1 day) to 1
+past = 120 				# Look in the past 120 hours to predict...
+future = 1 				# Look one day in the future
+learning_rate = 0.001
 batch_size = 256
+epochs = 10
 
 def get_station():
 	stations = DwdObservationRequest(
-		parameter=[DwdObservationDataset.TEMPERATURE_AIR, DwdObservationDataset.PRESSURE, DwdObservationDataset.TEMPERATURE_SOIL, DwdObservationDataset.SUN],
-		resolution=DwdObservationResolution.HOURLY,
+		parameter=DwdObservationDataset.CLIMATE_SUMMARY,
+		resolution=DwdObservationResolution.DAILY,
 		period=DwdObservationPeriod.RECENT,
 	).filter_by_rank(49.19780976647141, 8.135207205143768, 20).df
 	
@@ -48,8 +50,8 @@ def get_data(station):
 	logger.info("end date: {}", end_date)
 	
 	request = DwdObservationRequest(
-		parameter=[DwdObservationDataset.TEMPERATURE_AIR, DwdObservationDataset.PRESSURE, DwdObservationDataset.TEMPERATURE_SOIL, DwdObservationDataset.SUN],
-		resolution=DwdObservationResolution.HOURLY,
+		parameter=DwdObservationDataset.CLIMATE_SUMMARY,
+		resolution=DwdObservationResolution.DAILY,
 		start_date=start_date,
 		end_date=end_date
 	)
@@ -137,49 +139,58 @@ def prepare_training_and_validation_data(station_data, parameters):
 
 	train_data = features.loc[0:num_training_data - 1]
 	val_data = features.loc[num_training_data:num_training_data + num_validation_data - 1]
-	test_data = features.loc[num_training_data + num_validation_data:]
+	infer_data = features.loc[num_training_data + num_validation_data:]
 	
-	logger.info("Length train data: {}, length val data: {}, length test data: {}", len(train_data), len(val_data), len(test_data))
+	logger.info("Length train data: {}, length val data: {}, length test data: {}", len(train_data), len(val_data), len(infer_data))
 
 	# training dataset
-	#start = past + future
-	#end = start + num_training_data
+	start = past + future
+	end = start + num_training_data
 
 	x_train = train_data[[i for i in range(len(selected_features))]].values
-	y_train = train_data.iloc[:][[2]] # Training in mean temperature (index 2)
+	y_train = features.iloc[start:end][[2]] # Training in mean temperature (index 2)
+
+	sequence_length = int(past / step)
+
 	dataset_train = keras.preprocessing.timeseries_dataset_from_array(
 		x_train,
 		y_train,
-		sequence_length=120,
+		sequence_length=sequence_length,
 		sampling_rate=step,
 		batch_size=batch_size,
 	)
 
-	x_val = val_data.iloc[:][[i for i in range(len(selected_features))]].values
-	y_val = val_data.iloc[:][[2]]
+	# validation dataset
+	x_end = len(val_data) - past - future
+
+	label_start = num_training_data + past + future
+
+	x_val = val_data.iloc[:x_end][[i for i in range(len(selected_features))]].values
+	y_val = features.iloc[label_start:][[2]]
+
 	dataset_val = keras.preprocessing.timeseries_dataset_from_array(
 		x_val,
 		y_val,
-		sequence_length=120,
+		sequence_length=sequence_length,
 		sampling_rate=step,
 		batch_size=batch_size,
 	)
 	
-	x_test = test_data.iloc[:][[i for i in range(len(selected_features))]].values
+	x_infer = val_data.iloc[x_end:][[i for i in range(len(selected_features))]].values
 	
 	#logger.info("\n"+tabulate(val_data.iloc[x_end:], headers='keys'))
 	
-	dataset_test = keras.preprocessing.timeseries_dataset_from_array(
-		x_test,
+	dataset_infer = keras.preprocessing.timeseries_dataset_from_array(
+		x_infer,
 		None,
-		sequence_length=120,
+		sequence_length=sequence_length,
 		sampling_rate=step,
 		batch_size=batch_size,
 	)
 	
 	logger.info("Training data length: {}", len(dataset_train))
 	logger.info("Validation data length: {}", len(dataset_val))
-	return dataset_train, dataset_val, dataset_test, mean, std
+	return dataset_train, dataset_val, dataset_infer, mean, std
 
 def train(dataset_train, dataset_val):
 	for batch in dataset_train.take(1):
@@ -256,7 +267,6 @@ def main():
 	if (not os.path.exists(WEATHER_FILE) or not USE_CACHE):
 		station = get_station()
 		data, parameters = get_data(station)
-		logger.info("Parameters: {}", parameters)
 		data = preprocess_data(data, parameters)
 		data.to_csv(WEATHER_FILE, index=False)
 	else:
@@ -264,8 +274,8 @@ def main():
 		with open(PARAMETERS_FILE, 'r') as f:
 			parameters = json.load(f)
 		
-	plot_raw_data(data, parameters)
-	plot_correlation(data)
+	#plot_raw_data(data, parameters)
+	#plot_correlation(data)
 	
 	dataset_train, dataset_val, dataset_infer, mean, std = prepare_training_and_validation_data(data, parameters)
 	
