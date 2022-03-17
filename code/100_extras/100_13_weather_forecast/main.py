@@ -16,21 +16,31 @@ from wetterdienst.provider.dwd.observation import DwdObservationRequest, DwdObse
 WEATHER_FILE = 'weather_data.csv'
 PARAMETERS_FILE = 'parameters.csv'
 
+feature_names = ['temperature_air_mean_200']#, 'humidity']
+
 USE_CACHE = False
 
 colors = ["blue", "orange", "green", "red",	"purple", "brown", "pink", "gray", "olive", "cyan"]
 
 # Training parameter
-sampling_rate = 6		# sample six data points (6 hours) to one
-sequence_length = 120	# look at 5 days
-delay = sampling_rate * (sequence_length + 24 - 1)
+sampling_rate = 6									# sample six data points (6*10 minutes = 1h) to one
+sequence_length = 120								# look at 5 days
 batch_size = 256
+learning_rate = 0.001
+epochs=1
+outlook=sampling_rate * (sequence_length + 24 - 1)
 
 def get_station():
+
+	start_date = (datetime.now() - timedelta(days=1*365)).strftime('%Y-%m-%d')
+	end_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+	
 	stations = DwdObservationRequest(
-		parameter=[DwdObservationDataset.TEMPERATURE_AIR, DwdObservationDataset.PRESSURE, DwdObservationDataset.TEMPERATURE_SOIL, DwdObservationDataset.SUN],
-		resolution=DwdObservationResolution.HOURLY,
-		period=DwdObservationPeriod.RECENT,
+		parameter=[DwdObservationDataset.TEMPERATURE_AIR],
+		resolution=DwdObservationResolution.MINUTE_10,
+		start_date=start_date,
+		end_date=end_date
+	
 	).filter_by_rank(49.19780976647141, 8.135207205143768, 20).df
 	
 	logger.info("\n"+tabulate(stations, headers='keys'))
@@ -41,19 +51,20 @@ def get_station():
 
 def get_data(station):
 
-	start_date = (datetime.now() - timedelta(days=4*365)).strftime('%Y-%m-%d')
+	start_date = (datetime.now() - timedelta(days=1*365)).strftime('%Y-%m-%d')
 	end_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 	
 	logger.info("start date: {} ", start_date)
 	logger.info("end date: {}", end_date)
 	
 	request = DwdObservationRequest(
-		parameter=[DwdObservationDataset.TEMPERATURE_AIR, DwdObservationDataset.PRESSURE, DwdObservationDataset.TEMPERATURE_SOIL, DwdObservationDataset.SUN],
-		resolution=DwdObservationResolution.HOURLY,
+		parameter=[DwdObservationDataset.TEMPERATURE_AIR],
+		resolution=DwdObservationResolution.MINUTE_10,
 		start_date=start_date,
 		end_date=end_date
 	)
 	station_data = request.filter_by_station_id(station['station_id']).values.all().df
+	
 	parameters =  pd.unique(station_data['parameter']).tolist()
 	with open(PARAMETERS_FILE, 'w') as f:
 		json.dump(parameters, f, indent=2) 
@@ -80,7 +91,7 @@ def preprocess_data(station_data, parameters):
 	return station_data
 	
 def plot_raw_data(station_data, parameters):
-	fig, axes = plt.subplots(nrows=7, ncols=2, figsize=(15, 20), dpi=80, facecolor="w", edgecolor="k")
+	fig, axes = plt.subplots(nrows=3, ncols=2, figsize=(10, 10), dpi=80, facecolor="w", edgecolor="k")
 	for i in range(len(parameters)):
 		key = parameters[i]
 		c = colors[i % (len(colors))]
@@ -99,12 +110,12 @@ def plot_raw_data(station_data, parameters):
 	
 def plot_correlation(station_data):
     plt.matshow(station_data.corr())
-    plt.xticks(range(station_data.shape[1]), station_data.columns, fontsize=10, rotation=90)
+    plt.xticks(range(station_data.shape[1]), station_data.columns, fontsize=8, rotation=90)
     plt.gca().xaxis.tick_bottom()
-    plt.yticks(range(station_data.shape[1]), station_data.columns, fontsize=10)
+    plt.yticks(range(station_data.shape[1]), station_data.columns, fontsize=8)
 
     cb = plt.colorbar()
-    cb.ax.tick_params(labelsize=10)
+    cb.ax.tick_params(labelsize=6)
     plt.title("Feature Correlation Heatmap", fontsize=10)
     plt.show()
 	
@@ -123,11 +134,11 @@ def prepare_training_and_validation_data(station_data, parameters):
 		data_std = data[:num_training_data].std(axis=0)
 				
 		# return mean and std for inverse standardization
-		return (data - data_mean) / data_std, data_mean[2], data_std[2] # Index 2 for temperature
+		return (data - data_mean) / data_std, data_mean[0], data_std[0] # Index 0 for temperature
 		
-	logger.info("Selected parameters are: {}", ", ".join([parameters[i] for i in [5-1, 8-1, 10-1, 11-1]])) # 10-1 because date is still in the dataframe
-	selected_features = [parameters[i] for i in [5-1, 8-1, 10-1, 11-1]]
-	features = station_data[selected_features]
+	logger.info("Selected parameters are: {}", ", ".join(feature_names))
+		
+	features = station_data[feature_names]
 	features.index = station_data['date']
 	logger.info("Indexed data with selected features:\n{}", tabulate(features.head(), headers='keys'))
 
@@ -135,50 +146,41 @@ def prepare_training_and_validation_data(station_data, parameters):
 	features = pd.DataFrame(features)
 	logger.info("Normalized data:\n{}", tabulate(features.head(), headers='keys'))
 
-	train_data = features.loc[0:num_training_data - 1]
-	val_data = features.loc[num_training_data:num_training_data + num_validation_data - 1]
-	test_data = features.loc[num_training_data + num_validation_data:]
-	
-	logger.info("Length train data: {}, length val data: {}, length test data: {}", len(train_data), len(val_data), len(test_data))
-
-	# training dataset
-	#start = past + future
-	#end = start + num_training_data
-
-	x_train = train_data[[i for i in range(len(selected_features))]].values
-	y_train = train_data.iloc[:][[2]] # Training in mean temperature (index 2)
 	dataset_train = keras.preprocessing.timeseries_dataset_from_array(
-		x_train,
-		y_train,
-		sequence_length=120,
-		sampling_rate=step,
+		features[:-outlook],#x_train,
+		features[outlook:][0],#y_train,
+		sequence_length=sequence_length,
+		sampling_rate=sampling_rate,
 		batch_size=batch_size,
+		start_index=0,
+		end_index=num_training_data-1
 	)
 
-	x_val = val_data.iloc[:][[i for i in range(len(selected_features))]].values
-	y_val = val_data.iloc[:][[2]]
 	dataset_val = keras.preprocessing.timeseries_dataset_from_array(
-		x_val,
-		y_val,
-		sequence_length=120,
-		sampling_rate=step,
+		features[:-outlook],#x_train,
+		features[outlook:][0],#y_train,
+		sequence_length=sequence_length,
+		sampling_rate=sampling_rate,
 		batch_size=batch_size,
+		start_index=num_training_data,
+		end_index=num_training_data + num_validation_data-1
 	)
-	
-	x_test = test_data.iloc[:][[i for i in range(len(selected_features))]].values
-	
-	#logger.info("\n"+tabulate(val_data.iloc[x_end:], headers='keys'))
-	
+		
 	dataset_test = keras.preprocessing.timeseries_dataset_from_array(
-		x_test,
+		features[:-outlook],
 		None,
-		sequence_length=120,
-		sampling_rate=step,
+		sequence_length=sequence_length,
+		sampling_rate=sampling_rate,
 		batch_size=batch_size,
+		start_index=num_training_data + num_validation_data
 	)
 	
-	logger.info("Training data length: {}", len(dataset_train))
-	logger.info("Validation data length: {}", len(dataset_val))
+	for batch in dataset_train.take(1):
+		inputs, targets = batch
+
+		print("Input shape:", inputs.numpy().shape)
+		print("Target shape:", targets.numpy().shape)
+
 	return dataset_train, dataset_val, dataset_test, mean, std
 
 def train(dataset_train, dataset_val):
@@ -188,31 +190,40 @@ def train(dataset_train, dataset_val):
 	logger.info("Input shape: {}", inputs.numpy().shape)
 	logger.info("Target shape: {}", targets.numpy().shape)
 		
-	inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
-	lstm_out = keras.layers.LSTM(32)(inputs)
-	outputs = keras.layers.Dense(1)(lstm_out)
+	#inputs = keras.layers.Input(shape=(inputs.shape[1], inputs.shape[2]))
+	#lstm_out = keras.layers.LSTM(32)(inputs)
+	#outputs = keras.layers.Dense(1)(lstm_out)
 
-	model = keras.Model(inputs=inputs, outputs=outputs)
-	model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate), loss="mse")
-	model.summary()
+	#model = keras.Model(inputs=inputs, outputs=outputs)
+	#model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate), loss="mse")
+	#model.summary()
+	inputs = keras.Input(shape=(sequence_length, inputs.shape[2]))
+	x = keras.layers.Bidirectional(keras.layers.LSTM(16))(inputs)
+	outputs = keras.layers.Dense(1)(x)
+	model = keras.Model(inputs, outputs)
+
+	model.compile(optimizer="rmsprop", loss="mse", metrics=["mae"])
+	history = model.fit(dataset_train,
+						epochs=10,
+						validation_data=dataset_val)
 	
-	path_checkpoint = "model_checkpoint.h5"
-	es_callback = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=0, patience=5)
+	#path_checkpoint = "model_checkpoint.h5"
+	#es_callback = keras.callbacks.EarlyStopping(monitor="val_loss", min_delta=0, patience=5)
 
-	modelckpt_callback = keras.callbacks.ModelCheckpoint(
-		monitor="val_loss",
-		filepath=path_checkpoint,
-		verbose=1,
-		save_weights_only=True,
-		save_best_only=True,
-	)
+	#modelckpt_callback = keras.callbacks.ModelCheckpoint(
+	#	monitor="val_loss",
+	#	filepath=path_checkpoint,
+	#	verbose=1,
+	#	save_weights_only=True,
+	#	save_best_only=True,
+	#)
 
-	history = model.fit(
-		dataset_train,
-		epochs=epochs,
-		validation_data=dataset_val,
-		callbacks=[es_callback, modelckpt_callback],
-	)
+	#history = model.fit(
+	#	dataset_train,
+	#	epochs=epochs,
+	#	validation_data=dataset_val,
+	#	callbacks=[es_callback, modelckpt_callback],
+	#	)
 	return model
 
 def plot_data_prediction(plot_data, delta, title):
@@ -227,18 +238,24 @@ def plot_data_prediction(plot_data, delta, title):
 
 	plt.title(title)
 	
+	print(plot_data)
+	
 	# Plot history (0), true future (1) and model prediction (2)
 	for i, val in enumerate(plot_data):
 	
+		print(i)
+		print(plot_data[i])
 		# Are we in prediction mode?
-		if i == 1 and val == None:
+		if i == 1 and not val.any():
 			continue
 			
 		if i:
+			print("len future: ", future, "len plot data", len(plot_data[i]))
+			future = [future] * len(plot_data[i])
 			plt.plot(future, plot_data[i], marker[i], markersize=10, label=labels[i])
-
 		else:
-			plt.plot(time_steps, plot_data[i].flatten(), marker[i], label=labels[i])
+			#plt.plot(time_steps, plot_data[i].flatten(), marker[i], label=labels[i])
+			pass
 			
 	plt.legend()
 	plt.xlim([time_steps[0], (future + 5) * 2])
@@ -264,17 +281,30 @@ def main():
 		with open(PARAMETERS_FILE, 'r') as f:
 			parameters = json.load(f)
 		
-	plot_raw_data(data, parameters)
-	plot_correlation(data)
-	
+	#plot_raw_data(data, parameters)
+	#plot_correlation(data)
+		
 	dataset_train, dataset_val, dataset_infer, mean, std = prepare_training_and_validation_data(data, parameters)
+	
+	print("train")
+	print(dataset_train)
 	
 	model = train(dataset_train, dataset_val)
 		
 	for x, y in dataset_val.take(1):
-		history = x[0][:, 2].numpy() # 2 for temperature
-		ground_truth = y[0].numpy()
+		print("x:", x)
+		print("y:", y)
+		#history = x[0][:, 0].numpy() # 0 for temperature
+		#ground_truth = y[0].numpy()
+		#history = x[0][:, 0].numpy()
+		history = x[0][:,0].numpy()
+		ground_truth = y.numpy()
 		prediction = model.predict(x)[0]
+
+		print(history.shape)
+		print(ground_truth.shape)
+		print(prediction)
+
 				
 		history = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in history])
 		ground_truth = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in ground_truth])
@@ -284,7 +314,7 @@ def main():
 		
 	# predict the actual temperature
 	for x in dataset_infer.take(1):
-		history = x[0][:, 2].numpy() # 2 for temperature
+		history = x[0][:, 0].numpy() # 0 for temperature
 		#ground_truth = y[0].numpy() # We don't have a ground truth
 		prediction = model.predict(x)[0]
 				
