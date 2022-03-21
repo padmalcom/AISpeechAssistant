@@ -204,7 +204,7 @@ def train(dataset_train, dataset_val):
 
 	model.compile(optimizer="rmsprop", loss="mse", metrics=["mae"])
 	history = model.fit(dataset_train,
-						epochs=10,
+						epochs=epochs,
 						validation_data=dataset_val)
 	
 	#path_checkpoint = "model_checkpoint.h5"
@@ -250,14 +250,16 @@ def plot_data_prediction(plot_data, delta, title):
 			continue
 			
 		if i:
-			print("len future: ", future, "len plot data", len(plot_data[i]))
+			print("i:", i, " len future: ", future, "len plot data", len(plot_data[i]))
 			future = [future] * len(plot_data[i])
+			print("i:", i, " len future: ", len(future), "len plot data", len(plot_data[i]))
 			plt.plot(future, plot_data[i], marker[i], markersize=10, label=labels[i])
 		else:
 			#plt.plot(time_steps, plot_data[i].flatten(), marker[i], label=labels[i])
 			pass
 			
 	plt.legend()
+	print("t1", type(time_steps[0]), "t2:", type((future + 5) * 2))
 	plt.xlim([time_steps[0], (future + 5) * 2])
 	plt.xlabel("Time-Step")
 	plt.show()
@@ -303,12 +305,12 @@ def main():
 
 		print(history.shape)
 		print(ground_truth.shape)
-		print(prediction)
+		print("pred: ", prediction)
 
 				
 		history = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in history])
 		ground_truth = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in ground_truth])
-		prediction = np.array([kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in prediction])
+		prediction = [kelvin_to_celsius(inverse_standardization(xi, mean, std)) for xi in prediction]
 						
 		plot_data_prediction([history, ground_truth, prediction], 12, "Validation")
 		
