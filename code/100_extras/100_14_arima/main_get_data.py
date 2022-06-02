@@ -1,6 +1,5 @@
 import os
-import csv
-from wetterdienst.provider.dwd.observation import DwdObservationRequest, DwdObservationPeriod, DwdObservationResolution, DwdObservationDataset
+from wetterdienst.provider.dwd.observation import DwdObservationRequest, DwdObservationResolution, DwdObservationDataset
 from datetime import datetime
 import pandas as pd
 from tabulate import tabulate
@@ -46,7 +45,7 @@ def preprocess_data(station_data, parameters):
 		
 	# drop nan
 	station_data.dropna(subset=['value'])
-		
+	print("before", tabulate(station_data))
 	aggregegation_functions = {}
 	aggregegation_functions['date'] = 'first' # first gets first item in group which is always the same date
 	for p in parameters:
@@ -55,12 +54,12 @@ def preprocess_data(station_data, parameters):
 	logger.info("Aggregation function: {}", aggregegation_functions)		
 	
 	station_data = station_data.groupby('date').aggregate(aggregegation_functions)
-		
+	print("after", tabulate(station_data))	
 	return station_data
 
 if __name__ == '__main__':
 
-	start_date = datetime.fromisoformat('2021-01-01 00:00:00')
+	start_date = datetime.fromisoformat('2021-06-01 00:00:00')
 	end_date = datetime.fromisoformat('2021-06-01 23:59:59')
 
 	station = get_station(start_date, end_date)
