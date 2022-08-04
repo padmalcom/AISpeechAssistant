@@ -1,0 +1,37 @@
+blis==0.7.8
+catalogue==2.0.7
+certifi @ file:///C:/Windows/TEMP/abs_e9b7158a-aa56-4a5b-87b6-c00d295b01fanefpc8_o/croots/recipe/certifi_1655968940823/work/certifi
+charset-normalizer==2.1.0
+click==8.1.3
+colorama==0.4.5
+cymem==2.0.6
+Cython==0.29.28
+dash-bootstrap-components==1.1.0
+de-core-news-lg @ https://github.com/explosion/spacy-models/releases/download/de_core_news_lg-3.4.0/de_core_news_lg-3.4.0-py3-none-any.whl
+de-core-news-md @ https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.4.0/de_core_news_md-3.4.0-py3-none-any.whl
+gensim==4.2.0
+idna==3.3
+Jinja2==3.1.2
+langcodes==3.3.0
+MarkupSafe==2.1.1
+murmurhash==1.0.7
+numpy==1.23.1
+packaging==21.3
+pathy==0.6.2
+preshed==3.0.6
+pydantic==1.9.1
+pyparsing==3.0.9
+requests==2.28.1
+scipy==1.8.1
+smart-open==5.2.1
+spacy==3.4.0
+spacy-legacy==3.0.9
+spacy-loggers==1.0.3
+srsly==2.4.3
+thinc==8.1.0
+tqdm==4.64.0
+typer==0.4.2
+typing_extensions==4.3.0
+urllib3==1.26.10
+wasabi==0.9.1
+wincertstore==0.2
