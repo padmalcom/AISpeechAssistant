@@ -11,14 +11,14 @@ from tensorflow.keras import layers
 from tabulate import tabulate
 from loguru import logger
 
-# only display tensorflow error messages
+# Zeige nur TensorFlow-Error Nachrichten
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 WEATHER_DATA = os.path.join("weather_data.csv")
 
 SAMPLING_RATE = 6
 SEQUENCE_LENGTH = 120
-OUTLOOK = SAMPLING_RATE * (SEQUENCE_LENGTH + 24*3 - 1) # 3 days in the future
+OUTLOOK = SAMPLING_RATE * (SEQUENCE_LENGTH + 24*3 - 1) # 3 Tage in der Zukunft
 BATCH_SIZE = 256
 EPOCHS = 15
 
@@ -32,7 +32,7 @@ def read_data():
 		for i, row in enumerate(spamreader):
 			if i==0:
 				continue
-			row[2] = float(row[2]) - 273.15 # kelvin to celsius
+			row[2] = float(row[2]) - 273.15 # Kelvin zu Celsius
 			temperature.append(float(row[2]))
 			raw_data.append([float(x) for x in row[2:6]])
 			dates.append(row[0])
@@ -105,12 +105,12 @@ def visualize_training(loss, val_loss, epochs):
 	plt.figure()
 	plt.plot(epochs, loss, "bo", label="Training MAE")
 	plt.plot(epochs, val_loss, "b", label="Validation MAE")
-	plt.title("Training and validation MAE")
+	plt.title("Mittlere absolute Fehler von Training und Validation")
 	plt.legend()
 	plt.show()
 
 def visualize_evaluation(plot_data, delta, title):
-	labels = ["History", "True Future", "Model Prediction"]
+	labels = ["History", "Ground Truth", "Model Prediction"]
 	marker = [".-", "rx", "go"]
 	time_steps = list(range(-(plot_data[0].shape[0]), 0))
 	if delta:
@@ -120,9 +120,9 @@ def visualize_evaluation(plot_data, delta, title):
 
 	plt.title(title)
 	for i, val in enumerate(plot_data):
-		if i: # i==1: ground_truth, i==2: prediction
+		if i: # i==1: Ground Truth, i==2: Prediction
 			plt.plot(future, plot_data[i][0,0], marker[i], markersize=10, label=labels[i])
-		else: # i== 0: history
+		else: # i== 0: History
 			plt.plot(time_steps, [x[0] for x in plot_data[i]], marker[i], label=labels[i])
 	plt.legend()
 	plt.xlim([time_steps[0], (future + 5) * 2])
@@ -139,7 +139,8 @@ def evaluate(val_dataset, model):
 		ground_truth = np.array([ground_truth * std + mean])
 		prediction = np.array([prediction * std + mean])
 				
-		visualize_evaluation([history, ground_truth, prediction], 3, "Single Step Prediction") # 3 = 3 day in the future
+		 # Markiere 3 Tage in der Zukunft
+		visualize_evaluation([history, ground_truth, prediction], 3*24, "3-Tages-Temperaturprognose")
 
 def predict(prediction_sequence):
 	prediction = model.predict(prediction_sequence)
@@ -149,7 +150,7 @@ def predict(prediction_sequence):
 
 if __name__ == '__main__':
 		
-	logger.info("GPUs Available: {}", len(tf.config.list_physical_devices('GPU')))
+	logger.info("GPUs verfügbar: {}", len(tf.config.list_physical_devices('GPU')))
 	
 	raw_data, temperature, dates, num_train_samples, num_val_samples = read_data()
 	raw_data, temperature, mean, std = standardize(
@@ -177,20 +178,23 @@ if __name__ == '__main__':
 		model
 	)
 	
-	# hour that we want to predict the time for on the next day
+	# Genaue Stunde, an der die Temperatur in 3 Tagen vorhergesagt werden soll
 	prediction_hour = 12
 
-	# Create sequence for prediction from last 5 days (120 hours) to predict the next 72 hours
-	prediction_sequence = np.asarray(raw_data[-120-prediction_hour*6:-prediction_hour*6]) # need exactly sequence of 120 entries
+	# Generieren Sequenz der letzten 5 Tage (120 Stunden), um die nächsten 72 Stunden vorherzusagen
+	prediction_sequence = np.asarray(raw_data[-120-prediction_hour*6:-prediction_hour*6])
 	
+	# Füge eine Dimension hinzu (Anzahl Samples)
 	# Insert one dimension (# of samples)
+	print("Before: ", prediction_sequence)
 	prediction_sequence = np.expand_dims(prediction_sequence, axis=0) 
+	print("After: ", prediction_sequence)
 	weather_in_24h_day = predict(prediction_sequence)
 	
-	# get the last date in the dataset and add 3 days
+	# Hole das letzte Datum des Datensatzes und füge 3 Tage hinzu.
 	tomorrow = datetime.fromisoformat(dates[-1  - prediction_hour*6]) + timedelta(days=3)
 
-	logger.info("Temperature at {} is {}.", tomorrow, weather_in_24h_day)
+	logger.info("Temperatur am {} ist {}.", tomorrow, weather_in_24h_day)
 	
 	
 	
