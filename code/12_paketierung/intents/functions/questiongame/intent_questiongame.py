@@ -5,7 +5,6 @@ import sys
 import os
 import global_variables
 import yaml
-import constants
 
 YES = ["JA", "J", "YES", "Y"]
 NO = ["NEIN", "N", "NO"]
@@ -29,7 +28,7 @@ def questionGameAnswer(answer=""):
 	if not question_game_session is None:
 		answer_value = question_game_session.evaluateAnswer(answer)
 		for i in range(len(question_game_session.items)):
-			question_game_session.items[i].updateCertainty(answer_value, len(question_game_session.questions))			
+			question_game_session.items[i].updateCertainty(answer_value, question_game_session.current_question, len(question_game_session.questions))			
 		question = question_game_session.askQuestion()
 		if question:
 			logger.info("Die nächste Frage ist {}.", question)
@@ -45,6 +44,7 @@ def questionGameAnswer(answer=""):
 	else:
 		return question_game_session.PLEASE_START_NEW_GAME
 
+# Danke an https://github.com/FergusGriggs/20q
 class Q20Session():
 	
 	def __init__(self):
@@ -53,9 +53,9 @@ class Q20Session():
 		self.current_question = 0
 		
 		# Lese die Konfiguration
-		config_path = constants.find_data_file(os.path.join('intents','functions','questiongame','config_questiongame.yml'))
+		config_path = os.path.join('intents','functions','questiongame','config_questiongame.yml')
 		cfg = None
-		with open(config_path, "r", encoding='utf-8') as ymlfile:
+		with open(config_path, "r", encoding='utf8') as ymlfile:
 			cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 		# Holen der Sprache aus der globalen Konfigurationsdatei
@@ -64,8 +64,8 @@ class Q20Session():
 		self.PLEASE_START_NEW_GAME = cfg['intent']['questiongame'][LANGUAGE]['please_start_new_game']
 		self.GUESS = cfg['intent']['questiongame'][LANGUAGE]['i_guess']
 		
-		items_path = constants.find_data_file(os.path.join('intents','functions','questiongame', 'items_' + LANGUAGE + '.txt'))
-		questions_path = constants.find_data_file(os.path.join('intents','functions','questiongame', 'questions_' + LANGUAGE + '.txt'))
+		items_path = os.path.join('intents','functions','questiongame', 'items_' + LANGUAGE + '.txt')
+		questions_path = os.path.join('intents','functions','questiongame', 'questions_' + LANGUAGE + '.txt')
 		
 		itemData=open(items_path, encoding="utf-8")
 		data=itemData.readlines()
@@ -133,5 +133,5 @@ class Item():
 		self.index=id
 		self.certainty=0
 		
-	def updateCertainty(self, val, num_questions):
-		self.certainty+=(1-abs(val-self.questionFloats[num_questions-1]))/num_questions
+	def updateCertainty(self, val, current_question, num_questions):
+		self.certainty+=(1-abs(val-self.questionFloats[current_question-1]))/num_questions

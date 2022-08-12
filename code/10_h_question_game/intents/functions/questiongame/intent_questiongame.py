@@ -28,7 +28,7 @@ def questionGameAnswer(answer=""):
 	if not question_game_session is None:
 		answer_value = question_game_session.evaluateAnswer(answer)
 		for i in range(len(question_game_session.items)):
-			question_game_session.items[i].updateCertainty(answer_value, len(question_game_session.questions))			
+			question_game_session.items[i].updateCertainty(answer_value, question_game_session.current_question, len(question_game_session.questions))			
 		question = question_game_session.askQuestion()
 		if question:
 			logger.info("Die nächste Frage ist {}.", question)
@@ -133,5 +133,5 @@ class Item():
 		self.index=id
 		self.certainty=0
 		
-	def updateCertainty(self, val, num_questions):
-		self.certainty+=(1-abs(val-self.questionFloats[num_questions-1]))/num_questions
+	def updateCertainty(self, val, current_question, num_questions):
+		self.certainty+=(1-abs(val-self.questionFloats[current_question-1]))/num_questions
