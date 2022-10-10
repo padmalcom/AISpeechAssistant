@@ -16,8 +16,8 @@ setup(  name = "Sprachassistent",
         version = "1.0",
         description = "Mein erster Sprachassistent",
         options = {
-			"build_exe": build_exe_options,
-			"bdist_msi": bdist_msi_options
+			"build_exe": build_exe_options, # 1. Schritt, dann ffmpeg und _soundfile_data kopieren
+			#"bdist_msi": bdist_msi_options # 2. Schritt (Schritt 1 auskommentieren, Schritt 2 einkommentieren)
 		},
         executables = [Executable("main_12.py", base=base)])
 		

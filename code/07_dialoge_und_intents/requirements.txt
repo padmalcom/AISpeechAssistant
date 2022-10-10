@@ -8,7 +8,7 @@ idna==2.10
 loguru==0.5.3
 numpy==1.19.3
 pvporcupine==1.8.7
-PyAudio @ file:///C:/Users/jfrei/AISpeechAssistant/code/07_dialoge_und_intents/PyAudio-0.2.11-cp38-cp38-win_amd64.whl
+PyAudio-0.2.11-cp38-cp38-win_amd64.whl
 pypiwin32==223
 pyttsx3==2.90
 pywin32==228
