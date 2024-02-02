@@ -1,0 +1,7 @@
+Dinge, die du hier lernen wirst:
+- Fine-Tuning von wav2vec2
+- Hinzufügen weiterer Classification Heads zur bestehenden Modellarchitektur
+
+conda create -n 05_a_wav2vec2 python=3.9
+
+conda activate 05_a_wav2vec2
