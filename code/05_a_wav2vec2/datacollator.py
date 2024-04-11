@@ -20,11 +20,6 @@ class DataCollatorCTCWithPadding:
 			gender_cls_labels = [feature["labels"][-2] for feature in features]
 			emotion_cls_labels = [feature["labels"][-3] for feature in features]
 			dialect_cls_labels = [feature["labels"][-4] for feature in features]
-			#age_cls_labels = [feature["labels"][-1] for feature in features]
-			#gender_cls_labels = [feature["labels"][-2] for feature in features]
-			#emotion_cls_labels = [feature["labels"][-3] for feature in features]
-			#dialect_cls_labels = [feature["labels"][-4] for feature in features]
-			#print("Collator age labels: ", age_cls_labels, " gender labels:", gender_cls_labels, "emotion labels:", emotion_cls_labels, "dialect labels:", dialect_cls_labels)
 			
 		batch = self.processor.pad(
 			input_features,
@@ -47,5 +42,4 @@ class DataCollatorCTCWithPadding:
 			ctc_labels = labels_batch["input_ids"].masked_fill(labels_batch.attention_mask.ne(1), -100)
 			batch["labels"] = (ctc_labels, torch.tensor(age_cls_labels), torch.tensor(gender_cls_labels), torch.tensor(emotion_cls_labels), torch.tensor(dialect_cls_labels))
 
-		#print("Collator batch is: ", batch)
 		return batch

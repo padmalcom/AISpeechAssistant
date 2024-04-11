@@ -5,12 +5,14 @@ from tqdm import tqdm
 from pydub import AudioSegment
 from transformers import pipeline
 
-RAW_DATA_FILE = os.path.join('common-voice-16-full','validated.tsv')
-TRAIN_FILE = os.path.join("common-voice-16-full", "train.csv")
-TEST_FILE = os.path.join("common-voice-16-full", "test.csv")
-TEST_TRAIN_RATIO = 8 # every 8th sample goes into test
+BASE_PATH = os.path.join('D:', os.sep, 'Datasets', 'common-voice-16-full')
+RAW_DATA_FILE = os.path.join(BASE_PATH,'shuffled.tsv')
+TRAIN_FILE = os.path.join(BASE_PATH, 'train.csv')
+TEST_FILE = os.path.join(BASE_PATH, 'test.csv')
+TEST_TRAIN_RATIO = 8 # Jeder 8. Datensatz geht in Test
 
-## dialects
+MAX_SAMPLES = 100000
+
 dialect_map = {
   'Amerikanisches Deutsch': 'Amerikanisch',
   'Bayerisch': 'Bayerisch',
@@ -118,10 +120,10 @@ dialect_map = {
   '': 'Deutsch'
 }  
 
-### emotion
-EMOTION_MODEL_NAME = "padmalcom/wav2vec2-large-emotion-detection-german"
+# Emotion über ein externes Modell erkennen
+EMOTION_MODEL_NAME = 'padmalcom/wav2vec2-large-emotion-detection-german'
 emotions = {'anger':0, 'boredom':1, 'disgust':2, 'fear':3, 'happiness':4, 'sadness':5, 'neutral':6}
-audio_classifier = pipeline(task="audio-classification", model=EMOTION_MODEL_NAME)
+audio_classifier = pipeline(task='audio-classification', model=EMOTION_MODEL_NAME)
 
 def emotion(audio_file):
   preds = audio_classifier(audio_file)
@@ -131,22 +133,21 @@ def emotion(audio_file):
   for p in preds:
     if p['score'] > max_score and p['score'] > 0.25:
       max_score = p['score']
-      max_label = emotions[p["label"]]
-      max_label_text = p["label"]
-      print("There is an emotional file:", max_label_text)
+      max_label = emotions[p['label']]
+      max_label_text = p['label']
+      print('There is an emotional file:', max_label_text)
   return max_label_text
 
-### preparation
 def prepare_data():
-  with open(RAW_DATA_FILE, 'r', encoding="utf8") as f:
+  with open(RAW_DATA_FILE, 'r', encoding='utf8') as f:
     row_count = sum(1 for line in f)
-    print("There are", row_count, "rows in the dataset.")
+    print('There are', row_count, 'rows in the dataset.')
   
-  with open(RAW_DATA_FILE, 'r', encoding="utf8") as f:
-    tsv = csv.DictReader(f, delimiter="\t")
+  with open(RAW_DATA_FILE, 'r', encoding='utf8') as f:
+    tsv = csv.DictReader(f, delimiter='\t')
     
-    if not os.path.exists(os.path.join('common-voice-16-full', "wavs")):
-      os.mkdir(os.path.join('common-voice-16-full', "wavs"))
+    if not os.path.exists(os.path.join(BASE_PATH, 'wavs')):
+      os.mkdir(os.path.join(BASE_PATH, 'wavs'))
       
     i = 0
     faulty_lines = 0
@@ -154,10 +155,12 @@ def prepare_data():
     test_file_header_written = False
     test_count = 0
     train_count = 0
-    with open(TRAIN_FILE, 'w', newline='', encoding="utf8") as train_f:
-      with open(TEST_FILE, 'w', newline='', encoding="utf8") as test_f:
+    with open(TRAIN_FILE, 'w', newline='', encoding='utf8') as train_f:
+      with open(TEST_FILE, 'w', newline='', encoding='utf8') as test_f:
         try:
           for line in tqdm(tsv, total=row_count):
+            if i >= MAX_SAMPLES:
+              break              
             formatted_sample = {}
             formatted_sample['file'] = line['path']
             formatted_sample['sentence'] = line['sentence'].translate(str.maketrans('', '', string.punctuation))
@@ -166,22 +169,21 @@ def prepare_data():
             if line['accents'].strip() in dialect_map:
                 formatted_sample['accent'] = dialect_map[line['accents'].strip()]
             else:
-                print("Key not in dict:", line['accents'].strip())
+                print('Key not in dict:', line['accents'].strip())
             
             if (formatted_sample['sentence'] == None or formatted_sample['sentence'] == 'nan' or line['path'] == None or line['sentence'] == None or line['age'] == None or line['gender'] == None or line['accents'] == None or line['path'].strip() == '' or line['sentence'].strip() == '' or line['age'].strip() == '' or line['gender'].strip() == '' or line['accents'].strip() == '' or formatted_sample['sentence'].strip() == ''):
-              #print("Faulty line: ", line)
               faulty_lines += 1
               continue
 
-            mp3FullPath = os.path.join('common-voice-16-full', "clips", line['path'])
+            mp3FullPath = os.path.join(BASE_PATH, 'clips', line['path'])
             filename, _ = os.path.splitext(os.path.basename(mp3FullPath))
             sound = AudioSegment.from_mp3(mp3FullPath)
             if sound.duration_seconds > 0:
                 sound = sound.set_frame_rate(16000)
                 sound = sound.set_channels(1)
-                wav_path = os.path.join('common-voice-16-full', "wavs", filename + ".wav")
-                sound.export(wav_path, format="wav")
-                formatted_sample['file'] = filename + ".wav"
+                wav_path = os.path.join(BASE_PATH, 'wavs', filename + '.wav')
+                sound.export(wav_path, format='wav')
+                formatted_sample['file'] = filename + '.wav'
                 
                 # emotion classification
                 formatted_sample['emotion'] = 'neutral' #emotion(wav_path)
@@ -202,10 +204,9 @@ def prepare_data():
                   train_count += 1
                 i += 1
         except KeyboardInterrupt:
-          print("Keyboard interrupt called. Exiting...")
+          print('Keyboard interrupt called. Exiting...')
         
-        #random.shuffle(data)
-        print("Found", i, "samples.", train_count, "in train and", test_count, "in test.", faulty_lines, "lines were faulty.")
+        print('Found', i, 'samples.', train_count, 'in train and', test_count, 'in test.', faulty_lines, 'lines were faulty.')
     
 if __name__ == '__main__':
   prepare_data()

@@ -47,8 +47,7 @@ if __name__ == "__main__":
 	
 	os.makedirs(training_args.output_dir, exist_ok=True)
 		
-	#base_path = os.path.join("E:", os.sep, "Datasets", "common-voice-12")
-	base_path = os.path.join("common-voice-16-full")
+	base_path = os.path.join('D:', os.sep, 'Datasets', 'common-voice-16-full')
 		
 	# Load dataset
 	dataset = datasets.load_dataset('csv', data_files={'train': os.path.join(base_path, 'train.csv'), 'test': os.path.join(base_path, 'test.csv')},
