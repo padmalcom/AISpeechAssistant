@@ -36,7 +36,6 @@ class DataTrainingArguments:
 @dataclass
 class ModelArguments:
 	model_name_or_path = "facebook/wav2vec2-base"
-	#model_name_or_path = "facebook/wav2vec2-large-xlsr-53"
 	cache_dir = "cache/"
 	freeze_feature_extractor = True
 	alpha = 0.1
@@ -47,14 +46,9 @@ if __name__ == "__main__":
 	
 	os.makedirs(training_args.output_dir, exist_ok=True)
 		
-	base_path = os.path.join('D:', os.sep, 'Datasets', 'common-voice-16-full')
+	base_path = os.path.join('common-voice-16')
 		
-	# Load dataset
-	dataset = datasets.load_dataset('csv', data_files={'train': os.path.join(base_path, 'train.csv'), 'test': os.path.join(base_path, 'test.csv')},
-        cache_dir="G:\\datasets\\")
-	print("Dataset:", dataset)
-	print("Test:", dataset['test'])
-	print("Test0:", dataset['test'][0])
+	dataset = datasets.load_dataset('csv', data_files={'train': os.path.join(base_path, 'train.csv'), 'test': os.path.join(base_path, 'test.csv')}, cache_dir=os.path.join('cache'))
 			
 	german_char_map = {ord('ä'):'ae', ord('ü'):'ue', ord('ö'):'oe', ord('ß'):'ss', ord('Ä'): 'Ae', ord('Ü'):'Ue', ord('Ö'):'Oe'}
 	
@@ -65,18 +59,14 @@ if __name__ == "__main__":
 		
 	dataset = dataset.map(remove_special_characters)
 	
-	# create processor
-	feature_extractor = Wav2Vec2FeatureExtractor(feature_size=1, sampling_rate=16000, padding_value=0.0, do_normalize=True, return_attention_mask=False)
+	feature_extractor = Wav2Vec2FeatureExtractor(feature_size=1, sampling_rate=16000)
 	
-	# create and save tokenizer
 	tokenizer = build_tokenizer(training_args.output_dir, dataset)
 	tokenizer.save_pretrained(os.path.join(training_args.output_dir, "tokenizer"))
 	
-	# create processor
 	processor = Wav2Vec2Processor(feature_extractor=feature_extractor, tokenizer=tokenizer)
 	print("vocab size: ", len(processor.tokenizer))
 		
-	# create label maps and count of each label class	
 	cls_age_label_map = {'teens':0, 'twenties': 1, 'thirties': 2, 'fourties': 3, 'fifties': 4, 'sixties': 5, 'seventies': 6, 'eighties': 7, 'nineties': 8}
 	cls_age_class_weights = [0] * len(cls_age_label_map)
 	
@@ -93,7 +83,6 @@ if __name__ == "__main__":
         'Ruhrdeutsch': 34,'Finnisch': 35,'Fränkisch': 36,'Berlinerisch': 37,'Lettisch': 38,'Niederrheinisch': 39}
 	cls_dialect_class_weights = [0] * len(cls_dialect_label_map)
 	
-	# count label sizes in train to balance classes
 	df = pd.read_csv(os.path.join(base_path, 'train.csv'))
 	
 	df_age_count = df.groupby(['age']).count()
@@ -120,7 +109,6 @@ if __name__ == "__main__":
 			cls_dialect_class_weights[index] = 1 - (df_dialect_count.loc[k]['file'] / df.size)
 	print("Dialect label weights:", cls_dialect_class_weights)
 	
-	# Load model
 	model = Wav2Vec2ForCTCnCLS.from_pretrained(
 		model_args.model_name_or_path,
 		cache_dir=model_args.cache_dir,
@@ -137,7 +125,6 @@ if __name__ == "__main__":
 		alpha=model_args.alpha,
 	)
 	
-	# load metrics
 	wer_metric = evaluate.load("wer")
 	
 	# preprocess data

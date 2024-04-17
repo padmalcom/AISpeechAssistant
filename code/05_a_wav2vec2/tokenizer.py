@@ -16,19 +16,12 @@ def build_tokenizer(model_output_dir, dataset):
 		num_proc=1
 	)
 	
-	print("VOCAB TRAIN:", vocab_train)
-
 	special_vocab_dict = {"<pad>": 0, "<s>": 1, "</s>": 2, "<unk>": 3, "|": 4}
 
-	min_char_occurrence = 1
+    vocab_list = set(vocab_train["all_text"][0])
 
-	if min_char_occurrence > 1:
-		character_counter = collections.Counter(vocab_train["all_text"][0])
-		vocab_list = [character for character, count in character_counter.items() if count >= min_char_occurrence]
-	else:
-		vocab_list = set(vocab_train["all_text"][0])
-
-	vocab_list = [x for x in vocab_list if x.isalpha() or x in ["-", "'"]] # removing non-alpha (except - or ') characters
+    # Behalte alle Buchstaben (a-zA-Z), Bindestriche und Anführungszeichen
+	vocab_list = [x for x in vocab_list if x.isalpha() or x in ["-", "\""]]
 
 	vocab_list = sorted(vocab_list)
 	vocab_dict = {v: k + len(special_vocab_dict) for k, v in enumerate(vocab_list)}

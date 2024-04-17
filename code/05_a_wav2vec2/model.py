@@ -29,14 +29,11 @@ class Wav2Vec2ForCTCnCLS(Wav2Vec2PreTrainedModel):
 		loss = None
 		if labels is not None:
 
-			# retrieve loss input_lengths from attention_mask
 			attention_mask = (
 				attention_mask if attention_mask is not None else torch.ones_like(input_values, dtype=torch.long)
 			)
 			input_lengths = self._get_feat_extract_output_lengths(attention_mask.sum(-1))
 
-			# assuming that padded tokens are filled with -100
-			# when not being attended to
 			labels_mask = labels >= 0
 			target_lengths = labels_mask.sum(-1)
 			flattened_targets = labels.masked_select(labels_mask)
@@ -56,8 +53,7 @@ class Wav2Vec2ForCTCnCLS(Wav2Vec2PreTrainedModel):
 
 		return loss
 
-	# use this function for all classification tasks
-	def _cls_loss(self, logits, cls_labels, cls_weights): # sum hidden_states over dim 1 (the sequence length), then feed into self.cls
+	def _cls_loss(self, logits, cls_labels, cls_weights):
 		loss = None
 		if cls_labels is not None:
 			loss = F.cross_entropy(logits, cls_labels.to(logits.device), weight=torch.tensor(cls_weights, device=logits.device, dtype=torch.float))
@@ -71,7 +67,7 @@ class Wav2Vec2ForCTCnCLS(Wav2Vec2PreTrainedModel):
 		output_attentions=None,
 		output_hidden_states=None,
 		return_dict=None,
-		labels=None, # tuple: (ctc_labels, age_cls_labels, gender_cls_labels), shape=(batch_size, target_length)
+		labels=None
 		):
 
 		return_dict = return_dict if return_dict is not None else self.config.use_return_dict
@@ -95,9 +91,6 @@ class Wav2Vec2ForCTCnCLS(Wav2Vec2PreTrainedModel):
 		
 		loss = None
 		if labels is not None:
-			#print("labels in forward:", "label1 (age):", labels[1], "label2 (gender):", labels[2], "label3 (emotion):", labels[3], "label4 (dialect):", labels[4])
-			
-			#print("logits gender:", logits_gender_cls, "gender weights:", self.gender_cls_weights)
 			loss_ctc = self._ctc_loss(logits_ctc, labels[0], input_values, attention_mask)
 			loss_age_cls = self._cls_loss(logits_age_cls, labels[1], self.age_cls_weights)
 			loss_gender_cls = self._cls_loss(logits_gender_cls, labels[2], self.gender_cls_weights)				

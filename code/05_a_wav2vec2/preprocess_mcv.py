@@ -5,7 +5,7 @@ from tqdm import tqdm
 from pydub import AudioSegment
 from transformers import pipeline
 
-BASE_PATH = os.path.join('D:', os.sep, 'Datasets', 'common-voice-16-full')
+BASE_PATH = os.path.join('common-voice-16')
 RAW_DATA_FILE = os.path.join(BASE_PATH,'shuffled.tsv')
 TRAIN_FILE = os.path.join(BASE_PATH, 'train.csv')
 TEST_FILE = os.path.join(BASE_PATH, 'test.csv')
